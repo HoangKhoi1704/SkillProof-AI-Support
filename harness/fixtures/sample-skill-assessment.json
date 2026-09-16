@@ -1,0 +1,9 @@
+{
+    "competency": "SQL / Database",
+    "level": "Intermediate",
+    "reason": "The answer identifies indexing and execution-plan analysis.",
+    "evidence": [
+        "mentions indexes",
+        "mentions execution plans"
+    ]
+}

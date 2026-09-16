@@ -1,0 +1,12 @@
+[
+  {
+    "id": "backend-developer",
+    "name": "Backend Developer",
+    "description": "Designs, builds, and maintains server-side logic, APIs, and databases."
+  },
+  {
+    "id": "financial-analyst",
+    "name": "Financial Analyst",
+    "description": "Analyzes financial data, builds financial models, and forecasts business performance."
+  }
+]

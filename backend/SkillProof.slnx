@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SkillProof.Api.Tests/SkillProof.Api.Tests.csproj" />
+  <Project Path="SkillProof.Api/SkillProof.Api.csproj" />
+</Solution>

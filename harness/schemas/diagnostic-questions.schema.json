@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DiagnosticQuestionsResponse",
+  "description": "Schema for public diagnostic questions returned by GET /api/diagnostics/questions (rubrics excluded)",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "careerRoleId", "competency", "type", "questionText", "sourceType", "sourceReference"],
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "integer",
+        "description": "Unique integer identifier of the question"
+      },
+      "careerRoleId": {
+        "type": "string",
+        "enum": ["backend-developer", "financial-analyst"],
+        "description": "Role string slug"
+      },
+      "competency": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Evaluated competency name"
+      },
+      "type": {
+        "type": "string",
+        "enum": ["knowledge", "interview", "practical_case", "reasoning"],
+        "description": "Question pedagogical classification"
+      },
+      "questionText": {
+        "type": "string",
+        "minLength": 10,
+        "description": "The realistic interview or case scenario prompt"
+      },
+      "sourceType": {
+        "type": "string",
+        "enum": ["team_curated", "public_interview_resource", "company_interview_source"],
+        "description": "Origin classification of the question"
+      },
+      "sourceReference": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Verifiable source URL or explicit unverified attribution tag"
+      }
+    }
+  }
+}

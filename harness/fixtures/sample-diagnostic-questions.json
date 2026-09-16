@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "careerRoleId": "backend-developer",
+    "competency": "REST API",
+    "type": "interview",
+    "questionText": "Explain the difference between PUT and PATCH in REST API design. In what real-world scenarios would you choose one over the other, and what idempotency considerations apply?",
+    "sourceType": "team_curated",
+    "sourceReference": "[standard interview pattern - unverified]"
+  },
+  {
+    "id": 2,
+    "careerRoleId": "backend-developer",
+    "competency": "SQL / Database",
+    "type": "practical_case",
+    "questionText": "A production relational database query joining an Orders table (10 million rows) and an OrderItems table (40 million rows) has become extremely slow when filtering by CustomerId and OrderDate. How would you diagnose the bottleneck and what indexing or schema optimizations would you investigate?",
+    "sourceType": "team_curated",
+    "sourceReference": "[standard interview pattern - unverified]"
+  },
+  {
+    "id": 3,
+    "careerRoleId": "backend-developer",
+    "competency": "Testing",
+    "type": "interview",
+    "questionText": "When writing automated unit tests for an API service that charges customer payments through a third-party gateway, how do you isolate dependencies, and what positive, negative, and edge test cases would you write?",
+    "sourceType": "team_curated",
+    "sourceReference": "[standard interview pattern - unverified]"
+  },
+  {
+    "id": 4,
+    "careerRoleId": "backend-developer",
+    "competency": "System Design",
+    "type": "reasoning",
+    "questionText": "You need to design a backend rate-limiting mechanism to prevent abusive clients from degrading API availability. What architectural approach would you take, where would rate-limit state be stored, and how would you handle distributed instances?",
+    "sourceType": "team_curated",
+    "sourceReference": "[standard interview pattern - unverified]"
+  },
+  {
+    "id": 5,
+    "careerRoleId": "backend-developer",
+    "competency": "Authentication",
+    "type": "knowledge",
+    "questionText": "Explain how stateless JWT (JSON Web Token) authentication works in an API, how claims are verified, and how you would handle token revocation or user logout before expiration.",
+    "sourceType": "team_curated",
+    "sourceReference": "[standard interview pattern - unverified]"
+  },
+  {
+    "id": 6,
+    "careerRoleId": "backend-developer",
+    "competency": "Programming Fundamentals",
+    "type": "practical_case",
+    "questionText": "Consider a background task that processes a collection of 50,000 records. Describe how you would manage memory allocation, asynchronous I/O, and cancellation if the user or orchestrator requests a shutdown mid-processing.",
+    "sourceType": "team_curated",
+    "sourceReference": "[standard interview pattern - unverified]"
+  }
+]
