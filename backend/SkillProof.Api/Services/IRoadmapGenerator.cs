@@ -8,4 +8,10 @@ public interface IRoadmapGenerator
         GenerateRoadmapRequest request,
         CancellationToken cancellationToken = default
     );
+
+    Task<RoadmapResponse> GenerateFromHandoffAsync(
+        RoadmapHandoffContract handoff,
+        string? sessionId = null,
+        CancellationToken cancellationToken = default
+    );
 }

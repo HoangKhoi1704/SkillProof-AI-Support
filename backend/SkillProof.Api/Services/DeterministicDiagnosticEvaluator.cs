@@ -20,43 +20,115 @@ public class DeterministicDiagnosticEvaluator : IDiagnosticEvaluator
     {
         var normalizedRoleId = roleId.Trim().ToLowerInvariant();
 
-        var roleQuestions = SeedData.Questions
-            .Where(q => q.CareerRoleId.Equals(normalizedRoleId, StringComparison.OrdinalIgnoreCase))
-            .ToList();
-
         var answersByQuestionId = submissions
             .GroupBy(a => a.QuestionId)
-            .ToDictionary(g => g.Key, g => g.Last().Answer);
+            .ToDictionary(g => g.Key, g => g.Last().Answer, StringComparer.OrdinalIgnoreCase);
 
         var skillEvaluations = new List<SkillEvaluationItem>();
 
-        foreach (var q in roleQuestions)
+        var isDynamicSqlite = submissions.Any(s => s.QuestionId.StartsWith("q-be-", StringComparison.OrdinalIgnoreCase));
+
+        if (isDynamicSqlite && normalizedRoleId == "backend-developer")
         {
-            answersByQuestionId.TryGetValue(q.Id, out var rawAnswer);
-            var trimmedAnswer = rawAnswer?.Trim() ?? string.Empty;
-
-            // Empty or unusable answers produce Insufficient Evidence
-            if (string.IsNullOrWhiteSpace(trimmedAnswer) || trimmedAnswer.Length < 15)
+            foreach (var sub in submissions)
             {
-                skillEvaluations.Add(new SkillEvaluationItem(
-                    q.Competency,
-                    "Insufficient Evidence",
-                    $"The answer submitted for {q.Competency} is empty or lacks sufficient technical explanation to assess competence.",
-                    new List<string>()
-                ));
-                continue;
+                var (competency, legacyId) = ResolveCompetencyFromSqliteId(sub.QuestionId);
+                var rawAnswer = sub.Answer?.Trim() ?? string.Empty;
+
+                if (string.IsNullOrWhiteSpace(rawAnswer) || rawAnswer.Length < 15)
+                {
+                    skillEvaluations.Add(new SkillEvaluationItem(
+                        competency,
+                        "Insufficient Evidence",
+                        $"The answer submitted for {competency} is empty or lacks sufficient technical explanation to assess competence.",
+                        new List<string>()
+                    ));
+                    continue;
+                }
+
+                var (level, reason, evidence) = EvaluateSubstantiveAnswer(normalizedRoleId, legacyId, competency, rawAnswer);
+                var safeLevel = ApprovedLevels.Contains(level) ? level : "Insufficient Evidence";
+                skillEvaluations.Add(new SkillEvaluationItem(competency, safeLevel, reason, evidence));
             }
+        }
+        else
+        {
+            var roleQuestions = SeedData.Questions
+                .Where(q => q.CareerRoleId.Equals(normalizedRoleId, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-            var (level, reason, evidence) = EvaluateSubstantiveAnswer(normalizedRoleId, q.Id, q.Competency, trimmedAnswer);
+            foreach (var q in roleQuestions)
+            {
+                var key = q.Id.ToString();
+                answersByQuestionId.TryGetValue(key, out var rawAnswer);
+                var trimmedAnswer = rawAnswer?.Trim() ?? string.Empty;
 
-            // Safety guardrail: enforce approved levels strictly
-            var safeLevel = ApprovedLevels.Contains(level) ? level : "Insufficient Evidence";
-            skillEvaluations.Add(new SkillEvaluationItem(q.Competency, safeLevel, reason, evidence));
+                if (string.IsNullOrWhiteSpace(trimmedAnswer) || trimmedAnswer.Length < 15)
+                {
+                    skillEvaluations.Add(new SkillEvaluationItem(
+                        q.Competency,
+                        "Insufficient Evidence",
+                        $"The answer submitted for {q.Competency} is empty or lacks sufficient technical explanation to assess competence.",
+                        new List<string>()
+                    ));
+                    continue;
+                }
+
+                var (level, reason, evidence) = EvaluateSubstantiveAnswer(normalizedRoleId, q.Id, q.Competency, trimmedAnswer);
+                var safeLevel = ApprovedLevels.Contains(level) ? level : "Insufficient Evidence";
+                skillEvaluations.Add(new SkillEvaluationItem(q.Competency, safeLevel, reason, evidence));
+            }
         }
 
         var topGaps = CalculateTopGaps(skillEvaluations);
-
         return Task.FromResult(new EvaluationResponse(normalizedRoleId, skillEvaluations, topGaps));
+    }
+
+    public static (string Level, string Reason, List<string> Evidence) EvaluateSingleAnswer(
+        string roleId,
+        string questionId,
+        string answer)
+    {
+        var normalizedRoleId = roleId.Trim().ToLowerInvariant();
+        var rawAnswer = answer?.Trim() ?? string.Empty;
+
+        var (competency, legacyId) = ResolveCompetencyFromSqliteId(questionId);
+
+        if (string.IsNullOrWhiteSpace(rawAnswer) || rawAnswer.Length < 15)
+        {
+            return (
+                "Insufficient Evidence",
+                $"The answer submitted for {competency} is empty or lacks sufficient technical explanation to assess competence.",
+                new List<string>()
+            );
+        }
+
+        var (level, reason, evidence) = EvaluateSubstantiveAnswer(normalizedRoleId, legacyId, competency, rawAnswer);
+        var safeLevel = ApprovedLevels.Contains(level) ? level : "Insufficient Evidence";
+        return (safeLevel, reason, evidence);
+    }
+
+    public static (string Competency, int LegacyId) ResolveCompetencyFromSqliteId(string questionId)
+    {
+        var id = questionId.ToLowerInvariant();
+        if (id.Contains("-prog-")) return ("Programming Fundamentals", 6);
+        if (id.Contains("-rest-")) return ("REST API", 1);
+        if (id.Contains("-sql-")) return ("SQL / Database", 2);
+        if (id.Contains("-test-")) return ("Testing", 3);
+        if (id.Contains("-sec-") || id.Contains("-auth-")) return ("Authentication", 5);
+        if (id.Contains("-sys-")) return ("System Design", 4);
+        if (id.Contains("-nosql-")) return ("NoSQL Databases", 13);
+        if (id.Contains("-cache-")) return ("Caching & Performance", 14);
+        if (id.Contains("-cs-")) return ("C# / .NET", 15);
+        if (id.Contains("-java-")) return ("Java", 16);
+        if (id.Contains("-py-")) return ("Python", 17);
+        if (id.Contains("-cpp-")) return ("C++", 18);
+        if (id.Contains("-js-")) return ("JavaScript", 19);
+        if (id.Contains("-ts-")) return ("TypeScript", 20);
+        if (id.Contains("-go-")) return ("Go", 21);
+        if (id.Contains("-rust-")) return ("Rust", 22);
+
+        return (questionId, 1);
     }
 
     public static List<string> CalculateTopGaps(IReadOnlyList<SkillEvaluationItem> skills)
@@ -136,6 +208,76 @@ public class DeterministicDiagnosticEvaluator : IDiagnosticEvaluator
                         "Intermediate",
                         "Demonstrates understanding of asynchronous pipelines, memory management, and cancellation token propagation.",
                         new List<string> { "Mentions async/await and CancellationToken" }
+                    );
+
+                case 13: // NoSQL Databases
+                    return (
+                        "Intermediate",
+                        "Demonstrates solid understanding of document store modeling, denormalization, and CAP theorem consistency trade-offs.",
+                        new List<string> { "Explained document modeling vs normalized schemas", "Addressed consistency and access pattern trade-offs" }
+                    );
+
+                case 14: // Caching & Performance
+                    return (
+                        "Intermediate",
+                        "Explains cache-aside pattern, TTL invalidation, cache stampede mitigation, and eviction policies.",
+                        new List<string> { "Identified cache-aside pattern and stampede mitigation", "Addressed distributed caching invalidation trade-offs" }
+                    );
+
+                case 15: // C# / .NET
+                    return (
+                        "Intermediate",
+                        "Demonstrates practical .NET backend implementation proficiency, memory management, and asynchronous execution.",
+                        new List<string> { "Applied .NET runtime constructs effectively", "Addressed async/await and dependency injection lifetimes" }
+                    );
+
+                case 16: // Java
+                    return (
+                        "Intermediate",
+                        "Demonstrates practical JVM backend implementation proficiency, Spring Boot concepts, and concurrency patterns.",
+                        new List<string> { "Applied Java/Spring backend patterns effectively", "Addressed JVM threading and transaction boundaries" }
+                    );
+
+                case 17: // Python
+                    return (
+                        "Intermediate",
+                        "Demonstrates practical Python backend implementation proficiency using FastAPI/AsyncIO and GIL considerations.",
+                        new List<string> { "Applied async Python constructs effectively", "Addressed GIL limitations and multiprocessing strategies" }
+                    );
+
+                case 18: // C++
+                    return (
+                        "Intermediate",
+                        "Demonstrates deterministic memory management with RAII, smart pointers, and concurrency synchronization.",
+                        new List<string> { "Applied modern C++ memory management (unique_ptr, RAII)", "Addressed thread synchronization and data race safety" }
+                    );
+
+                case 19: // JavaScript
+                    return (
+                        "Intermediate",
+                        "Demonstrates mastery of the Node.js event loop, asynchronous I/O, streams, and backpressure handling.",
+                        new List<string> { "Explained event loop microtask vs macrotask execution", "Addressed stream backpressure and event loop starvation" }
+                    );
+
+                case 20: // TypeScript
+                    return (
+                        "Intermediate",
+                        "Demonstrates advanced structural typing, conditional types, and runtime schema validation with Zod.",
+                        new List<string> { "Utilized advanced TypeScript generic and mapped types", "Addressed type erasure with runtime schema validation" }
+                    );
+
+                case 21: // Go
+                    return (
+                        "Intermediate",
+                        "Demonstrates effective Go concurrency with goroutines, channels, context cancellation, and CSP patterns.",
+                        new List<string> { "Applied goroutines and channel worker pool patterns", "Addressed context cancellation and goroutine leak prevention" }
+                    );
+
+                case 22: // Rust
+                    return (
+                        "Intermediate",
+                        "Demonstrates memory safety through ownership and borrowing, Tokio asynchronous tasks, and thread safety.",
+                        new List<string> { "Applied Rust ownership and borrow checker rules", "Addressed async Tokio tasks with Arc and async Mutex" }
                     );
             }
         }

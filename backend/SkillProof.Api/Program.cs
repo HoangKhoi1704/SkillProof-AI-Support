@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SkillProof.Api.Data.Catalog;
 using SkillProof.Api.Models;
 using SkillProof.Api.Services;
 
@@ -6,6 +8,25 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to DI
 builder.Services.AddOpenApi();
+
+// Register SQLite Catalog DbContext & Services
+var connectionString = builder.Configuration.GetConnectionString("SkillProofCatalog") ?? "Data Source=skillproof_catalog.db";
+builder.Services.AddDbContext<CatalogDbContext>(options =>
+{
+    options.UseSqlite(connectionString);
+});
+builder.Services.AddScoped<ICatalogSeeder, CatalogSeeder>();
+builder.Services.AddScoped<ICatalogService, CatalogService>();
+
+// Register Developer AI Inspector Services
+builder.Services.AddSingleton<IAiDiagnosticTraceStore, AiDiagnosticTraceStore>();
+builder.Services.AddScoped<IDevAiInspectorService, DevAiInspectorService>();
+
+// Register Adaptive Diagnostic Services
+builder.Services.AddSingleton<IAdaptiveDiagnosticEngine, AdaptiveDiagnosticEngine>();
+builder.Services.AddSingleton<IAdaptiveSessionStore, AdaptiveSessionStore>();
+builder.Services.AddSingleton<IAdaptiveProfileBuilder, AdaptiveProfileBuilder>();
+builder.Services.AddScoped<IAdaptiveDiagnosticService, AdaptiveDiagnosticService>();
 
 // Register Diagnostic Evaluators
 builder.Services.AddSingleton<DeterministicDiagnosticEvaluator>();
@@ -73,7 +94,29 @@ builder.Services.AddSingleton<IProjectRecommender>(sp =>
     return fallback;
 });
 
-builder.Services.AddSingleton<IQuestionService, QuestionService>();
+// Register Project Evaluators
+builder.Services.AddSingleton<DeterministicProjectEvaluator>();
+builder.Services.AddSingleton<IProjectEvaluator>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    var logger = sp.GetRequiredService<ILogger<OpenAiProjectEvaluator>>();
+    var fallback = sp.GetRequiredService<DeterministicProjectEvaluator>();
+
+    var apiKey = config["OpenAI:ApiKey"];
+    var model = config["OpenAI:Model"] ?? "gpt-5.4-mini";
+
+    var isLiveAiDisabled = string.Equals(Environment.GetEnvironmentVariable("DISABLE_LIVE_AI"), "true", StringComparison.OrdinalIgnoreCase) ||
+                           string.Equals(config["OpenAI:LiveEvaluationEnabled"], "false", StringComparison.OrdinalIgnoreCase);
+
+    if (!isLiveAiDisabled && !string.IsNullOrWhiteSpace(apiKey))
+    {
+        return new OpenAiProjectEvaluator(apiKey, model, fallback, logger);
+    }
+
+    return fallback;
+});
+
+builder.Services.AddScoped<IQuestionService, QuestionService>();
 
 // Enable CORS for Next.js frontend
 const string CorsPolicy = "AllowFrontend";
@@ -96,6 +139,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors(CorsPolicy);
+
+// Initialize & seed SQLite catalog automatically
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<ICatalogSeeder>();
+    await seeder.InitializeAsync();
+}
 
 // Canonical MVP Endpoints
 
@@ -132,6 +182,239 @@ app.MapGet("/api/diagnostics/questions", ([FromQuery] string? roleId, IQuestionS
 .WithName("GetDiagnosticQuestions")
 .WithSummary("Retrieve curated career-readiness questions (rubrics excluded)");
 
+// 2b. POST /api/diagnostics/questions/select (Dynamic SQLite Question Selection)
+app.MapPost("/api/diagnostics/questions/select", async ([FromBody] DynamicQuestionSelectionRequest request, ICatalogService catalogService, CancellationToken cancellationToken) =>
+{
+    var (success, response, errorCode, errorMessage) = await catalogService.SelectQuestionsAsync(request, cancellationToken);
+    if (!success || response == null)
+    {
+        if (errorCode == "NOT_FOUND")
+        {
+            return Results.NotFound(new ErrorResponse(new ErrorDetail(errorCode, errorMessage ?? "Resource not found.")));
+        }
+        return Results.BadRequest(new ErrorResponse(new ErrorDetail(errorCode ?? "VALIDATION_ERROR", errorMessage ?? "Invalid question selection request.")));
+    }
+
+    return Results.Ok(response);
+})
+.WithName("SelectDiagnosticQuestions")
+.WithSummary("Select dynamic assessment questions from SQLite based on user skill selection");
+
+// 2c. POST /api/diagnostics/adaptive/sessions (Adaptive Career Readiness Diagnostic Session Start)
+app.MapPost("/api/diagnostics/adaptive/sessions", async ([FromBody] AdaptiveSessionRequest request, IAdaptiveDiagnosticService adaptiveService, CancellationToken cancellationToken) =>
+{
+    var (success, response, errorCode, errorMessage) = await adaptiveService.StartSessionAsync(request, cancellationToken);
+    if (!success || response == null)
+    {
+        if (errorCode == "NOT_FOUND")
+        {
+            return Results.NotFound(new ErrorResponse(new ErrorDetail(errorCode, errorMessage ?? "Resource not found.")));
+        }
+        return Results.BadRequest(new ErrorResponse(new ErrorDetail(errorCode ?? "VALIDATION_ERROR", errorMessage ?? "Invalid adaptive session request.")));
+    }
+
+    return Results.Ok(response);
+})
+.WithName("StartAdaptiveSession")
+.WithSummary("Start an adaptive career readiness diagnostic session");
+
+// 2d. POST /api/diagnostics/adaptive/sessions/{sessionId}/answers (Adaptive Answer Submission)
+app.MapPost("/api/diagnostics/adaptive/sessions/{sessionId}/answers", async (string sessionId, [FromBody] AdaptiveAnswerRequest request, IAdaptiveDiagnosticService adaptiveService, CancellationToken cancellationToken) =>
+{
+    var (success, response, errorCode, errorMessage) = await adaptiveService.SubmitAnswerAsync(sessionId, request, cancellationToken);
+    if (!success || response == null)
+    {
+        if (errorCode == "SESSION_NOT_FOUND")
+        {
+            return Results.NotFound(new ErrorResponse(new ErrorDetail(errorCode, errorMessage ?? "Session not found.")));
+        }
+        return Results.BadRequest(new ErrorResponse(new ErrorDetail(errorCode ?? "VALIDATION_ERROR", errorMessage ?? "Invalid answer submission.")));
+    }
+
+    return Results.Ok(response);
+})
+.WithName("SubmitAdaptiveAnswer")
+.WithSummary("Submit an answer in an adaptive diagnostic session and trigger branch or completion");
+
+// 2e. GET /api/diagnostics/adaptive/sessions/{sessionId} (Get Adaptive Session State)
+app.MapGet("/api/diagnostics/adaptive/sessions/{sessionId}", async (string sessionId, IAdaptiveDiagnosticService adaptiveService, CancellationToken cancellationToken) =>
+{
+    var (success, response, errorCode, errorMessage) = await adaptiveService.GetSessionAsync(sessionId, cancellationToken);
+    if (!success || response == null)
+    {
+        return Results.NotFound(new ErrorResponse(new ErrorDetail(errorCode ?? "SESSION_NOT_FOUND", errorMessage ?? "Session not found.")));
+    }
+
+    return Results.Ok(response);
+})
+.WithName("GetAdaptiveSession")
+.WithSummary("Retrieve current state of an adaptive diagnostic session");
+
+// 2f. GET /api/diagnostics/adaptive/sessions/{sessionId}/profile (Get Career Readiness Profile)
+app.MapGet("/api/diagnostics/adaptive/sessions/{sessionId}/profile", async (string sessionId, IAdaptiveDiagnosticService adaptiveService, CancellationToken cancellationToken) =>
+{
+    var (success, profile, errorCode, errorMessage) = await adaptiveService.GetProfileAsync(sessionId, cancellationToken);
+    if (!success || profile == null)
+    {
+        if (errorCode == "SESSION_IN_PROGRESS")
+        {
+            return Results.BadRequest(new ErrorResponse(new ErrorDetail(errorCode, errorMessage ?? "Diagnostic session is still in progress.")));
+        }
+        return Results.NotFound(new ErrorResponse(new ErrorDetail(errorCode ?? "SESSION_NOT_FOUND", errorMessage ?? "Session not found.")));
+    }
+
+    return Results.Ok(profile);
+})
+.WithName("GetAdaptiveProfile")
+.WithSummary("Retrieve normalized career readiness profile and gap analysis for completed adaptive diagnostic session");
+
+// 2g. POST /api/diagnostics/adaptive/sessions/{sessionId}/roadmap (Generate Personalized Roadmap from Profile Handoff)
+app.MapPost("/api/diagnostics/adaptive/sessions/{sessionId}/roadmap", async (string sessionId, IAdaptiveDiagnosticService adaptiveService, IAdaptiveSessionStore sessionStore, IRoadmapGenerator roadmapGenerator, CancellationToken cancellationToken) =>
+{
+    var (success, profile, errorCode, errorMessage) = await adaptiveService.GetProfileAsync(sessionId, cancellationToken);
+    if (!success || profile == null)
+    {
+        if (errorCode == "SESSION_IN_PROGRESS")
+        {
+            return Results.BadRequest(new ErrorResponse(new ErrorDetail(errorCode, errorMessage ?? "Diagnostic session is still in progress.")));
+        }
+        return Results.NotFound(new ErrorResponse(new ErrorDetail(errorCode ?? "SESSION_NOT_FOUND", errorMessage ?? "Session not found.")));
+    }
+
+    var roadmap = await roadmapGenerator.GenerateFromHandoffAsync(profile.RoadmapInput, sessionId, cancellationToken);
+    if (sessionStore.TryGetSession(sessionId, out var sState) && sState != null)
+    {
+        sState.Roadmap = roadmap;
+        sessionStore.UpdateSession(sState);
+    }
+    return Results.Ok(roadmap);
+})
+.WithName("GenerateAdaptiveRoadmap")
+.WithSummary("Generate a personalized learning roadmap from an adaptive session's trusted profile handoff");
+
+// 2h. POST /api/diagnostics/adaptive/sessions/{sessionId}/project/recommend (Generate Gap-Based Project from Trusted Roadmap)
+app.MapPost("/api/diagnostics/adaptive/sessions/{sessionId}/project/recommend", async (
+    string sessionId,
+    IAdaptiveDiagnosticService adaptiveService,
+    IAdaptiveSessionStore sessionStore,
+    IRoadmapGenerator roadmapGenerator,
+    IProjectRecommender projectRecommender,
+    CancellationToken cancellationToken) =>
+{
+    var (success, profile, errorCode, errorMessage) = await adaptiveService.GetProfileAsync(sessionId, cancellationToken);
+    if (!success || profile == null)
+    {
+        if (errorCode == "SESSION_IN_PROGRESS")
+        {
+            return Results.BadRequest(new ErrorResponse(new ErrorDetail(errorCode, errorMessage ?? "Diagnostic session is still in progress.")));
+        }
+        return Results.NotFound(new ErrorResponse(new ErrorDetail(errorCode ?? "SESSION_NOT_FOUND", errorMessage ?? "Session not found.")));
+    }
+
+    if (!sessionStore.TryGetSession(sessionId, out var sessionState) || sessionState == null)
+    {
+        return Results.NotFound(new ErrorResponse(new ErrorDetail("SESSION_NOT_FOUND", "Adaptive session not found.")));
+    }
+
+    // Resolve or generate Roadmap
+    if (sessionState.Roadmap == null)
+    {
+        sessionState.Roadmap = await roadmapGenerator.GenerateFromHandoffAsync(profile.RoadmapInput, sessionId, cancellationToken);
+    }
+
+    var projectContext = sessionState.Roadmap.ProjectContext;
+    if (projectContext == null || projectContext.TargetSkills.Count == 0)
+    {
+        var targets = sessionState.Roadmap.Items.Select(i => new ProjectGapTargetSkill(
+            SkillId: i.SkillId ?? i.Skill.ToLowerInvariant(),
+            CurrentLevel: i.CurrentLevel ?? "Intermediate",
+            TargetArea: i.TargetArea ?? i.Skill,
+            PracticeTask: i.PracticeTask,
+            EvidenceTarget: i.EvidenceTarget ?? "Technical implementation and documentation"
+        )).ToList();
+        projectContext = new ProjectGapContext(sessionState.RoleId, targets);
+    }
+
+    var project = await projectRecommender.RecommendGapBasedAsync(projectContext, cancellationToken);
+    sessionState.Project = project;
+    sessionStore.UpdateSession(sessionState);
+
+    return Results.Ok(project);
+})
+.WithName("RecommendAdaptiveProject")
+.WithSummary("Recommend a focused gap-based real-world project engineered from trusted adaptive profile gaps");
+
+// 2i. POST /api/diagnostics/adaptive/sessions/{sessionId}/project/submit (Submit Project Evidence & Evaluate)
+app.MapPost("/api/diagnostics/adaptive/sessions/{sessionId}/project/submit", async (
+    string sessionId,
+    [FromBody] SubmitProjectEvidenceRequest request,
+    IAdaptiveSessionStore sessionStore,
+    IProjectEvaluator projectEvaluator,
+    CancellationToken cancellationToken) =>
+{
+    if (request == null)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorDetail(
+            "VALIDATION_ERROR",
+            "Evidence submission request cannot be empty."
+        )));
+    }
+
+    if (!sessionStore.TryGetSession(sessionId, out var sessionState) || sessionState == null)
+    {
+        return Results.NotFound(new ErrorResponse(new ErrorDetail(
+            "SESSION_NOT_FOUND",
+            $"Adaptive session '{sessionId}' was not found."
+        )));
+    }
+
+    if (sessionState.Project == null)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorDetail(
+            "PROJECT_NOT_RECOMMENDED",
+            "A gap-based project must be recommended before submitting evidence."
+        )));
+    }
+
+    var evaluation = await projectEvaluator.EvaluateAsync(sessionState.Project, request, cancellationToken);
+    sessionState.ProjectEvaluation = evaluation;
+    sessionStore.UpdateSession(sessionState);
+
+    return Results.Ok(evaluation);
+})
+.WithName("SubmitAdaptiveProjectEvidence")
+.WithSummary("Submit project evidence and receive qualitative evaluation and portfolio proof");
+
+// 2j. GET /api/diagnostics/adaptive/sessions/{sessionId}/project (Retrieve Project & Evaluation)
+app.MapGet("/api/diagnostics/adaptive/sessions/{sessionId}/project", (
+    string sessionId,
+    IAdaptiveSessionStore sessionStore) =>
+{
+    if (!sessionStore.TryGetSession(sessionId, out var sessionState) || sessionState == null)
+    {
+        return Results.NotFound(new ErrorResponse(new ErrorDetail(
+            "SESSION_NOT_FOUND",
+            $"Adaptive session '{sessionId}' was not found."
+        )));
+    }
+
+    if (sessionState.Project == null)
+    {
+        return Results.NotFound(new ErrorResponse(new ErrorDetail(
+            "PROJECT_NOT_FOUND",
+            "No project has been recommended for this session yet."
+        )));
+    }
+
+    return Results.Ok(new
+    {
+        Project = sessionState.Project,
+        Evaluation = sessionState.ProjectEvaluation
+    });
+})
+.WithName("GetAdaptiveProject")
+.WithSummary("Retrieve recommended gap-based project and evaluation for an adaptive session");
+
 // 3. POST /api/diagnostics/evaluate
 app.MapPost("/api/diagnostics/evaluate", async ([FromBody] EvaluationRequest request, IQuestionService questionService, CancellationToken cancellationToken) =>
 {
@@ -150,7 +433,11 @@ app.MapPost("/api/diagnostics/evaluate", async ([FromBody] EvaluationRequest req
 .WithSummary("Evaluate diagnostic answers and return qualitative skill profile with top gaps");
 
 // 4. POST /api/roadmaps/generate
-app.MapPost("/api/roadmaps/generate", async ([FromBody] GenerateRoadmapRequest request, IRoadmapGenerator roadmapGenerator, CancellationToken cancellationToken) =>
+app.MapPost("/api/roadmaps/generate", async (
+    [FromBody] GenerateRoadmapRequest request,
+    IRoadmapGenerator roadmapGenerator,
+    IAdaptiveDiagnosticService adaptiveService,
+    CancellationToken cancellationToken) =>
 {
     if (request == null)
     {
@@ -158,6 +445,23 @@ app.MapPost("/api/roadmaps/generate", async ([FromBody] GenerateRoadmapRequest r
             "VALIDATION_ERROR",
             "Request body cannot be empty."
         )));
+    }
+
+    // If SessionId is provided, resolve trusted server-side handoff from Adaptive session
+    if (!string.IsNullOrWhiteSpace(request.SessionId))
+    {
+        var (success, profile, errorCode, errorMessage) = await adaptiveService.GetProfileAsync(request.SessionId, cancellationToken);
+        if (!success || profile == null)
+        {
+            if (errorCode == "SESSION_IN_PROGRESS")
+            {
+                return Results.BadRequest(new ErrorResponse(new ErrorDetail(errorCode, errorMessage ?? "Diagnostic session is still in progress.")));
+            }
+            return Results.NotFound(new ErrorResponse(new ErrorDetail(errorCode ?? "SESSION_NOT_FOUND", errorMessage ?? "Session not found.")));
+        }
+
+        var adaptiveResponse = await roadmapGenerator.GenerateFromHandoffAsync(profile.RoadmapInput, request.SessionId, cancellationToken);
+        return Results.Ok(adaptiveResponse);
     }
 
     if (string.IsNullOrWhiteSpace(request.RoleId))
@@ -232,6 +536,149 @@ app.MapPost("/api/projects/recommend", async ([FromBody] RecommendProjectRequest
 })
 .WithName("RecommendProject")
 .WithSummary("Recommend a real-world portfolio project engineered backward from diagnosed skill gaps");
+
+// 6. GET /api/roles/{roleId}/skills (Catalog Foundation Read API)
+app.MapGet("/api/roles/{roleId}/skills", async (string roleId, ICatalogService catalogService, CancellationToken cancellationToken) =>
+{
+    if (string.IsNullOrWhiteSpace(roleId))
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorDetail(
+            "VALIDATION_ERROR",
+            "Route parameter 'roleId' is required."
+        )));
+    }
+
+    var response = await catalogService.GetRoleSkillsAsync(roleId, cancellationToken);
+    if (response == null)
+    {
+        return Results.NotFound(new ErrorResponse(new ErrorDetail(
+            "NOT_FOUND",
+            $"Role '{roleId}' was not found."
+        )));
+    }
+
+    return Results.Ok(response);
+})
+.WithName("GetRoleSkills")
+.WithSummary("Retrieve public UI-safe skills catalog for a career role grouped by Core, Recommended, Optional, and Languages");
+
+// Development-Only Guard: Reject /api/dev/* outside Development environment with 404
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/api/dev") && !app.Environment.IsDevelopment())
+    {
+        context.Response.StatusCode = StatusCodes.Status404NotFound;
+        return;
+    }
+    await next();
+});
+
+// Development-Only Endpoints: AI Diagnostic Inspector
+if (app.Environment.IsDevelopment())
+{
+    var devAi = app.MapGroup("/api/dev/ai");
+
+    // GET /api/dev/ai/runtime
+    devAi.MapGet("/runtime", (IDevAiInspectorService inspector) =>
+    {
+        return Results.Ok(inspector.GetRuntimeConfig());
+    })
+    .WithName("GetDevAiRuntime")
+    .WithSummary("Developer-only: Retrieve safe runtime AI configuration");
+
+    // GET /api/dev/ai/questions
+    devAi.MapGet("/questions", async (
+        [FromQuery] string? roleId,
+        [FromQuery] string? skillId,
+        [FromQuery] string? difficulty,
+        IDevAiInspectorService inspector,
+        CancellationToken ct) =>
+    {
+        var questions = await inspector.GetQuestionsAsync(roleId, skillId, difficulty, ct);
+        return Results.Ok(questions);
+    })
+    .WithName("GetDevAiQuestions")
+    .WithSummary("Developer-only: List SQLite questions with filters");
+
+    // GET /api/dev/ai/questions/{questionId}
+    devAi.MapGet("/questions/{questionId}", async (
+        string questionId,
+        IDevAiInspectorService inspector,
+        CancellationToken ct) =>
+    {
+        var detail = await inspector.GetQuestionDetailAsync(questionId, ct);
+        if (detail == null)
+        {
+            return Results.NotFound(new ErrorResponse(new ErrorDetail(
+                "QUESTION_NOT_FOUND",
+                $"Question '{questionId}' was not found in SQLite catalog."
+            )));
+        }
+        return Results.Ok(detail);
+    })
+    .WithName("GetDevAiQuestionDetail")
+    .WithSummary("Developer-only: Retrieve question with server-side rubric and expected signals");
+
+    // POST /api/dev/ai/evaluate
+    devAi.MapPost("/evaluate", async (
+        [FromBody] DevEvaluateRequest request,
+        IDevAiInspectorService inspector,
+        CancellationToken ct) =>
+    {
+        var (success, trace, errorCode, errorMessage) = await inspector.EvaluateAsync(request, ct);
+        if (!success || trace == null)
+        {
+            if (errorCode == "QUESTION_NOT_FOUND")
+            {
+                return Results.NotFound(new ErrorResponse(new ErrorDetail(errorCode, errorMessage ?? "Question not found")));
+            }
+            return Results.BadRequest(new ErrorResponse(new ErrorDetail(errorCode ?? "EVALUATION_ERROR", errorMessage ?? "Evaluation failed")));
+        }
+        return Results.Ok(trace);
+    })
+    .WithName("EvaluateDevAiQuestion")
+    .WithSummary("Developer-only: Execute deterministic preview or live AI evaluation and return trace");
+
+    // GET /api/dev/ai/traces
+    devAi.MapGet("/traces", (IAiDiagnosticTraceStore traceStore) =>
+    {
+        return Results.Ok(traceStore.GetRecentTraces());
+    })
+    .WithName("GetDevAiTraces")
+    .WithSummary("Developer-only: List recent in-memory evaluation traces");
+
+    // GET /api/dev/ai/traces/{traceId}
+    devAi.MapGet("/traces/{traceId}", (string traceId, IAiDiagnosticTraceStore traceStore) =>
+    {
+        var trace = traceStore.GetTrace(traceId);
+        if (trace == null)
+        {
+            return Results.NotFound(new ErrorResponse(new ErrorDetail(
+                "TRACE_NOT_FOUND",
+                $"Trace '{traceId}' was not found in in-memory history."
+            )));
+        }
+        return Results.Ok(trace);
+    })
+    .WithName("GetDevAiTraceDetail")
+    .WithSummary("Developer-only: Retrieve full trace by ID");
+
+    // GET /api/dev/ai/adaptive/sessions/{sessionId}
+    devAi.MapGet("/adaptive/sessions/{sessionId}", async (string sessionId, IDevAiInspectorService inspector, CancellationToken ct) =>
+    {
+        var inspection = await inspector.InspectAdaptiveSessionAsync(sessionId, ct);
+        if (inspection == null)
+        {
+            return Results.NotFound(new ErrorResponse(new ErrorDetail(
+                "SESSION_NOT_FOUND",
+                $"Adaptive session '{sessionId}' was not found."
+            )));
+        }
+        return Results.Ok(inspection);
+    })
+    .WithName("GetDevAiAdaptiveSession")
+    .WithSummary("Developer-only: Inspect adaptive session details delineating AI evaluation outputs from backend derivations");
+}
 
 app.Run();
 

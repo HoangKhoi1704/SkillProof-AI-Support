@@ -1,10 +1,13 @@
+using Microsoft.EntityFrameworkCore;
 using SkillProof.Api.Data;
+using SkillProof.Api.Data.Catalog;
 using SkillProof.Api.Models;
 
 namespace SkillProof.Api.Services;
 
 public class QuestionService : IQuestionService
 {
+    private readonly CatalogDbContext? _db;
     private readonly IDiagnosticEvaluator _evaluator;
 
     private static readonly HashSet<string> ValidRoleIds = new(StringComparer.OrdinalIgnoreCase)
@@ -13,8 +16,9 @@ public class QuestionService : IQuestionService
         "financial-analyst"
     };
 
-    public QuestionService(IDiagnosticEvaluator? evaluator = null)
+    public QuestionService(CatalogDbContext? db = null, IDiagnosticEvaluator? evaluator = null)
     {
+        _db = db;
         _evaluator = evaluator ?? new DeterministicDiagnosticEvaluator();
     }
 
@@ -73,15 +77,28 @@ public class QuestionService : IQuestionService
         }
 
         // Validate each questionId belongs to the role
-        var roleQuestions = SeedData.Questions
+        var legacyRoleQuestions = SeedData.Questions
             .Where(q => q.CareerRoleId.Equals(normalizedRoleId, StringComparison.OrdinalIgnoreCase))
             .ToList();
 
-        var roleQuestionIds = new HashSet<int>(roleQuestions.Select(q => q.Id));
+        var validQuestionIds = new HashSet<string>(legacyRoleQuestions.Select(q => q.Id.ToString()), StringComparer.OrdinalIgnoreCase);
+
+        if (normalizedRoleId == "backend-developer" && _db != null)
+        {
+            var dbQIds = await _db.Questions.AsNoTracking()
+                .Where(q => q.RoleId.ToLower() == normalizedRoleId)
+                .Select(q => q.Id)
+                .ToListAsync(cancellationToken);
+
+            foreach (var qid in dbQIds)
+            {
+                validQuestionIds.Add(qid);
+            }
+        }
 
         foreach (var answer in request.Answers)
         {
-            if (!roleQuestionIds.Contains(answer.QuestionId))
+            if (!validQuestionIds.Contains(answer.QuestionId))
             {
                 return (false, null, $"Question ID {answer.QuestionId} does not belong to role '{normalizedRoleId}'.");
             }

@@ -8,4 +8,9 @@ public interface IProjectRecommender
         RecommendProjectRequest request,
         CancellationToken cancellationToken = default
     );
+
+    Task<GapBasedProjectDto> RecommendGapBasedAsync(
+        ProjectGapContext context,
+        CancellationToken cancellationToken = default
+    );
 }
