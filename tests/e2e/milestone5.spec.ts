@@ -8,6 +8,12 @@ test.describe('Milestone 5: Gap-Backward Real-World Project Recommendation', () 
         await expect(page.getByRole('heading', { name: 'Backend Developer' })).toBeVisible();
         await page.getByRole('button', { name: /Start Career Diagnostic/i }).first().click();
 
+        // Assessment Setup step (Milestone I2): select primary language and continue
+        const langCard = page.getByTestId('language-card-csharp');
+        await expect(langCard).toBeVisible();
+        await langCard.click();
+        await page.getByTestId('continue-to-assessment-button').click();
+
         // Fill questions
         await expect(page.getByText('Backend Developer Diagnostic')).toBeVisible();
         const answerInput = page.locator('textarea');
@@ -34,6 +40,10 @@ test.describe('Milestone 5: Gap-Backward Real-World Project Recommendation', () 
 
         // Q6
         await answerInput.fill('Asynchronous streaming with IAsyncEnumerable and CancellationToken propagation.');
+        await page.getByRole('button', { name: /Next Question/i }).click();
+
+        // Q7 (C# Language)
+        await answerInput.fill('In C#, I handle concurrency with async/await, Task, and thread synchronization primitives.');
 
         // Review & Submit Diagnostic
         await page.getByRole('button', { name: /Review/i }).click();

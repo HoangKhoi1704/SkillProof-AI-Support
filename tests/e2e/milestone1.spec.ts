@@ -16,10 +16,16 @@ test.describe('Milestone 1: Role Selection & Diagnostic Flow', () => {
         // Click Start Career Diagnostic for Backend Developer
         await page.getByRole('button', { name: /Start Career Diagnostic/i }).first().click();
 
+        // Assessment Setup step (Milestone I2): select primary language and continue
+        const langCard = page.getByTestId('language-card-csharp');
+        await expect(langCard).toBeVisible();
+        await langCard.click();
+        await page.getByTestId('continue-to-assessment-button').click();
+
         // Verify Diagnostic Questions UI loaded
         await expect(page.getByText('Backend Developer Diagnostic')).toBeVisible();
-        await expect(page.getByText('Question 1 of 6')).toBeVisible();
-        await expect(page.getByText('REST API', { exact: true })).toBeVisible();
+        await expect(page.getByText('Question 1 of 7')).toBeVisible();
+        await expect(page.getByText(/Programming Fundamentals/)).toBeVisible();
 
         // Enter answer for Question 1
         const answerInput = page.locator('textarea');
@@ -29,16 +35,16 @@ test.describe('Milestone 1: Role Selection & Diagnostic Flow', () => {
 
         // Navigate to Question 2
         await page.getByRole('button', { name: /Next Question/i }).click();
-        await expect(page.getByText('Question 2 of 6')).toBeVisible();
-        await expect(page.getByText('SQL / Database', { exact: true })).toBeVisible();
+        await expect(page.getByText('Question 2 of 7')).toBeVisible();
+        await expect(page.getByText(/REST API Design/)).toBeVisible();
 
         // Fill Question 2
         await answerInput.fill('I would inspect the execution plan and create a composite index on (CustomerId, OrderDate).');
 
-        // Navigate through remaining questions to the end
-        for (let i = 3; i <= 6; i++) {
+        // Navigate through remaining questions to the end (questions 3 to 7)
+        for (let i = 3; i <= 7; i++) {
             await page.getByRole('button', { name: /Next Question/i }).click();
-            await expect(page.getByText(`Question ${i} of 6`)).toBeVisible();
+            await expect(page.getByText(`Question ${i} of 7`)).toBeVisible();
             await answerInput.fill(`Sample answer for Question ${i} demonstrating competency.`);
         }
 
@@ -51,7 +57,7 @@ test.describe('Milestone 1: Role Selection & Diagnostic Flow', () => {
 
         // Verify answered status badges
         const answeredBadges = page.locator('text=Answered');
-        await expect(answeredBadges).toHaveCount(6);
+        await expect(answeredBadges).toHaveCount(7);
     });
 
     test('User can select Financial Analyst and load questions', async ({ page }) => {

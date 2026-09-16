@@ -15,6 +15,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             services.AddSingleton<IDiagnosticEvaluator, DeterministicDiagnosticEvaluator>();
             services.AddSingleton<IRoadmapGenerator, DeterministicRoadmapGenerator>();
             services.AddSingleton<IProjectRecommender, DeterministicProjectRecommender>();
+            services.AddSingleton<IProjectEvaluator, DeterministicProjectEvaluator>();
         });
     }
 }

@@ -1,0 +1,465 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SkillProof Backend Skill Catalog",
+  "version": "1.0.0",
+  "roleId": "backend-developer",
+  "roleName": "Backend Developer",
+  "description": "Comprehensive competency taxonomy and language classification for backend engineering career readiness.",
+  "competencies": [
+    {
+      "id": "programming-fundamentals",
+      "name": "Programming Fundamentals",
+      "category": "core",
+      "description": "Core computer science principles, data structure selection, algorithmic complexity, error handling, and clean modular code design.",
+      "subskills": [
+        {
+          "id": "data-structures",
+          "name": "Data Structure Selection",
+          "description": "Selecting optimal data structures (hash tables, trees, lists, heaps) based on time/space access patterns."
+        },
+        {
+          "id": "algorithms-complexity",
+          "name": "Algorithmic Complexity & Big-O",
+          "description": "Evaluating and optimizing time and space complexity for computation and data processing."
+        },
+        {
+          "id": "object-oriented-design",
+          "name": "Object-Oriented & Modular Design",
+          "description": "Applying SOLID principles, dependency inversion, clean separation of concerns, and cohesion."
+        },
+        {
+          "id": "error-exception-handling",
+          "name": "Error & Exception Handling",
+          "description": "Designing robust exception hierarchies, boundary error handling, and fault containment."
+        }
+      ]
+    },
+    {
+      "id": "rest-api",
+      "name": "REST API Design & HTTP",
+      "category": "core",
+      "description": "Architecting reliable, standards-compliant RESTful web services, HTTP semantics, idempotency, and resource contracts.",
+      "subskills": [
+        {
+          "id": "http-semantics-idempotency",
+          "name": "HTTP Semantics & Idempotency",
+          "description": "Understanding HTTP verbs (GET, POST, PUT, PATCH, DELETE), status codes, and idempotency guarantees."
+        },
+        {
+          "id": "resource-modeling-contracts",
+          "name": "Resource Modeling & API Contracts",
+          "description": "Designing predictable REST resource URIs, payload schemas, and backward-compatible contract evolution."
+        },
+        {
+          "id": "pagination-filtering-sorting",
+          "name": "Pagination, Filtering & Sorting",
+          "description": "Implementing offset-based and keyset/cursor-based pagination for performant dataset querying."
+        },
+        {
+          "id": "concurrency-control-etags",
+          "name": "Concurrency Control & Headers",
+          "description": "Using ETags, If-Match headers, and optimistic concurrency for safe concurrent resource updates."
+        }
+      ]
+    },
+    {
+      "id": "sql",
+      "name": "SQL & Relational Databases",
+      "category": "core",
+      "description": "Relational data modeling, query optimization, indexing internals, execution plan analysis, and ACID transaction semantics.",
+      "subskills": [
+        {
+          "id": "relational-schema-constraints",
+          "name": "Schema Design & Constraints",
+          "description": "Designing normalized relational schemas with foreign keys, uniqueness, and check constraints."
+        },
+        {
+          "id": "complex-queries-joins",
+          "name": "Complex Queries, Joins & Aggregations",
+          "description": "Authoring multi-table joins, subqueries, grouping aggregations, and window functions."
+        },
+        {
+          "id": "indexing-execution-plans",
+          "name": "Indexing & Query Execution Plans",
+          "description": "Analyzing EXPLAIN query plans, B-Tree index selectivity, covering indexes, and scan-vs-seek costs."
+        },
+        {
+          "id": "transactions-acid-isolation",
+          "name": "Transactions & ACID Isolation",
+          "description": "Managing atomic transactions, lock escalation, isolation levels, and concurrency anomalies."
+        }
+      ]
+    },
+    {
+      "id": "testing",
+      "name": "Automated Testing & Quality",
+      "category": "core",
+      "description": "Automated test suites, unit testing fundamentals, dependency isolation with mocks, integration testing, and test determinism.",
+      "subskills": [
+        {
+          "id": "unit-testing-assertions",
+          "name": "Unit Testing & Assertions",
+          "description": "Authoring isolated unit tests validating business logic, boundary values, and invariants."
+        },
+        {
+          "id": "test-doubles-mocking",
+          "name": "Test Doubles & Dependency Mocking",
+          "description": "Isolating external services, databases, and third-party APIs using mocks, stubs, and fakes."
+        },
+        {
+          "id": "integration-testing",
+          "name": "Integration & API Testing",
+          "description": "Testing API endpoints and persistence layers against ephemeral databases and realistic test environments."
+        },
+        {
+          "id": "test-determinism-flakiness",
+          "name": "Test Determinism & Edge Cases",
+          "description": "Eliminating flaky tests, race conditions, and asserting negative paths and transient error handling."
+        }
+      ]
+    },
+    {
+      "id": "authentication-security",
+      "name": "Authentication & API Security",
+      "category": "core",
+      "description": "Identity verification, token lifecycles, cryptographic signature verification, authorization models, and API vulnerability mitigation.",
+      "subskills": [
+        {
+          "id": "jwt-token-lifecycle",
+          "name": "JWT & Token Lifecycle Management",
+          "description": "Generating, cryptographically verifying, and rotating access and refresh tokens."
+        },
+        {
+          "id": "authorization-rbac-abac",
+          "name": "Authorization Models (RBAC & ABAC)",
+          "description": "Enforcing role-based and attribute-based permissions across endpoints and data layers."
+        },
+        {
+          "id": "token-revocation-logout",
+          "name": "Token Revocation & Session Invalidation",
+          "description": "Managing token blacklists, refresh token rotation, and immediate user revocation."
+        },
+        {
+          "id": "owasp-api-security",
+          "name": "OWASP API Vulnerability Mitigation",
+          "description": "Preventing Broken Object Level Authorization (BOLA), injection, and unauthorized data exposure."
+        }
+      ]
+    },
+    {
+      "id": "system-design",
+      "name": "System Design & Architecture",
+      "category": "core",
+      "description": "Designing scalable, resilient, and maintainable backend architectures, stateless services, rate limiting, and failure containment.",
+      "subskills": [
+        {
+          "id": "stateless-service-scaling",
+          "name": "Stateless Service Design & Horizontal Scaling",
+          "description": "Designing shared-nothing stateless application tiers capable of horizontal load-balanced scaling."
+        },
+        {
+          "id": "rate-limiting-throttling",
+          "name": "Rate Limiting & Traffic Throttling",
+          "description": "Implementing distributed token bucket and sliding-window rate limiters to protect service availability."
+        },
+        {
+          "id": "caching-patterns",
+          "name": "Caching Strategies & Invalidation",
+          "description": "Applying cache-aside, write-through, TTL invalidation, and mitigating thundering herd problems."
+        },
+        {
+          "id": "resilience-fault-tolerance",
+          "name": "Resilience & Failure Mitigation",
+          "description": "Designing circuit breakers, retries with exponential backoff, dead-letter queues, and graceful degradation."
+        }
+      ]
+    },
+    {
+      "id": "nosql",
+      "name": "NoSQL Data Stores",
+      "category": "recommended",
+      "description": "Document, key-value, and wide-column data stores, schema design tradeoffs, and CAP theorem consistency models.",
+      "subskills": [
+        {
+          "id": "document-stores",
+          "name": "Document Databases",
+          "description": "Modeling semi-structured data, indexing nested documents, and querying in stores like MongoDB."
+        },
+        {
+          "id": "cap-theorem-consistency",
+          "name": "CAP Theorem & Eventual Consistency",
+          "description": "Evaluating consistency vs. availability tradeoffs in distributed data stores."
+        }
+      ]
+    },
+    {
+      "id": "caching",
+      "name": "Distributed Caching",
+      "category": "recommended",
+      "description": "In-memory distributed key-value stores (e.g. Redis, Memcached), data structures, and eviction policies.",
+      "subskills": [
+        {
+          "id": "redis-data-structures",
+          "name": "Redis Data Types & Operations",
+          "description": "Utilizing strings, hashes, sorted sets, and atomic Lua scripts for distributed caching and state."
+        },
+        {
+          "id": "cache-eviction-policies",
+          "name": "Cache Eviction & Expiry Policies",
+          "description": "Configuring LRU, LFU, TTL policies, and managing memory pressure in caching tiers."
+        }
+      ]
+    },
+    {
+      "id": "git",
+      "name": "Version Control (Git)",
+      "category": "optional",
+      "description": "Distributed version control, branching strategies, rebase workflows, and collaborative code integration.",
+      "subskills": [
+        {
+          "id": "branching-gitflow",
+          "name": "Branching & Gitflow",
+          "description": "Managing feature branches, pull request workflows, and release branching."
+        },
+        {
+          "id": "merge-rebase-conflicts",
+          "name": "Merging, Rebasing & Conflict Resolution",
+          "description": "Resolving complex merge conflicts and maintaining clean linear commit histories."
+        }
+      ]
+    },
+    {
+      "id": "docker",
+      "name": "Containerization (Docker)",
+      "category": "optional",
+      "description": "Containerizing backend services, multi-stage builds, container networking, and local compose orchestration.",
+      "subskills": [
+        {
+          "id": "dockerfile-multi-stage",
+          "name": "Multi-Stage Dockerfiles",
+          "description": "Writing lean, secure multi-stage Dockerfiles minimizing production container image size."
+        },
+        {
+          "id": "docker-compose-orchestration",
+          "name": "Docker Compose Local Environment",
+          "description": "Orchestrating multi-container local development environments (API, database, cache)."
+        }
+      ]
+    },
+    {
+      "id": "cicd",
+      "name": "CI/CD Pipelines",
+      "category": "optional",
+      "description": "Automated build, test, and continuous deployment workflows, artifact versioning, and environment promotion.",
+      "subskills": [
+        {
+          "id": "automated-pipelines",
+          "name": "Automated Test & Build Pipelines",
+          "description": "Configuring GitHub Actions or GitLab CI to build, lint, and test on every pull request."
+        },
+        {
+          "id": "deployment-strategies",
+          "name": "Deployment Strategies",
+          "description": "Understanding blue-green, rolling, and canary deployments with automated rollback."
+        }
+      ]
+    },
+    {
+      "id": "concurrency",
+      "name": "Concurrency & Asynchronous Programming",
+      "category": "optional",
+      "description": "Thread management, asynchronous I/O, event loops, race condition prevention, and non-blocking pipelines.",
+      "subskills": [
+        {
+          "id": "async-await-event-loop",
+          "name": "Asynchronous I/O & Non-Blocking Execution",
+          "description": "Using async/await and non-blocking I/O to maximize throughput on high-concurrency servers."
+        },
+        {
+          "id": "thread-safety-locks",
+          "name": "Thread Safety & Synchronization",
+          "description": "Preventing race conditions, deadlocks, and coordinating concurrent access to shared resources."
+        }
+      ]
+    },
+    {
+      "id": "messaging",
+      "name": "Message Queues & Event-Driven Systems",
+      "category": "optional",
+      "description": "Asynchronous messaging, pub/sub architectures, message brokers (RabbitMQ, Kafka), and idempotent consumers.",
+      "subskills": [
+        {
+          "id": "pub-sub-message-brokers",
+          "name": "Pub/Sub & Queue Architecture",
+          "description": "Decoupling services using message queues, topic exchanges, and asynchronous worker pools."
+        },
+        {
+          "id": "idempotent-consumer-dead-letter",
+          "name": "Idempotent Processing & Dead-Letter Handling",
+          "description": "Ensuring message processing idempotency and capturing poison pills in dead-letter queues."
+        }
+      ]
+    },
+    {
+      "id": "observability",
+      "name": "Observability, Logging & Monitoring",
+      "category": "optional",
+      "description": "Structured logging, metrics collection, distributed request tracing, and production health monitoring.",
+      "subskills": [
+        {
+          "id": "structured-logging",
+          "name": "Structured Contextual Logging",
+          "description": "Emitting machine-parseable JSON logs with correlation IDs across distributed service calls."
+        },
+        {
+          "id": "metrics-distributed-tracing",
+          "name": "Metrics & Distributed Tracing",
+          "description": "Tracking latency percentiles (p95, p99), error rates, and OpenTelemetry distributed traces."
+        }
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "id": "csharp",
+      "name": "C# / .NET",
+      "description": "Object-oriented, strongly typed language on the .NET runtime widely used for enterprise backend web APIs.",
+      "subskills": [
+        {
+          "id": "csharp-async-threading",
+          "name": "Async/Await & Task Parallelism",
+          "description": "Managing Tasks, ValueTask, CancellationTokens, and async enumerable streams."
+        },
+        {
+          "id": "csharp-aspnet-core",
+          "name": "ASP.NET Core Architecture",
+          "description": "Middleware pipeline, dependency injection container, and Minimal API configuration."
+        },
+        {
+          "id": "csharp-linq-memory",
+          "name": "LINQ & Memory Optimization",
+          "description": "Expression trees, deferred execution, and struct/Span memory efficiency."
+        }
+      ]
+    },
+    {
+      "id": "java",
+      "name": "Java",
+      "description": "Class-based, object-oriented language on the JVM powering large-scale distributed enterprise backends.",
+      "subskills": [
+        {
+          "id": "java-spring-boot",
+          "name": "Spring Boot & Dependency Injection",
+          "description": "Inversion of control container, Spring Data repositories, and Spring Security."
+        },
+        {
+          "id": "java-concurrency-jvm",
+          "name": "JVM Concurrency & Garbage Collection",
+          "description": "ExecutorService, virtual threads (Project Loom), and garbage collection tuning."
+        }
+      ]
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "description": "Interpreted, dynamic language with high developer velocity commonly used with FastAPI, Django, and async backends.",
+      "subskills": [
+        {
+          "id": "python-asyncio-fastapi",
+          "name": "FastAPI & AsyncIO",
+          "description": "Asynchronous route handlers, Pydantic data validation, and event loop execution."
+        },
+        {
+          "id": "python-gil-multiprocessing",
+          "name": "GIL & Multiprocessing",
+          "description": "Overcoming Global Interpreter Lock bottlenecks using worker processes and Celery tasks."
+        }
+      ]
+    },
+    {
+      "id": "cpp",
+      "name": "C++",
+      "description": "High-performance compiled language providing deterministic resource control and low-latency system programming.",
+      "subskills": [
+        {
+          "id": "cpp-raii-memory",
+          "name": "RAII & Smart Pointers",
+          "description": "Deterministic memory management, unique_ptr, shared_ptr, and move semantics."
+        },
+        {
+          "id": "cpp-templates-stl",
+          "name": "STL & Concurrency Primitives",
+          "description": "Modern C++ standard template library, mutexes, condition variables, and atomics."
+        }
+      ]
+    },
+    {
+      "id": "javascript",
+      "name": "JavaScript (Node.js)",
+      "description": "Event-driven, single-threaded runtime executing asynchronous non-blocking I/O for web services.",
+      "subskills": [
+        {
+          "id": "js-event-loop",
+          "name": "Node.js Event Loop & Non-Blocking I/O",
+          "description": "Microtasks, macrotasks, and preventing event loop starvation."
+        },
+        {
+          "id": "js-streams-buffers",
+          "name": "Streams & Buffer Processing",
+          "description": "Handling backpressure and streaming large file uploads and downloads."
+        }
+      ]
+    },
+    {
+      "id": "typescript",
+      "name": "TypeScript",
+      "description": "Typed superset of JavaScript providing static compile-time type safety for scalable backend codebases.",
+      "subskills": [
+        {
+          "id": "ts-advanced-types",
+          "name": "Generics & Utility Types",
+          "description": "Conditional types, mapped types, discriminated unions, and type narrowing."
+        },
+        {
+          "id": "ts-schema-validation",
+          "name": "Runtime Validation Integration",
+          "description": "Integrating TypeScript types with runtime validation libraries like Zod or TypeBox."
+        }
+      ]
+    },
+    {
+      "id": "go",
+      "name": "Go (Golang)",
+      "description": "Compiled, statically typed language engineered at Google for concurrent, scalable network services.",
+      "subskills": [
+        {
+          "id": "go-goroutines-channels",
+          "name": "Goroutines & Channels",
+          "description": "CSP concurrency patterns, channel synchronization, and select multiplexing."
+        },
+        {
+          "id": "go-interfaces-composition",
+          "name": "Structural Typing & Composition",
+          "description": "Implicit interface implementation and composable package architecture."
+        }
+      ]
+    },
+    {
+      "id": "rust",
+      "name": "Rust",
+      "description": "Systems programming language delivering memory safety without a garbage collector via ownership and borrow checking.",
+      "subskills": [
+        {
+          "id": "rust-ownership-borrowing",
+          "name": "Ownership, Borrowing & Lifetimes",
+          "description": "Compile-time memory safety, mutable references, and lifetime annotations."
+        },
+        {
+          "id": "rust-async-tokio",
+          "name": "Async Rust & Tokio",
+          "description": "Future polling, Tokio runtime tasks, and fear-free concurrency with Send and Sync."
+        }
+      ]
+    }
+  ]
+}

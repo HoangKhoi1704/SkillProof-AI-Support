@@ -8,6 +8,12 @@ test.describe('Milestone 2: Diagnostic Evaluation & Skill Profile', () => {
         await expect(page.getByRole('heading', { name: 'Backend Developer' })).toBeVisible();
         await page.getByRole('button', { name: /Start Career Diagnostic/i }).first().click();
 
+        // Assessment Setup step (Milestone I2): select primary language and continue
+        const langCard = page.getByTestId('language-card-csharp');
+        await expect(langCard).toBeVisible();
+        await langCard.click();
+        await page.getByTestId('continue-to-assessment-button').click();
+
         // Fill Question 1 (REST API)
         await expect(page.getByText('Backend Developer Diagnostic')).toBeVisible();
         const answerInput = page.locator('textarea');
@@ -32,6 +38,10 @@ test.describe('Milestone 2: Diagnostic Evaluation & Skill Profile', () => {
         // Fill Question 6 (Programming Fundamentals)
         await page.getByRole('button', { name: /Next Question/i }).click();
         await answerInput.fill('I would stream records with IAsyncEnumerable and pass a CancellationToken to allow graceful cancellation.');
+
+        // Fill Question 7 (C# / .NET Language)
+        await page.getByRole('button', { name: /Next Question/i }).click();
+        await answerInput.fill('In C#, I use async/await with Task and CancellationTokens to avoid blocking threads.');
 
         // Navigate to Review Screen
         await page.getByRole('button', { name: /Review/i }).click();

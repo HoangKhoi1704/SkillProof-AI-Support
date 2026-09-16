@@ -16,6 +16,7 @@ The 5 canonical MVP routes defined in `docs/04_DOCUMENTATION_AUDIT_CHECKLIST.md`
 
 ```text
 GET  /api/roles
+GET  /api/roles/{roleId}/skills
 GET  /api/diagnostics/questions?roleId={roleId}
 POST /api/diagnostics/evaluate
 POST /api/roadmaps/generate
@@ -194,7 +195,97 @@ POST /api/projects/recommend
   }
   ```
 
+### 6. `GET /api/roles/{roleId}/skills`
+- **Purpose**: Retrieve role skills and separated programming languages for catalog browsing and skill selection (Milestone I1).
+- **Path Parameter**: `roleId` (string slug, e.g. `backend-developer`, required).
+- **Validation**: If `roleId` is unknown, return `404 Not Found` with standard error format.
+- **Privacy Invariant**: **MUST NOT** expose scoring rubrics, `expectedSignals`, or internal evaluation metadata. Exposes UI-safe metadata only (`id`, `name`, `category`, `skillType`, `description`, `subskills`).
+- **Response (`200 OK`)**:
+  ```json
+  {
+    "roleId": "backend-developer",
+    "core": [
+      {
+        "id": "programming-fundamentals",
+        "name": "Programming Fundamentals & Clean Code",
+        "category": "core",
+        "skillType": "competency",
+        "description": "...",
+        "subskills": [
+          { "id": "clean-code-refactoring", "name": "Clean Code & Refactoring", "description": "..." }
+        ]
+      }
+    ],
+    "recommended": [...],
+    "optional": [...],
+    "languages": [
+      {
+        "id": "csharp",
+        "name": "C# / .NET",
+        "category": "language",
+        "skillType": "language",
+        "description": null,
+        "subskills": [...]
+      }
+    ]
+  }
+  ```
+
+### 7. `POST /api/diagnostics/questions/select`
+- **Purpose**: Dynamically select diagnostic questions from SQLite based on user competency and language selection (Milestone I3).
+- **Privacy Invariant**: **MUST NOT** expose scoring rubrics, `expectedSignals`, or internal evaluation notes. Exposes public question data only (`id`, `competencyId`, `competency`, `difficulty`, `questionType`, `questionText`, `question`).
+- **Request Body**:
+  ```json
+  {
+    "roleId": "backend-developer",
+    "selectedSkillIds": [
+      "programming-fundamentals",
+      "sql",
+      "testing"
+    ],
+    "primaryLanguageId": "csharp"
+  }
+  ```
+- **Validation**:
+  - `roleId` must exist in catalog (`404 Not Found` if unknown).
+  - `selectedSkillIds` must not be empty, all IDs must exist in catalog and belong to the role (`400 Bad Request` if invalid).
+  - Programming languages cannot be passed in `selectedSkillIds` (`400 Bad Request`).
+  - If `primaryLanguageId` is provided, it must exist in catalog, belong to the role, and have `skillType = language` (`400 Bad Request`).
+  - Unsupported skills (recommended/optional skills without question coverage in v1.2) are returned in `assessmentCoverage.unsupportedSkillIds`, not invented.
+- **Response (`200 OK`)**:
+  ```json
+  {
+    "roleId": "backend-developer",
+    "questions": [
+      {
+        "id": "q-be-prog-02",
+        "competencyId": "programming-fundamentals",
+        "competency": "Programming Fundamentals & Clean Code",
+        "difficulty": "applied",
+        "questionType": "scenario_diagnostic",
+        "questionText": "A critical backend service occasionally deadlocks...",
+        "question": "A critical backend service occasionally deadlocks..."
+      },
+      {
+        "id": "q-be-sql-02",
+        "competencyId": "sql",
+        "competency": "SQL & Relational Data Modeling",
+        "difficulty": "applied",
+        "questionType": "scenario_diagnostic",
+        "questionText": "A reporting query joining `orders` and `order_items`...",
+        "question": "A reporting query joining `orders` and `order_items`..."
+      }
+    ],
+    "assessmentCoverage": {
+      "requestedSkillIds": ["programming-fundamentals", "sql"],
+      "assessedSkillIds": ["programming-fundamentals", "sql"],
+      "unsupportedSkillIds": []
+    }
+  }
+  ```
+
 ---
+
 
 ## 3. Standard Error Contract
 

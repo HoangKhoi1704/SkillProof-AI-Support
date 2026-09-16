@@ -1,0 +1,1813 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SkillProof Backend Assessment Question Bank",
+  "version": "2.0.0",
+  "roleId": "backend-developer",
+  "description": "Extended assessment question bank containing exactly 48 questions: 18 Core competency questions, 6 Recommended competency questions, and 24 Programming Language questions with calibrated difficulty (foundation, applied, advanced-reasoning), 4-tier qualitative evaluation rubrics, and enriched provenance.",
+  "questions": [
+    {
+      "id": "q-be-prog-01",
+      "roleId": "backend-developer",
+      "skillId": "programming-fundamentals",
+      "subskills": [
+        "data-structures",
+        "algorithms-complexity"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "Explain the difference between an Array (or List) and a Hash Table (or Dictionary) when searching for an element by an identifier (e.g., finding a user by `userId`). How do their average lookup time complexities compare, and why does a Hash Table achieve faster lookups?",
+      "expectedSignals": [
+        "Identifies O(N) linear search for an unsorted array vs O(1) average lookup for a hash table",
+        "Explains that a hash function computes an integer bucket index directly from the key",
+        "Mentions that arrays require inspecting elements sequentially unless sorted and indexed",
+        "Acknowledges that hash collisions can occur and require resolution"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot explain how an array or hash table locates data, or confuses basic time complexity concepts.",
+        "Beginner": "Correctly states that an array is O(N) and a hash table is O(1) on average, but only states this as a memorized fact without explaining how hash functions enable direct bucket indexing.",
+        "Intermediate": "Clearly explains that a hash function transforms the key into an array index for direct memory addressing, contrasting this with sequential scanning through array elements.",
+        "Advanced": "Explains collision resolution strategies (chaining vs open addressing), load factor thresholds, memory overhead of sparse bucket arrays, and worst-case O(N) degradation under severe hash collisions."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-cf-sfia-9-software-dev"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-cpig-amazon-tech-topics",
+          "evidenceType": "company-published-interview-guidance",
+          "supportedTopics": [
+            "data-structures",
+            "array-vs-hash-table-lookup",
+            "algorithmic-complexity"
+          ],
+          "evidenceStrength": "strong-topic-match",
+          "notes": "Amazon technical interview topics explicitly designate basic data structures—contrasting sequential arrays with hash tables and their time complexity trade-offs—as core screening topics."
+        },
+        {
+          "sourceId": "src-cpig-google-tech-dev-guide",
+          "evidenceType": "company-published-interview-guidance",
+          "supportedTopics": [
+            "hash-tables",
+            "array-lookup",
+            "collision-handling"
+          ],
+          "evidenceStrength": "strong-topic-match",
+          "notes": "Google Tech Dev Guide DSA pathway explicitly emphasizes understanding O(1) average hash lookup mechanisms and collision handling for interview readiness."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-cpig-amazon-tech-topics",
+        "src-cpig-google-tech-dev-guide"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-prog-02",
+      "roleId": "backend-developer",
+      "skillId": "programming-fundamentals",
+      "subskills": [
+        "error-exception-handling",
+        "object-oriented-design"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "In a layered web API (Controller -> Service -> Repository), a database unique-constraint violation occurs when registering a user with an existing email address. How should exceptions be propagated, translated, and logged across the layers, and what HTTP response should reach the client?",
+      "expectedSignals": [
+        "Catches persistence-specific exceptions at the repository or service boundary and maps them to a domain exception",
+        "Prevents internal database error messages, table schemas, or raw stack traces from leaking to external clients",
+        "Translates the conflict into an HTTP 409 Conflict or HTTP 422 Unprocessable Entity with a structured problem-details payload",
+        "Logs the original exception with contextual diagnostic details (e.g. correlation ID) on the server side"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests ignoring the error, catching generic Exception in the controller without handling, or returning HTTP 500 for expected validation failures.",
+        "Beginner": "Understands that a try/catch block is needed, but allows database-specific exceptions to leak directly to the client or controller.",
+        "Intermediate": "Translates the low-level database exception into a domain exception in the service layer, handled by central API middleware returning HTTP 409 Conflict without exposing internal database schemas.",
+        "Advanced": "Designs standardized error responses conforming to RFC 7807/9457 Problem Details, distinguishes client-correctable conflicts from fatal system faults, and coordinates transaction rollback."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-rfc9110-http"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-prog-03",
+      "roleId": "backend-developer",
+      "skillId": "programming-fundamentals",
+      "subskills": [
+        "object-oriented-design"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "A monolithic service class contains tightly coupled `new EmailSender()` and `new S3FileUploader()` instantiations directly inside business logic methods. Explain why this violates the Dependency Inversion Principle, what maintenance and testing issues it introduces, and how you would refactor it using interfaces and dependency injection.",
+      "expectedSignals": [
+        "Defines the Dependency Inversion Principle: high-level modules should depend on abstractions, not concrete implementations",
+        "Explains the inability to write isolated unit tests without invoking real third-party network or storage infrastructure",
+        "Refactors concrete classes to interface abstractions (e.g. IEmailSender, IFileUploader)",
+        "Applies constructor injection through an Inversion of Control (IoC) container"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not understand dependency inversion or claims that instantiating classes directly with 'new' has no drawbacks.",
+        "Beginner": "Recognizes that 'new' causes tight coupling and makes unit testing harder, but cannot clearly outline how to refactor using interfaces or dependency injection.",
+        "Intermediate": "Explains the DIP violation, refactors concrete classes to interface abstractions (`IEmailSender`, `IFileUploader`), and applies constructor injection for mock substitution in automated tests.",
+        "Advanced": "Evaluates service lifetimes (transient, scoped, singleton) and memory implications, warns against service locator anti-patterns, and discusses interface segregation and composition over inheritance."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-cf-sfia-9-software-dev",
+        "src-ref-xunit-test-patterns"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-cpig-amazon-tech-topics",
+          "evidenceType": "company-published-interview-guidance",
+          "supportedTopics": [
+            "object-oriented-design",
+            "dependency-inversion",
+            "loose-coupling"
+          ],
+          "evidenceStrength": "strong-topic-match",
+          "notes": "Amazon technical interview guidance emphasizes Object-Oriented Design principles, loose coupling, and dependency inversion over concrete instantiation."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-cpig-amazon-tech-topics"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-rest-01",
+      "roleId": "backend-developer",
+      "skillId": "rest-api",
+      "subskills": [
+        "http-semantics-idempotency",
+        "resource-modeling-contracts"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "In RESTful API design, describe the primary purpose of the GET, POST, and DELETE HTTP methods. For each method, what is the expected HTTP response status code upon successful execution, and why is GET considered a 'safe' and 'idempotent' method?",
+      "expectedSignals": [
+        "Explains GET retrieves resource representations (HTTP 200)",
+        "Explains POST creates a new resource (HTTP 201 with Location header, or 200/204)",
+        "Explains DELETE removes a resource (HTTP 200 or 204 No Content)",
+        "Defines 'safe' as producing no resource state mutation on the server, and 'idempotent' as producing the same server state when repeated"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Confuses standard HTTP methods (e.g. claiming GET modifies data or POST is used to retrieve data) or lists incorrect status codes.",
+        "Beginner": "Identifies the general purpose of GET, POST, and DELETE with basic status codes (200, 201, 204), but cannot clearly define what 'safe' or 'idempotent' means in HTTP semantics.",
+        "Intermediate": "Accurately pairs each method with its standard success code. Clearly explains that GET is safe because it does not alter server state, and idempotent because repeating it produces identical server outcomes.",
+        "Advanced": "Distinguishes safety from idempotency in depth, discusses caching implications of safe methods under RFC 9110, contrasts 200 vs 204 for DELETE, and mentions payload semantics in POST vs GET queries."
+      },
+      "frameworkSourceIds": [
+        "src-doc-rfc9110-http",
+        "src-cf-roadmap-backend"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-ipr-bytebytego-system-design",
+          "evidenceType": "interview-preparation-resource",
+          "supportedTopics": [
+            "http-methods",
+            "status-codes",
+            "idempotency-and-safety"
+          ],
+          "evidenceStrength": "strong-topic-match",
+          "notes": "ByteByteGo API design curriculum covers HTTP verbs, idempotent vs safe methods, and REST status code mappings as foundational API screening material."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-ipr-bytebytego-system-design"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-rest-02",
+      "roleId": "backend-developer",
+      "skillId": "rest-api",
+      "subskills": [
+        "pagination-filtering-sorting",
+        "resource-modeling-contracts"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "An API endpoint `/api/orders` returns millions of records. Compare Offset-based pagination (`?page=500&pageSize=50`) vs. Cursor-based (keyset) pagination (`?cursor=xyz&limit=50`). How do they behave under high insert frequency, and what are their database performance characteristics?",
+      "expectedSignals": [
+        "Explains that OFFSET N requires the database engine to scan and discard N rows, causing query performance to degrade at high offsets",
+        "Identifies the row-drift problem where new insertions shift records across page boundaries, causing duplicate or skipped items",
+        "Explains that Keyset/Cursor pagination uses indexed WHERE clauses (e.g. WHERE id > last_seen LIMIT 50) executing in constant time",
+        "Notes that cursor pagination prevents jumping directly to arbitrary page numbers"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests returning all records in a single payload without pagination, or fails to understand how paging queries execute.",
+        "Beginner": "Explains offset pagination with LIMIT and OFFSET, but is unaware of database scan costs at high page numbers or insertion drift.",
+        "Intermediate": "Explains that offset pagination degrades as the database scans and discards skipped rows. Explains how keyset/cursor pagination uses indexed WHERE clauses for stable, constant-time page retrieval under continuous inserts.",
+        "Advanced": "Evaluates multi-column cursor serialization (e.g. `(created_at, id)`), deterministic tie-breaking, opaque base64 cursor encoding, and trade-offs regarding random page jumping vs infinite scrolling."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-ref-ddia-kleppmann"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-cpig-slack-api-pagination",
+          "evidenceType": "company-published-interview-guidance",
+          "supportedTopics": [
+            "cursor-based-pagination",
+            "offset-pagination-pitfalls",
+            "database-scan-costs"
+          ],
+          "evidenceStrength": "direct",
+          "notes": "Slack Engineering's 'Evolving API Pagination at Slack' is the canonical case study documenting why offset pagination fails on large datasets and how cursor pagination solves row drift."
+        },
+        {
+          "sourceId": "src-ipr-bytebytego-system-design",
+          "evidenceType": "interview-preparation-resource",
+          "supportedTopics": [
+            "pagination-strategies",
+            "keyset-pagination"
+          ],
+          "evidenceStrength": "strong-topic-match",
+          "notes": "ByteByteGo API design modules evaluate cursor vs offset pagination performance for technical interviews."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-cpig-slack-api-pagination",
+        "src-ipr-bytebytego-system-design"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-rest-03",
+      "roleId": "backend-developer",
+      "skillId": "rest-api",
+      "subskills": [
+        "http-semantics-idempotency",
+        "concurrency-control-etags"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "interview",
+      "question": "Explain the semantic differences between PUT and PATCH in RESTful API design. What are the idempotency rules for each method, how should a server handle concurrent partial updates to prevent the 'lost update' problem, and what role do ETags play?",
+      "expectedSignals": [
+        "PUT replaces the entire resource representation and must be idempotent",
+        "PATCH applies partial modifications and may or may not be idempotent depending on payload semantics",
+        "Identifies lost update anomalies when two clients issue concurrent updates based on stale state",
+        "Explains using ETags with If-Match conditional headers to enforce optimistic concurrency control, returning HTTP 412 Precondition Failed on conflict"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot explain the difference between PUT and PATCH or confuses them with POST.",
+        "Beginner": "States that PUT updates and PATCH partially modifies, but cannot explain idempotency guarantees or concurrent update handling.",
+        "Intermediate": "Clearly contrasts PUT idempotency with PATCH partial updates. Explains the lost update anomaly and details how ETags and `If-Match` headers enforce optimistic concurrency.",
+        "Advanced": "Analyzes JSON Merge Patch (RFC 7396) vs JSON Patch (RFC 6902), discusses side-effect handling, cache revalidation, and transactional boundary considerations on conditional updates."
+      },
+      "frameworkSourceIds": [
+        "src-doc-rfc9110-http",
+        "src-cf-roadmap-backend"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-sql-01",
+      "roleId": "backend-developer",
+      "skillId": "sql",
+      "subskills": [
+        "relational-schema-constraints",
+        "complex-queries-joins"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "You have a `Users` table and an `Orders` table linked by a foreign key `Orders.user_id = Users.id`. Explain the difference between an `INNER JOIN` and a `LEFT JOIN` when querying for users and their orders. What will be returned for a user who has never placed an order in both cases?",
+      "expectedSignals": [
+        "Explains that INNER JOIN returns only rows where a matching key exists in both tables",
+        "Explains that a user with zero orders is excluded from the INNER JOIN result set",
+        "Explains that LEFT JOIN returns all rows from the left table (Users) regardless of whether a matching order exists",
+        "Identifies that columns from the Orders table will contain NULL values for a user with zero orders in a LEFT JOIN"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Confuses INNER JOIN and LEFT JOIN or cannot describe what happens when records do not match.",
+        "Beginner": "States that INNER JOIN shows matches and LEFT JOIN shows everything from the left, but struggles to explain what values appear for non-matching columns.",
+        "Intermediate": "Accurately explains that INNER JOIN excludes users with zero orders, while LEFT JOIN includes them with NULL values for order attributes. Explains the foreign key relationship.",
+        "Advanced": "Discusses query performance implications of INNER vs LEFT joins, join elimination by query optimizers when foreign keys are non-nullable, and filtering on LEFT JOIN columns in WHERE vs ON clauses."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-cf-sfia-9-software-dev"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-ipr-leetcode-175-combine-two-tables",
+          "evidenceType": "interview-preparation-resource",
+          "supportedTopics": [
+            "sql-joins",
+            "left-join-vs-inner-join",
+            "null-handling-in-joins"
+          ],
+          "evidenceStrength": "direct",
+          "notes": "LeetCode problem #175 (Combine Two Tables) is the classic interview question testing whether a candidate correctly uses a LEFT JOIN to include entities without foreign key matches."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-ipr-leetcode-175-combine-two-tables"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-sql-02",
+      "roleId": "backend-developer",
+      "skillId": "sql",
+      "subskills": [
+        "indexing-execution-plans",
+        "complex-queries-joins"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "A production query joining `Orders` (10 million rows) and `OrderItems` (40 million rows) filtering on `customer_id = ?` and `order_date >= ?` takes 8 seconds. How do you use EXPLAIN / EXPLAIN ANALYZE to diagnose the bottleneck, and what index structure would you create?",
+      "expectedSignals": [
+        "Inspects the query execution plan for Sequential Scan (Full Table Scan) vs Index Scan / Index Seek",
+        "Evaluates join operator costs (Nested Loop, Hash Join, Merge Join) and row estimate accuracy",
+        "Recommends creating a composite B-Tree index on `(customer_id, order_date)`",
+        "Places the equality filter column (`customer_id`) before the range filter column (`order_date`) in the composite index definition"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests restarting the database server or adding arbitrary single-column indexes without understanding execution plans.",
+        "Beginner": "Suggests adding an index on customer_id, but cannot explain how composite indexes work or how to interpret EXPLAIN output.",
+        "Intermediate": "Uses EXPLAIN ANALYZE to identify sequential table scans. Proposes a composite B-Tree index on `(customer_id, order_date)` placing the equality predicate before the range predicate to enable index range scans.",
+        "Advanced": "Analyzes index selectivity, covering indexes (INCLUDE clause to eliminate heap table lookups), join condition foreign key indexes, statistics updates (`ANALYZE`), and write amplification tradeoffs."
+      },
+      "frameworkSourceIds": [
+        "src-doc-postgresql-explain",
+        "src-ref-ddia-kleppmann"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-cpig-amazon-tech-topics",
+          "evidenceType": "company-published-interview-guidance",
+          "supportedTopics": [
+            "database-indexing",
+            "query-performance-optimization",
+            "execution-plans"
+          ],
+          "evidenceStrength": "strong-topic-match",
+          "notes": "Amazon technical interview guidance designates relational database query optimization and indexing strategy as primary evaluation criteria."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-cpig-amazon-tech-topics"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-sql-03",
+      "roleId": "backend-developer",
+      "skillId": "sql",
+      "subskills": [
+        "transactions-acid-isolation"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "Explain the four standard ANSI SQL transaction isolation levels. Describe the concurrency anomalies they prevent (Dirty Read, Non-Repeatable Read, Phantom Read), and explain why most production databases default to Read Committed rather than Serializable. How does Multi-Version Concurrency Control (MVCC) impact this?",
+      "expectedSignals": [
+        "Defines Read Uncommitted, Read Committed, Repeatable Read, and Serializable",
+        "Defines Dirty Read, Non-Repeatable Read, and Phantom Read concurrency anomalies",
+        "Explains that Serializable eliminates all anomalies but incurs severe lock contention or transaction abort/retry overhead",
+        "Explains that MVCC snapshot isolation allows readers to not block writers and writers to not block readers, making Read Committed practical and high-throughput"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot define ACID transactions or isolation levels.",
+        "Beginner": "Lists isolation level names but confuses them and cannot explain concurrency anomalies.",
+        "Intermediate": "Accurately defines the four isolation levels and matching anomalies. Explains why Read Committed is default in Postgres/SQL Server to balance concurrency throughput while preventing dirty reads.",
+        "Advanced": "Deeply analyzes MVCC snapshot isolation, write skew anomalies in Repeatable Read, optimistic concurrency checks, deadlock mitigation, and serialization failure retry strategies."
+      },
+      "frameworkSourceIds": [
+        "src-ref-ddia-kleppmann",
+        "src-cf-sfia-9-software-dev"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-test-01",
+      "roleId": "backend-developer",
+      "skillId": "testing",
+      "subskills": [
+        "unit-testing-assertions"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "What is a unit test, and what distinguishes it from an integration test? Describe the Arrange-Act-Assert (AAA) pattern with a simple example testing a business rule (e.g., calculating a discount or validating an age requirement).",
+      "expectedSignals": [
+        "Defines a unit test as verifying a small, isolated piece of business logic entirely in memory without real network or database calls",
+        "Distinguishes integration tests as verifying multiple integrated components, frameworks, or external persistence boundaries",
+        "Explains the Arrange phase: preparing test inputs, dependencies, and expected outcomes",
+        "Explains the Act phase (executing the target method) and Assert phase (verifying output or state matches expectations)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot define a unit test or claims unit testing requires running against a live database and web server.",
+        "Beginner": "Defines unit test vaguely as testing code, but struggles to articulate the AAA pattern or cannot distinguish unit from integration testing.",
+        "Intermediate": "Clearly distinguishes fast in-memory unit tests from integration tests that verify external dependencies. Details Arrange (setup), Act (execution), Assert (verification) with a clear example.",
+        "Advanced": "Discusses test isolation, single-concept assertion principles, deterministic test execution, readability as living documentation, and avoiding implementation coupling in assertions."
+      },
+      "frameworkSourceIds": [
+        "src-ref-xunit-test-patterns",
+        "src-cf-roadmap-backend"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-cpig-google-test-doubles",
+          "evidenceType": "company-published-interview-guidance",
+          "supportedTopics": [
+            "unit-testing",
+            "test-isolation",
+            "arrange-act-assert"
+          ],
+          "evidenceStrength": "supporting-context",
+          "notes": "Google Testing Blog guidance on test suite discipline emphasizes isolated unit tests with distinct execution phases over slow, non-isolated tests."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-cpig-google-test-doubles"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-test-02",
+      "roleId": "backend-developer",
+      "skillId": "testing",
+      "subskills": [
+        "test-doubles-mocking",
+        "unit-testing-assertions"
+      ],
+      "difficulty": "applied",
+      "questionType": "interview",
+      "question": "When unit testing an OrderProcessingService that interacts with an external PaymentGateway and an InventoryRepository, distinguish between a Mock, a Stub, and a Fake. How would you test that a payment is never charged if the inventory reservation fails?",
+      "expectedSignals": [
+        "Defines Stub (provides canned responses), Mock (verifies behavioral interactions/call counts), and Fake (working in-memory implementation)",
+        "Isolates the external payment gateway using a test double interface",
+        "Simulates inventory failure (e.g. InsufficientInventoryException) and asserts zero calls to payment charge (`mock.Verify(x => x.Charge(...), Times.Never())`)",
+        "Asserts state consistency and error propagation"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests running unit tests against real live third-party payment endpoints or cannot explain test doubles.",
+        "Beginner": "Uses the word 'mock' for all test doubles without distinguishing state verification from behavior verification.",
+        "Intermediate": "Accurately distinguishes Stubs (canned inputs) from Mocks (interaction verification). Simulates inventory failure and uses a mock to verify payment was never charged.",
+        "Advanced": "Critiques over-mocking and test fragility, demonstrates Fake in-memory repositories for state-based verification, and tests idempotency key propagation."
+      },
+      "frameworkSourceIds": [
+        "src-ref-xunit-test-patterns",
+        "src-cf-roadmap-backend"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-cpig-google-test-doubles",
+          "evidenceType": "company-published-interview-guidance",
+          "supportedTopics": [
+            "test-doubles",
+            "mocks-vs-stubs-vs-fakes",
+            "behavioral-verification"
+          ],
+          "evidenceStrength": "direct",
+          "notes": "Google Testing Blog: 'Testing on the Toilet: Know Your Test Doubles' explicitly defines Mocks vs Stubs vs Fakes and interaction assertions."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-cpig-google-test-doubles"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-test-03",
+      "roleId": "backend-developer",
+      "skillId": "testing",
+      "subskills": [
+        "test-determinism-flakiness",
+        "integration-testing"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "Your continuous integration (CI) pipeline fails randomly 10% of the time due to 'flaky' integration tests that pass when re-run. What are the common root causes of test non-determinism in backend test suites (e.g., shared state, timing races, time zones), and how do you systematically eliminate them?",
+      "expectedSignals": [
+        "Identifies shared mutable database or cache state between parallel test cases",
+        "Identifies reliance on real clock time (`DateTime.Now` or arbitrary `sleep` calls) causing timing race conditions",
+        "Identifies uncontrolled execution order dependencies between test suites",
+        "Proposes solutions: per-test schema isolation or transaction rollbacks, deterministic time provider abstractions, and polling condition assertions instead of sleeps"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests setting CI to automatically retry failed tests 5 times without fixing root causes.",
+        "Beginner": "Attributes flakiness vaguely to 'slow network' or adds arbitrary `sleep(5000)` pauses to tests.",
+        "Intermediate": "Identifies shared state contamination and timing race conditions. Replaces arbitrary sleeps with polling condition assertions and enforces per-test database cleanup or unique test tenant identifiers.",
+        "Advanced": "Implements deterministic time providers, parallel test execution isolation (per-worker database schemas or Testcontainers), mock server determinism, and establishes zero-tolerance flaky test quarantine pipelines."
+      },
+      "frameworkSourceIds": [
+        "src-ref-xunit-test-patterns",
+        "src-cf-sfia-9-software-dev"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-cpig-google-flaky-tests",
+          "evidenceType": "company-published-interview-guidance",
+          "supportedTopics": [
+            "flaky-tests",
+            "test-determinism",
+            "shared-state-in-ci"
+          ],
+          "evidenceStrength": "direct",
+          "notes": "Google Testing Blog: 'Flaky Tests at Google -- Tools and Mitigation' provides an authoritative analysis of root causes of flaky tests in CI pipelines."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-cpig-google-flaky-tests"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-auth-01",
+      "roleId": "backend-developer",
+      "skillId": "authentication-security",
+      "subskills": [
+        "authorization-rbac-abac",
+        "owasp-api-security"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "Explain the fundamental difference between Authentication and Authorization. Why should passwords never be stored in plain text or hashed with fast general-purpose algorithms like MD5 or SHA-256, and what kind of hashing algorithm should be used instead?",
+      "expectedSignals": [
+        "Defines Authentication as verifying identity (who you are) and Authorization as verifying permissions (what you are allowed to do)",
+        "Explains that fast hash functions (MD5, SHA-256) allow attackers to test billions of candidates per second using modern GPUs",
+        "Explains that rainbow tables precompute hashes for common passwords unless unique random salts are used",
+        "Recommends adaptive, slow key derivation functions with configurable work factors (e.g. bcrypt, Argon2, PBKDF2)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Confuses authentication with authorization, or suggests storing passwords in plain text or using reversible encryption.",
+        "Beginner": "States authentication is login and authorization is permissions, but does not understand why fast algorithms like MD5/SHA-256 are dangerous for passwords.",
+        "Intermediate": "Accurately contrasts identity verification (AuthN) with permission checks (AuthZ). Explains that fast hashing allows billions of GPU guesses per second and recommends adaptive, salted algorithms like bcrypt or Argon2.",
+        "Advanced": "Discusses work factor / cost parameter tuning to resist hardware advances, explains salting preventing rainbow table lookups, and mentions pepper/KMS defense-in-depth strategies."
+      },
+      "frameworkSourceIds": [
+        "src-doc-owasp-api-security",
+        "src-cf-roadmap-backend"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-auth-02",
+      "roleId": "backend-developer",
+      "skillId": "authentication-security",
+      "subskills": [
+        "authorization-rbac-abac",
+        "owasp-api-security"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "A medical record API endpoint `GET /api/patients/{patientId}/records` must ensure that only the assigned primary physician or an emergency room doctor with an active hospital shift can access patient data. Compare implementing this using Role-Based Access Control (RBAC) vs. Attribute-Based Access Control (ABAC). Which approach is appropriate, and how is it implemented?",
+      "expectedSignals": [
+        "Explains RBAC limitations: static role `Doctor` is too coarse because doctors should not see patients they are not treating",
+        "Defines ABAC: evaluates subject attributes (doctor ID, shift status), resource attributes (patient ID, assigned physician ID), and environment attributes (shift status)",
+        "Implements policy-based evaluation at the service or data query filter level",
+        "Explains preventing Broken Object Level Authorization (BOLA/IDOR)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests granting access to any authenticated user with a valid login.",
+        "Beginner": "Suggests creating custom roles for every patient-doctor pairing in RBAC, causing role explosion.",
+        "Intermediate": "Identifies that static RBAC cannot evaluate relationship context. Proposes ABAC / policy-based authorization checking `doctor.id == patient.primaryDoctorId OR (doctor.isER && doctor.activeShift)`.",
+        "Advanced": "Implements policy enforcement points (PEP) and policy decision points (PDP), evaluates database-level predicate pushdown (multi-tenancy filters in SQL WHERE clauses), and logs authorization audit trails."
+      },
+      "frameworkSourceIds": [
+        "src-doc-owasp-api-security",
+        "src-cf-sfia-9-software-dev"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-auth-03",
+      "roleId": "backend-developer",
+      "skillId": "authentication-security",
+      "subskills": [
+        "jwt-token-lifecycle",
+        "token-revocation-logout"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "How does stateless JSON Web Token (JWT) authentication work in a web API? Explain the roles of header, payload, and signature. What is the inherent architectural challenge of revoking a stateless token before expiration, and how do production systems solve this without negating the performance benefits of statelessness?",
+      "expectedSignals": [
+        "Explains three parts of JWT: Base64URL-encoded Header (algorithm), Payload (claims), Signature (cryptographic hash)",
+        "Explains signature verification with secret key (symmetric HMAC) or public key (asymmetric RSA/ECDSA) without database query",
+        "Explains inherent challenge: tokens remain valid until expiry even if user permissions change or logout occurs",
+        "Proposes revocation strategies: short-lived access tokens (e.g. 15m) paired with rotatable refresh tokens stored in Redis/DB, or an in-memory token blocklist"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Claims JWTs are encrypted passwords or believes the server must query the database to validate every stateless signature.",
+        "Beginner": "Knows JWT contains claims, but cannot explain signature verification or how logout/revocation works.",
+        "Intermediate": "Explains cryptographic signature verification preventing tampering. Outlines dual-token strategy: short-lived access tokens (10-15 mins) with revokable refresh tokens stored in persistent store.",
+        "Advanced": "Evaluates asymmetric key rotation (JWKS endpoints), distributed revocation lists in Redis, mitigating token replay attacks through refresh token family rotation, and security considerations against algorithm 'none'."
+      },
+      "frameworkSourceIds": [
+        "src-doc-rfc7519-jwt",
+        "src-doc-owasp-api-security"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-ipr-bytebytego-system-design",
+          "evidenceType": "interview-preparation-resource",
+          "supportedTopics": [
+            "jwt-authentication",
+            "stateless-token-revocation",
+            "refresh-tokens"
+          ],
+          "evidenceStrength": "strong-topic-match",
+          "notes": "ByteByteGo system design modules cover stateless token architecture, cryptographic signature checks, and dual-token (access/refresh) revocation patterns for technical interviews."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-ipr-bytebytego-system-design"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-sys-01",
+      "roleId": "backend-developer",
+      "skillId": "system-design",
+      "subskills": [
+        "stateless-service-scaling"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "Explain the difference between Vertical Scaling (scaling up) and Horizontal Scaling (scaling out) for a backend application. Why is it easier to scale out a stateless web server than a relational database?",
+      "expectedSignals": [
+        "Vertical scaling adds more CPU, RAM, or faster disk to a single machine; constrained by hardware limits and single point of failure",
+        "Horizontal scaling adds more machine instances behind a load balancer",
+        "Stateless web servers maintain no client session state in process memory, allowing any request to be routed to any instance",
+        "Relational databases maintain mutable persistent state, requiring complex data replication, consistency synchronization, and write coordination across nodes"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot define vertical or horizontal scaling, or claims adding servers is trivial for all software components.",
+        "Beginner": "States vertical is bigger machine and horizontal is more machines, but cannot clearly explain why databases are harder to scale than web servers.",
+        "Intermediate": "Accurately contrasts hardware boundaries of vertical scaling with horizontal scale-out. Explains that stateless web servers route requests arbitrarily without synchronization, whereas databases must synchronize state, transactions, and locks.",
+        "Advanced": "Discusses cost curves of commodity hardware vs high-end hardware, database sharding and replica synchronization lag, session externalization (Redis/JWT), and auto-scaling triggers."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-ref-ddia-kleppmann"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-ipr-system-design-primer",
+          "evidenceType": "interview-preparation-resource",
+          "supportedTopics": [
+            "vertical-vs-horizontal-scaling",
+            "stateless-web-tier",
+            "database-scaling-limits"
+          ],
+          "evidenceStrength": "direct",
+          "notes": "The System Design Primer explicitly structures interview prep around vertical vs horizontal scaling trade-offs and the stateless application tier."
+        },
+        {
+          "sourceId": "src-cpig-amazon-tech-topics",
+          "evidenceType": "company-published-interview-guidance",
+          "supportedTopics": [
+            "distributed-systems",
+            "horizontal-scaling",
+            "statelessness"
+          ],
+          "evidenceStrength": "strong-topic-match",
+          "notes": "Amazon's technical topics explicitly evaluate candidate understanding of horizontal scaling and stateless distributed architectures."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-ipr-system-design-primer",
+        "src-cpig-amazon-tech-topics"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-sys-02",
+      "roleId": "backend-developer",
+      "skillId": "system-design",
+      "subskills": [
+        "caching-patterns",
+        "resilience-fault-tolerance"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "A product catalog service experiences high read latency during flash sales. Describe the Cache-Aside pattern, explain the 'Thundering Herd' (Cache Stampede) problem when a popular cache key expires, and propose two technical mitigations.",
+      "expectedSignals": [
+        "Defines Cache-Aside: application reads from cache first; on miss, reads from DB and populates cache before returning",
+        "Defines Cache Stampede: concurrent requests hit cache miss simultaneously upon key expiration, all querying the database at once and overwhelming it",
+        "Mitigation 1: Distributed mutex / locking (only one worker queries DB while others wait or retry)",
+        "Mitigation 2: Probabilistic early expiration (XFetch algorithm) or background refresh before actual TTL expiry"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests removing caching entirely or cannot explain what happens when a cache key expires.",
+        "Beginner": "Explains cache-aside, but does not recognize that simultaneous requests can take down the database when a key expires.",
+        "Intermediate": "Accurately details cache-aside and the thundering herd phenomenon. Proposes mutex locking (e.g. Redlock / local locks) and adding jitter/randomization to TTLs to prevent synchronized expiration.",
+        "Advanced": "Implements probabilistic early recomputation (XFetch), background asynchronous worker refreshing, stale-while-revalidate serving, and soft vs hard TTL policies."
+      },
+      "frameworkSourceIds": [
+        "src-ref-ddia-kleppmann",
+        "src-ref-google-sre-book"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-ipr-system-design-primer",
+          "evidenceType": "interview-preparation-resource",
+          "supportedTopics": [
+            "cache-aside",
+            "cache-stampede",
+            "caching-mitigations"
+          ],
+          "evidenceStrength": "strong-topic-match",
+          "notes": "The System Design Primer details cache-aside architecture and cache stampede (thundering herd) failure scenarios for interview prep."
+        },
+        {
+          "sourceId": "src-cpig-meta-scaling-memcache",
+          "evidenceType": "company-published-interview-guidance",
+          "supportedTopics": [
+            "cache-stampede",
+            "thundering-herd-leases",
+            "distributed-caching"
+          ],
+          "evidenceStrength": "strong-topic-match",
+          "notes": "Meta / USENIX paper 'Scaling Memcache at Facebook' documents thundering herd cache stampedes and lease-based locking mitigations."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-ipr-system-design-primer",
+        "src-cpig-meta-scaling-memcache"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-sys-03",
+      "roleId": "backend-developer",
+      "skillId": "system-design",
+      "subskills": [
+        "rate-limiting-throttling",
+        "stateless-service-scaling"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "Design a distributed rate-limiting system for a public API that receives 50,000 requests per second across 20 web server instances. Explain which algorithm (Token Bucket vs. Sliding Window Counter) you would choose, how Redis is used, and how your system behaves if the Redis cluster becomes temporarily unavailable.",
+      "expectedSignals": [
+        "Evaluates Token Bucket (burst tolerance) vs Sliding Window Counter (accurate boundary limits without memory explosion)",
+        "Stores rate limit counters in centralized distributed store (Redis) with atomic increments or Lua scripts",
+        "Returns standard HTTP 429 Too Many Requests with Retry-After and X-RateLimit headers",
+        "Addresses failure mitigation: fail-open (allow traffic to preserve core business availability) vs fail-closed (block traffic to prevent backend overload)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Proposes maintaining static local variables inside each web server without coordinating across instances.",
+        "Beginner": "Suggests using Redis but uses non-atomic multi-step read-then-write operations subject to race conditions, and has no plan for cache outages.",
+        "Intermediate": "Chooses sliding window or token bucket with atomic Redis Lua script operations. Outlines client key identification (API key or IP) and establishes clear fail-open policy during Redis outages.",
+        "Advanced": "Analyzes Redis cluster sharding by client key, network round-trip overhead (local memory batching + async Redis synchronization), tiered rate limits (anonymous vs tier-1 customers), and noisy neighbor mitigation."
+      },
+      "frameworkSourceIds": [
+        "src-ref-google-sre-book",
+        "src-ref-ddia-kleppmann"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-cpig-stripe-rate-limiters",
+          "evidenceType": "company-published-interview-guidance",
+          "supportedTopics": [
+            "distributed-rate-limiting",
+            "token-bucket-vs-sliding-window",
+            "redis-lua-scripts",
+            "fail-open-resilience"
+          ],
+          "evidenceStrength": "direct",
+          "notes": "Stripe's engineering blog 'Scaling your API with rate limiters' is a definitive company publication outlining token bucket vs sliding window, Redis coordination, and graceful degradation."
+        },
+        {
+          "sourceId": "src-ipr-system-design-primer",
+          "evidenceType": "interview-preparation-resource",
+          "supportedTopics": [
+            "rate-limiting-algorithms",
+            "distributed-throttling"
+          ],
+          "evidenceStrength": "strong-topic-match",
+          "notes": "The System Design Primer includes dedicated rate limiting design patterns for system design interview preparation."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-cpig-stripe-rate-limiters",
+        "src-ipr-system-design-primer"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-nosql-01",
+      "roleId": "backend-developer",
+      "skillId": "nosql",
+      "subskills": [
+        "document-stores"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "Compare a Relational Database (e.g. PostgreSQL) and a Document-oriented NoSQL Database (e.g. MongoDB) in how they store data, handle schema changes, and manage relationships (joins vs embedding). When is embedding documents advantageous over normalizing data across separate collections/tables?",
+      "expectedSignals": [
+        "Contrasts strict relational tables/rows with flexible JSON/BSON document collections",
+        "Contrasts foreign key joins at query time with denormalized embedded child documents",
+        "Explains read performance advantages of embedding when child data is consistently retrieved together",
+        "Identifies trade-offs of embedding: data duplication, 16MB document size limits, and update amplification"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot distinguish relational tables from document collections or claims document stores have no operational trade-offs.",
+        "Beginner": "States that relational uses tables and NoSQL uses JSON, but cannot explain schema enforcement differences or access pattern trade-offs.",
+        "Intermediate": "Accurately explains normalized foreign key joins versus denormalized document embedding, identifying access patterns where single-query document reads outperform multi-table joins.",
+        "Advanced": "Evaluates document size constraints (e.g., 16MB in MongoDB), atomic single-document updates, write amplification during updates to nested arrays, and hybrid referencing strategies."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-mongodb-modeling",
+        "src-ref-ddia-kleppmann"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-nosql-02",
+      "roleId": "backend-developer",
+      "skillId": "nosql",
+      "subskills": [
+        "document-stores",
+        "cap-theorem-consistency"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "You are designing the storage layer for an e-commerce platform catalog where products across different categories have drastically varying attributes (e.g. clothing with sizes/colors vs electronics with wattage/ports). How would you model this catalog in a document database like MongoDB, how would you index arbitrary filter attributes, and how does this avoid relational schema migration pain?",
+      "expectedSignals": [
+        "Models products as documents with common fields (id, title, price) and polymorphic attributes (subdocuments or key-value arrays)",
+        "Uses multikey indexing or attribute pattern indexing to support efficient query filtering across dynamic properties",
+        "Explains that adding new category attributes requires no DDL ALTER TABLE locks or complex schema migrations",
+        "Evaluates data validation mechanisms (e.g. JSON Schema validation) at the database or application tier"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests creating a separate database table for every product category or cannot explain dynamic schema handling.",
+        "Beginner": "Recommends putting all fields into a single document but does not explain how to index or query disparate attribute keys efficiently.",
+        "Intermediate": "Designs an attribute pattern (e.g. `attrs: [{ k: 'color', v: 'blue' }]`) or dynamic subdocument with multikey indexing, explaining how zero-downtime schema evolution works without table locking.",
+        "Advanced": "Evaluates partial filter expressions, sparse indexes, memory working-set requirements for index RAM, and query performance trade-offs against relational EAV (Entity-Attribute-Value) anti-patterns."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-mongodb-modeling",
+        "src-ref-ddia-kleppmann"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-nosql-03",
+      "roleId": "backend-developer",
+      "skillId": "nosql",
+      "subskills": [
+        "cap-theorem-consistency"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "Under the CAP theorem, why is a distributed database forced to choose between Consistency (Linearizability) and Availability during a network partition? In a tunable distributed store (such as Cassandra, DynamoDB, or MongoDB replica sets with write concerns), how do quorum read/write levels (R + W > N) guarantee strong consistency, and what latency trade-offs occur under network degradation?",
+      "expectedSignals": [
+        "Explains that network partitions (P) are unavoidable in physical networks, forcing the choice between linearizable Consistency (C) and Availability (A)",
+        "Defines CP (refusing writes or failing to preserve linearizability) vs AP (accepting local writes with stale reads or eventual consistency)",
+        "Explains quorum equation: R + W > N ensures at least one node in the read set has the latest acknowledged write from the write set",
+        "Evaluates latency and throughput costs of strict quorums and mechanisms for reconciliation (read repair, hint handoff, vector clocks)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not understand network partitions, claims a distributed system can achieve C, A, and P simultaneously, or misunderstands quorum.",
+        "Beginner": "Quotes the CAP theorem acronym but cannot explain why network partitions force the trade-off, or fails to explain quorum math.",
+        "Intermediate": "Explains that network partitions prevent cross-node coordination, necessitating either write rejections (CP) or stale reads (AP); explains R + W > N quorum intersection.",
+        "Advanced": "Deeply evaluates PACELC extensions (latency vs consistency during normal operations), monotonic read guarantees, read-repair overhead, and split-brain resolution through Raft/Paxos consensus."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-ref-ddia-kleppmann"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-ipr-bytebytego-system-design",
+          "evidenceType": "interview-preparation-resource",
+          "supportedTopics": [
+            "cap-theorem",
+            "quorum-consistency",
+            "distributed-data-stores"
+          ],
+          "evidenceStrength": "strong-topic-match",
+          "notes": "ByteByteGo System Design curriculum provides canonical system design interview frameworks contrasting CP and AP systems and quorum read/write equations."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-ipr-bytebytego-system-design"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-cache-01",
+      "roleId": "backend-developer",
+      "skillId": "caching",
+      "subskills": [
+        "redis-data-structures"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "Why are in-memory caches like Redis significantly faster than relational disk-based databases for read operations? Beyond simple string key-value pairs, identify two specialized Redis data structures (such as Hashes, Sets, or Sorted Sets) and describe a practical backend use case for each.",
+      "expectedSignals": [
+        "Explains RAM access latency (nanoseconds) vs disk or NVMe SSD I/O latency (microseconds/milliseconds)",
+        "Mentions single-threaded non-blocking event loop execution eliminating thread context-switching overhead",
+        "Identifies Hashes (e.g. user session objects/field updates) and Sets/Sorted Sets (e.g. unique tags, leaderboards, sliding window rate limiters)",
+        "Explains memory-efficiency benefits of field-level manipulation over full object re-serialization"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot explain why Redis is fast or confuses in-memory storage with disk-based persistence.",
+        "Beginner": "States that memory is faster than disk but only describes Redis as storing plain strings, failing to explain specialized data structures.",
+        "Intermediate": "Explains RAM memory vs disk paging latency; accurately describes two non-string data structures (e.g., Hashes for objects, Sorted Sets for ranked scoring) with practical backend use cases.",
+        "Advanced": "Explains internal Redis encoding optimizations (e.g., ziplist/listpack vs hashtable, skiplist for sorted sets) and O(1) vs O(log N) complexity of specialized data structure operations."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-redis-data-types"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-cache-02",
+      "roleId": "backend-developer",
+      "skillId": "caching",
+      "subskills": [
+        "cache-eviction-policies"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "Your Redis cache cluster has reached 95% of its allocated memory limit (maxmemory). Explain how Redis behaves when memory is exhausted under different maxmemory-policy settings (e.g., allkeys-lru, volatile-lru, noeviction). How would you configure eviction policies and TTLs for a backend serving both transient user session tokens and static product metadata?",
+      "expectedSignals": [
+        "Compares noeviction (returns OOM error on writes) with allkeys-lru / volatile-lru",
+        "Explains that volatile-* policies only evict keys with an explicit TTL expiration set",
+        "Recommends separating workloads or setting explicit TTLs on transient sessions while configuring appropriate eviction for metadata",
+        "Discusses memory monitoring, key expiration sampling, and memory defragmentation"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Unaware of cache eviction policies or assumes Redis automatically provisions more RAM indefinitely.",
+        "Beginner": "Knows about LRU eviction but cannot contrast volatile-lru vs allkeys-lru or explain the risk of noeviction throwing errors.",
+        "Intermediate": "Correctly explains maxmemory-policy behaviors; proposes setting mandatory TTLs on ephemeral sessions and choosing volatile-lru (or separate cache instances) to prevent session data from evicting critical metadata.",
+        "Advanced": "Analyzes approximated LRU sampling algorithms in Redis, evaluates LFU (Least Frequently Used) vs LRU for skewed access frequencies, and recommends cluster tier isolation."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-redis-eviction"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-ipr-bytebytego-system-design",
+          "evidenceType": "interview-preparation-resource",
+          "supportedTopics": [
+            "cache-eviction",
+            "lru-eviction",
+            "redis-memory-management"
+          ],
+          "evidenceStrength": "strong-topic-match",
+          "notes": "ByteByteGo system design interview guide details LRU vs LFU eviction algorithms and memory capacity planning under distributed cache pressure."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-ipr-bytebytego-system-design"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-cache-03",
+      "roleId": "backend-developer",
+      "skillId": "caching",
+      "subskills": [
+        "cache-eviction-policies"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "A high-traffic backend service caches expensive database query results with a 10-minute TTL. When the cache key for a viral item expires, hundreds of concurrent requests simultaneously miss the cache and overwhelm the database. What is this phenomenon called, why does it occur, and what are two robust architectural techniques (such as mutex locking or probabilistic early expiration/XFetch) to prevent it?",
+      "expectedSignals": [
+        "Identifies the problem as Cache Stampede (or Thundering Herd)",
+        "Explains that multiple concurrent requests observe a cache miss at expiration time and all execute the expensive backing query simultaneously",
+        "Describes distributed mutex locking (e.g., Redis SET NX EX) so only one worker recalculates the cache while others wait or receive stale data",
+        "Describes probabilistic early expiration (e.g. XFetch algorithm) or background asynchronous refresh before hard TTL expiry"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not recognize cache stampede or suggests simply increasing the database server capacity.",
+        "Beginner": "Recognizes the thundering herd problem but only proposes basic locking without addressing lock timeouts, deadlocks, or stampede on lock release.",
+        "Intermediate": "Clearly explains the root cause of cache stampede; provides two concrete solutions such as distributed mutex with fallback or asynchronous pre-computation / stale-while-revalidate.",
+        "Advanced": "Formally explains the XFetch optimal probabilistic early expiration algorithm, discusses lock renewal, lease tokens (Meta Memcache paper), and jittered TTLs to prevent synchronized expiration."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-redis-data-types"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-cpig-meta-scaling-memcache",
+          "evidenceType": "company-published-interview-guidance",
+          "supportedTopics": [
+            "cache-stampede",
+            "thundering-herd",
+            "lease-mechanism"
+          ],
+          "evidenceStrength": "direct",
+          "notes": "Meta's seminal NSDI paper 'Scaling Memcache at Facebook' formally analyzes the cache stampede problem and introduces the lease token mechanism to prevent database overloading on key invalidation."
+        },
+        {
+          "sourceId": "src-ipr-bytebytego-system-design",
+          "evidenceType": "interview-preparation-resource",
+          "supportedTopics": [
+            "cache-stampede",
+            "distributed-caching-mitigation"
+          ],
+          "evidenceStrength": "strong-topic-match",
+          "notes": "ByteByteGo interview curriculum covers cache stampede mitigations including mutex locking and probabilistic refresh in production system design."
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-cpig-meta-scaling-memcache",
+        "src-ipr-bytebytego-system-design"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-cs-01",
+      "roleId": "backend-developer",
+      "skillId": "csharp",
+      "subskills": [
+        "csharp-linq-memory"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "In C# and the .NET runtime, what is the core behavioral and memory difference between a struct (value type) and a class (reference type)? Additionally, explain how LINQ's deferred execution works with IEnumerable<T>, and why calling .ToList() or .Count() changes when code executes.",
+      "expectedSignals": [
+        "Explains value types store data directly (stack or inline in object) vs reference types store memory pointers to managed heap objects",
+        "Mentions copying semantics: structs copy value bits by default while classes copy the reference pointer",
+        "Explains that IEnumerable<T> queries define an execution pipeline that does not evaluate until enumerated (foreach, .ToList())",
+        "Identifies multiple enumeration risks if deferred queries are executed repeatedly without materialization"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Confuses value and reference types or thinks LINQ queries execute immediately upon declaration.",
+        "Beginner": "Knows structs are value types and classes are reference types, but cannot explain copying implications or deferred execution mechanics.",
+        "Intermediate": "Clearly articulates value vs reference semantics; explains how LINQ operators use iterator state machines (yield return) to defer execution until materialized by terminal operators like .ToList().",
+        "Advanced": "Details garbage collection impact of heap allocations, boxing/unboxing overhead when casting structs to object or interfaces, and multiple-enumeration anti-patterns with EF Core / IQueryable."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-dotnet-memory"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-cs-02",
+      "roleId": "backend-developer",
+      "skillId": "csharp",
+      "subskills": [
+        "csharp-aspnet-core"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "In ASP.NET Core, explain the differences between Transient, Scoped, and Singleton service lifetimes. What critical architectural bug occurs if a Singleton service directly injects a Scoped service (such as an EF Core DbContext), and how should background workers or singletons safely resolve scoped dependencies?",
+      "expectedSignals": [
+        "Defines Transient (new instance per call), Scoped (single instance per HTTP request scope), Singleton (single instance for application lifetime)",
+        "Identifies the Captive Dependency anti-pattern: Singleton holding a Scoped reference keeps it alive indefinitely across requests",
+        "Explains that EF Core DbContext is not thread-safe; capturing it in a Singleton causes concurrent access exceptions and memory leaks",
+        "Solves the problem using IServiceScopeFactory to explicitly create an IServiceScope within a using statement"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not know the three lifetimes or sees no issue with injecting a Scoped service into a Singleton.",
+        "Beginner": "Lists the lifetime definitions from memory but fails to explain the captive dependency problem or how DbContext concurrency fails.",
+        "Intermediate": "Identifies captive dependency and DbContext thread-safety violations; provides the correct solution using IServiceScopeFactory.CreateScope() to create an explicit scope.",
+        "Advanced": "Discusses root container memory leaks from unresolved IDisposable transient instances in singletons, ValidateScopes in ASP.NET Core development mode, and thread-safety in asynchronous scopes."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-aspnetcore-di"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-cs-03",
+      "roleId": "backend-developer",
+      "skillId": "csharp",
+      "subskills": [
+        "csharp-async-threading"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "Explain how C#'s async and await keywords are transformed by the Roslyn compiler into a state machine. Why does blocking on asynchronous code using .Result or .Wait() risk thread-pool exhaustion or deadlocks (sync-over-async), and in what high-throughput backend scenarios should you return ValueTask<T> instead of Task<T>?",
+      "expectedSignals": [
+        "Explains that Roslyn generates an IAsyncStateMachine struct that registers continuations without blocking OS threads",
+        "Explains sync-over-async: blocking synchronous threads on unfinished tasks consumes thread pool workers and can deadlock if synchronization contexts wait for the blocking thread",
+        "Defines ValueTask<T> as a discriminated union struct avoiding heap allocation when an operation completes synchronously (e.g. cache hit)",
+        "Discusses ConfigureAwait(false) in library code and thread-pool starvation under high concurrent web traffic"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Believes async/await creates a new OS thread per method or does not understand why .Result is harmful.",
+        "Beginner": "Knows .Result can cause deadlocks and async is non-blocking, but cannot explain the state machine or the purpose of ValueTask.",
+        "Intermediate": "Explains the compiler-generated state machine; explains how .Result blocks thread-pool threads leading to starvation; explains ValueTask<T> saves heap allocations for synchronous paths.",
+        "Advanced": "Details continuation scheduling on the ThreadPool, memory allocation costs of Task<T> vs ValueTask<T>, rules against double-awaiting ValueTask, and thread-pool hill-climbing latency under starvation."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-dotnet-async"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-java-01",
+      "roleId": "backend-developer",
+      "skillId": "java",
+      "subskills": [
+        "java-concurrency-jvm"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "In Java, what is the contract between .equals() and .hashCode()? What critical bug occurs in a HashMap or HashSet if a class overrides .equals() but fails to override .hashCode()? Additionally, explain the architectural difference between checked exceptions (Exception) and unchecked exceptions (RuntimeException).",
+      "expectedSignals": [
+        "Contract: if a.equals(b) is true, then a.hashCode() == b.hashCode() must be true",
+        "Failing to override hashCode() causes equal objects to compute different bucket indices, making retrieval from HashMap/HashSet fail",
+        "Checked exceptions must be declared in method signatures (throws) or caught at compile time; unchecked (RuntimeException) represent programming errors or unexpected runtime faults",
+        "Modern backend practices generally favor unchecked exceptions for clean layered service architectures"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot state the equals/hashCode contract or confuses checked with unchecked exceptions.",
+        "Beginner": "States that equal objects must have equal hashCodes, but cannot explain how hash buckets work in HashMap or why objects disappear in lookups.",
+        "Intermediate": "Explains bucket indexing via hash code; shows that mismatched hashCodes cause lookup misses even when objects are logically equal; distinguishes checked vs unchecked exceptions and their handling rules.",
+        "Advanced": "Discusses hash collision resolution (linked list to red-black tree in Java 8+ HashMap), immutable keys, and architectural trade-offs of checked exceptions in distributed architectures."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-oracle-java-concurrency"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-java-02",
+      "roleId": "backend-developer",
+      "skillId": "java",
+      "subskills": [
+        "java-spring-boot"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "In a Spring Boot backend application, a developer marks a method with @Transactional. However, when that method is invoked from another method within the same service class (this.processOrder()), transactions fail to commit or rollback. Explain how Spring's AOP proxy mechanism causes this issue, and explain why unchecked exceptions trigger a rollback by default while checked exceptions do not.",
+      "expectedSignals": [
+        "Explains Spring uses dynamic proxies (CGLIB or JDK dynamic proxies) around beans to intercept calls and manage transaction lifecycles",
+        "Internal self-invocation (this.method()) bypasses the proxy interceptor, calling the target instance directly without transaction advice",
+        "Explains default rollback behavior: Spring rolls back for RuntimeException and Error, but commits for checked Exception by default",
+        "Resolves the issue by extracting logic to an external service bean, injecting self-proxy, or configuring rollbackFor = Exception.class"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Unaware of Spring proxies or claims @Transactional always works regardless of caller.",
+        "Beginner": "Mentions that self-invocation doesn't work, but cannot explain the AOP proxy mechanism or default rollback rules.",
+        "Intermediate": "Accurately explains that proxy interception only wraps external bean calls, so internal calls bypass transaction boundaries; explains rollbackFor requirements for checked exceptions.",
+        "Advanced": "Analyzes CGLIB subclassing vs JDK interface proxies, transaction propagation behaviors (e.g. REQUIRES_NEW), and database connection pooling release mechanics."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-spring-framework"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-java-03",
+      "roleId": "backend-developer",
+      "skillId": "java",
+      "subskills": [
+        "java-concurrency-jvm"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "Traditional Java web servers allocated one OS platform thread per client request. What scalability and memory bottlenecks occur under this model when handling 50,000 concurrent blocking I/O connections? How do Java 21+ Virtual Threads (Project Loom) solve this, how does the JVM schedule them on carrier threads, and what is 'pinning'?",
+      "expectedSignals": [
+        "Traditional platform threads map 1:1 to OS kernel threads, consuming ~1MB stack memory each and degrading under OS context switching",
+        "Virtual threads are lightweight user-mode threads managed by the JVM with small dynamic stacks (kilobytes) stored on the heap",
+        "When a virtual thread performs blocking I/O (e.g. network/DB), the JVM unmounts it from the carrier platform thread until the I/O completes",
+        "Explains thread pinning: synchronized blocks or native methods (JNI) prevent unmounting from the carrier thread, blocking the underlying OS thread"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Confuses virtual threads with reactive programming or does not understand thread stack memory constraints.",
+        "Beginner": "Knows virtual threads are lightweight and improve concurrency, but cannot explain carrier threads or the mechanism of non-blocking I/O unmounting.",
+        "Intermediate": "Explains the 1:1 OS thread model memory/context-switch limits; explains M:N scheduling where the JVM parks virtual threads upon blocking I/O; identifies carrier thread pinning in synchronized blocks.",
+        "Advanced": "Details ForkJoinPool carrier schedulers, replacing synchronized with ReentrantLock to prevent pinning, and the impact of virtual threads on thread-local variables and object pooling anti-patterns."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-openjdk-virtual-threads"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-py-01",
+      "roleId": "backend-developer",
+      "skillId": "python",
+      "subskills": [
+        "python-asyncio-fastapi"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "In Python, how do the underlying data structures of a list, a dict, and a set differ in lookup complexity and hashing requirements? Additionally, explain what a generator function (yield) is and why using a generator to process a 10GB log file is more memory-efficient than returning a full list.",
+      "expectedSignals": [
+        "Lists are dynamic arrays with O(N) lookup; dicts and sets are open-addressing hash tables with O(1) average lookup",
+        "Dict/set keys must be hashable and implement __hash__ and __eq__ (immutable types)",
+        "Generators produce values lazily on-demand using yield, maintaining execution state across iterations",
+        "Processing 10GB file: generators stream one line at a time (O(1) memory) instead of loading the entire 10GB into RAM"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not understand lookup complexity or thinks generators load data all at once.",
+        "Beginner": "States dicts are O(1) and lists are O(N), and notes that generators save memory, but cannot explain the iterator protocol or hashing requirements.",
+        "Intermediate": "Accurately explains open-addressing hash table lookups and hashability rules; explains how yield produces an iterator that streams data with constant memory footprint.",
+        "Advanced": "Details generator frame objects, Python's compact dictionary implementation (split-table and key/value arrays), and the itertools module for memory-bounded data processing pipelines."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-python-data-model"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-py-02",
+      "roleId": "backend-developer",
+      "skillId": "python",
+      "subskills": [
+        "python-asyncio-fastapi"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "In an asynchronous FastAPI application running under Uvicorn, a developer writes an async def get_report() route handler that calls a blocking synchronous library (time.sleep(5) or a synchronous database client). Why does this degrade response times for ALL users across the entire server, and how should blocking I/O or CPU operations be properly offloaded in async Python?",
+      "expectedSignals": [
+        "Explains Python's asyncio uses a single-threaded cooperative event loop",
+        "A synchronous blocking call in an async def function halts the single event loop, preventing all other concurrent requests from progressing",
+        "Explains that defining the route as plain def get_report() causes FastAPI to automatically offload it to an external thread pool",
+        "For async functions, offload using asyncio.to_thread() or an external background task queue (Celery, ARQ) for heavy tasks"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Believes async def automatically makes synchronous blocking libraries non-blocking or does not understand event-loop blocking.",
+        "Beginner": "Understands that the server freezes, but does not explain the single-threaded event loop or proposes using asyncio.sleep() for CPU/synchronous I/O libraries.",
+        "Intermediate": "Explains that blocking operations starve the cooperative event loop; demonstrates offloading using asyncio.to_thread() or utilizing standard def thread-pool routing in FastAPI.",
+        "Advanced": "Evaluates thread pool limits (anyio.to_thread), context variables propagation across threads, and architectural separation between I/O-bound async event loops and CPU-bound process pools."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-fastapi",
+        "src-doc-python-asyncio"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-py-03",
+      "roleId": "backend-developer",
+      "skillId": "python",
+      "subskills": [
+        "python-gil-multiprocessing"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "What is Python's Global Interpreter Lock (GIL), and why does it prevent multi-threaded Python programs from utilizing multiple CPU cores for CPU-bound computations? Compare multithreading, multiprocessing (multiprocessing / Celery), and async I/O in Python. In a high-traffic production backend combining API routing and image processing, how would you architect the system?",
+      "expectedSignals": [
+        "GIL is a mutex protecting CPython memory management and reference counts, allowing only one native thread to execute Python bytecode at a time",
+        "Multithreading helps with I/O-bound concurrency (threads release GIL during I/O) but fails to parallelize CPU-bound tasks",
+        "Multiprocessing bypasses the GIL by spawning independent OS processes, each with its own memory space and interpreter",
+        "Architecture: Async API tier (FastAPI/Uvicorn with multiple worker processes) accepts requests and delegates CPU-intensive tasks via a message broker (RabbitMQ/Redis) to background worker processes (Celery)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not understand the GIL or assumes standard Python threads achieve parallel multi-core CPU execution.",
+        "Beginner": "Knows the GIL limits multi-core threading, but cannot explain why CPython requires it or how to separate I/O and CPU workloads architecturally.",
+        "Intermediate": "Clearly explains reference count safety as the GIL rationale; compares threads vs processes; proposes an architecture offloading image processing to worker processes via a queue.",
+        "Advanced": "Discusses IPC serialization/deserialization (pickle) overhead, shared memory (multiprocessing.shared_memory), and the architectural decoupling of API web servers from asynchronous task queues."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-python-data-model"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-cpp-01",
+      "roleId": "backend-developer",
+      "skillId": "cpp",
+      "subskills": [
+        "cpp-raii-memory"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "In C++, what are the key differences between a pointer and a reference? Explain the concept of Resource Acquisition Is Initialization (RAII). How does tying resource lifetimes (such as heap memory, file handles, or database mutexes) to object stack lifetimes prevent resource leaks when exceptions are thrown?",
+      "expectedSignals": [
+        "Pointers can be null, reassigned, and require pointer arithmetic/dereferencing; references are non-null aliases bound at initialization",
+        "RAII binds the lifecycle of a resource to the lifetime of an object: allocated in constructor, released in destructor",
+        "Stack unwinding automatically invokes destructors when an exception leaves scope, guaranteeing deterministic cleanup",
+        "Eliminates manual delete, close(), or unlock() calls prone to developer error"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot distinguish pointers from references or does not understand RAII.",
+        "Beginner": "States basic syntax differences between * and &, and knows destructors clean up, but cannot explain stack unwinding during exceptions.",
+        "Intermediate": "Articulates pointer vs reference semantics; explains RAII principles and how deterministic stack unwinding guarantees destructor execution even during exceptions.",
+        "Advanced": "Discusses exception-safety guarantees (basic, strong, noexcept), zero-overhead abstractions, and custom deleters for non-memory OS resources."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-cppreference-raii"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-cpp-02",
+      "roleId": "backend-developer",
+      "skillId": "cpp",
+      "subskills": [
+        "cpp-raii-memory"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "In modern C++ (C++11 and later), explain when you should use std::unique_ptr, std::shared_ptr, and std::weak_ptr. In a backend service managing active TCP client connections, why is std::unique_ptr preferred for exclusive socket ownership, how do move semantics transfer ownership, and what memory leak occurs if two objects hold shared_ptr to each other?",
+      "expectedSignals": [
+        "unique_ptr: exclusive ownership, zero runtime overhead compared to raw pointer, movable but non-copyable",
+        "shared_ptr: shared ownership via atomic reference counting control block",
+        "weak_ptr: non-owning observer breaking circular reference cycles",
+        "Move semantics (std::move) transfer ownership of unique resources without copying; cyclic shared_ptr references prevent refcount from reaching zero, leaking memory"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Confuses smart pointers with raw pointers or cannot explain why shared ownership can leak.",
+        "Beginner": "Knows unique_ptr is single-owner and shared_ptr is multiple-owner, but cannot explain move semantics or cyclic leaks.",
+        "Intermediate": "Accurately contrasts unique_ptr and shared_ptr; explains how move semantics transfer ownership to unique_ptr; explains circular reference leaks and how weak_ptr resolves them.",
+        "Advanced": "Details the control block allocation in make_shared vs shared_ptr(new), atomic reference count increment/decrement performance overhead, and thread safety of control block vs pointed-to object."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-cppreference-raii",
+        "src-ref-effective-modern-cpp"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-cpp-03",
+      "roleId": "backend-developer",
+      "skillId": "cpp",
+      "subskills": [
+        "cpp-templates-stl"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "In a high-throughput multi-threaded C++ backend service, multiple worker threads concurrently update a shared metrics counter. What constitutes a Data Race in the C++ memory model, and why is it Undefined Behavior? Contrast solving this with std::mutex, std::atomic<uint64_t> (with relaxed or acquire-release memory order), and lock-free programming.",
+      "expectedSignals": [
+        "Data race occurs when two threads access the same memory location concurrently, at least one is a write, and neither uses synchronization",
+        "Data races cause Undefined Behavior (UB), allowing compiler optimizations and CPU instruction reordering to produce corrupted state",
+        "std::mutex: OS-level blocking, context switching overhead under high contention",
+        "std::atomic: hardware-assisted atomic CPU instructions (e.g. LOCK XADD / CAS); explains sequential consistency vs relaxed memory ordering"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not know what a data race is or believes atomic operations and mutexes are identical in performance and semantics.",
+        "Beginner": "Recognizes data races cause bugs and proposes mutex locking, but cannot explain atomic memory orders or hardware-level lock-free concepts.",
+        "Intermediate": "Defines data race and undefined behavior; contrasts mutex locking overhead with std::atomic; explains acquire-release semantics for synchronization across threads.",
+        "Advanced": "Deeply evaluates hardware memory models (x86 TSO vs ARM relaxed), CPU cache line bouncing (false sharing), ABA problem in lock-free CAS queues, and compiler memory barriers."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-cppreference-concurrency"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-js-01",
+      "roleId": "backend-developer",
+      "skillId": "javascript",
+      "subskills": [
+        "js-event-loop"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "Node.js runs JavaScript on a single thread. Explain the relationship between the Call Stack, the Event Loop, Microtasks (e.g. Promise.then, process.nextTick), and Macrotasks (e.g. setTimeout, setImmediate). In what exact sequence will console.log statements execute when mixing synchronous code, a Promise resolution, and a setTimeout(..., 0)?",
+      "expectedSignals": [
+        "Call stack executes synchronous frames to completion (Run-to-Completion)",
+        "Microtask queue (process.nextTick, resolved promises) is drained immediately after the current operation finishes and before moving to the next event loop phase",
+        "Macrotask queue (timers like setTimeout, I/O callbacks) executes in discrete phases of the event loop",
+        "Execution order: Synchronous code -> Microtasks (Promises) -> Macrotasks (setTimeout)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Believes Node.js executes JavaScript on multiple parallel threads or cannot order Promise vs setTimeout execution.",
+        "Beginner": "Knows Promises execute before setTimeout, but cannot explain the event loop phases or microtask queue draining.",
+        "Intermediate": "Accurately explains call stack, microtask queue, and event loop phases; traces exact output order of mixed sync, Promise, and setTimeout code with correct technical justification.",
+        "Advanced": "Details process.nextTick queue priority over standard microtasks, microtask queue starvation, and the difference between setImmediate (check phase) and setTimeout (timers phase)."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-nodejs-event-loop"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-js-02",
+      "roleId": "backend-developer",
+      "skillId": "javascript",
+      "subskills": [
+        "js-streams-buffers"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "You are building an HTTP endpoint in Node.js that accepts a 2GB CSV file upload and streams it to cloud object storage (or transforms it line-by-line). Why does using fs.readFile() or accumulating chunks in memory crash the server with an ERR_STRING_TOO_LONG or heap out-of-memory error? How do Node.js Streams and the stream.pipeline API manage Backpressure to protect server memory?",
+      "expectedSignals": [
+        "fs.readFile buffers the entire 2GB file in V8 heap memory, exceeding default heap limits (~1.4GB - 2GB) and crashing the Node.js process",
+        "Streams process data in small chunks (buffers of highWaterMark, typically 16KB/64KB)",
+        "Backpressure: when the writable stream's buffer fills, it signals the readable stream to pause (pause()) until drained (drain event)",
+        "stream.pipeline automatically wires readable/transform/writable streams and manages backpressure, cleanup, and error propagation"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests increasing Node heap memory to 10GB or cannot explain how streaming prevents memory crashes.",
+        "Beginner": "Knows streams process data in pieces to save memory, but cannot explain backpressure or why .pipe() is error-prone compared to stream.pipeline.",
+        "Intermediate": "Accurately explains V8 heap limitations; describes the backpressure flow-control mechanism; uses pipeline() with async/await for proper resource cleanup.",
+        "Advanced": "Evaluates highWaterMark tuning, Transform stream memory pressure, backpressure in custom stream implementations, and unhandled stream destructions causing socket leaks."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-nodejs-streams"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-js-03",
+      "roleId": "backend-developer",
+      "skillId": "javascript",
+      "subskills": [
+        "js-event-loop"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "A backend service written in Express/Node.js handles 5,000 HTTP requests per second. A developer introduces a route that executes a synchronous cryptographic calculation or parses a massive JSON string synchronously. Explain how this causes Event Loop Starvation, what happens to health check probes and network latency across all routes, and how you would architect the solution using Worker Threads (worker_threads) or a task queue.",
+      "expectedSignals": [
+        "Synchronous computation blocks the main V8 thread, preventing the Event Loop from processing any I/O callbacks, timer ticks, or incoming connections",
+        "Health checks (e.g. Kubernetes /healthz) timeout because the event loop cannot respond, triggering unwanted container restarts",
+        "Node.js utilizes libuv threadpool for asynchronous I/O (file system, crypto methods), but user JS runs purely on the main thread",
+        "Solution: offload heavy CPU operations to worker_threads (sharing memory via SharedArrayBuffer) or delegate asynchronously to an external worker service"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Thinks Node.js automatically balances synchronous loops across CPU cores or denies that one route affects others.",
+        "Beginner": "Understands the server becomes unresponsive, but cannot explain how event loop starvation causes timeouts or how to use worker threads.",
+        "Intermediate": "Clearly explains how main thread blocking stops event loop progression; analyzes failure modes like failed health checks; details offloading via worker_threads or microservices.",
+        "Advanced": "Evaluates the libuv threadpool (UV_THREADPOOL_SIZE), IPC serialization costs between main thread and worker threads, cluster module multi-process models, and event loop latency monitoring (perf_hooks)."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-nodejs-event-loop"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-ts-01",
+      "roleId": "backend-developer",
+      "skillId": "typescript",
+      "subskills": [
+        "ts-advanced-types"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "Explain the concept of Structural Typing (duck typing) in TypeScript and how it differs from Nominal Typing (as in Java or C#). What is a Discriminated Union (tagged union), and how does TypeScript's control-flow analysis use a common discriminant property to narrow types safely?",
+      "expectedSignals": [
+        "Structural typing checks shape/properties rather than explicit class hierarchy or nominal names",
+        "Two types with identical members are mutually assignable regardless of their names or declarations",
+        "Discriminated union combines object types sharing a common literal property (e.g., type: 'success' | 'error')",
+        "TypeScript compiler uses switch/if blocks on the discriminant tag to narrow to the exact subtype with full type safety"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not understand structural typing or claims TypeScript enforces nominal runtime classes.",
+        "Beginner": "Knows types are checked at compile time, but cannot explain duck typing or the structure of discriminated unions.",
+        "Intermediate": "Clearly contrasts structural vs nominal typing; provides an accurate example of a discriminated union and explains compiler type narrowing.",
+        "Advanced": "Discusses excess property checks on object literals, exhaustiveness checking using the never type in switch default cases, and performance of union distribution."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-typescript-handbook"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-ts-02",
+      "roleId": "backend-developer",
+      "skillId": "typescript",
+      "subskills": [
+        "ts-schema-validation"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "A backend developer creates a TypeScript interface CreateUserRequest and assumes that incoming HTTP request bodies typed as req.body as CreateUserRequest are validated. Why is this assumption fatally flawed due to Type Erasure? How do schema validation libraries (such as Zod) bridge compile-time types with runtime validation, and how does z.infer<typeof schema> enforce single-source-of-truth types?",
+      "expectedSignals": [
+        "TypeScript types and interfaces are completely erased during compilation to JavaScript; no runtime validation exists natively",
+        "Using as CreateUserRequest (type assertion) silences the compiler without validating actual payload data at runtime, risking undefined property errors or security vulnerabilities",
+        "Schema validation libraries validate actual incoming JSON payloads at runtime and reject malformed input",
+        "z.infer<typeof schema> extracts static TypeScript types directly from the runtime schema definition, eliminating duplicate maintenance"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Believes TypeScript interfaces exist and validate input at runtime in production JavaScript.",
+        "Beginner": "Knows types are erased at compile time, but does not know how to validate runtime data or how schema inference works.",
+        "Intermediate": "Explains type erasure and why type assertions (as) are dangerous at API boundaries; demonstrates runtime validation using Zod and type inference via z.infer.",
+        "Advanced": "Evaluates performance tradeoffs of schema parsing vs JIT-compiled validators (e.g. TypeBox / Ajv), sanitization of unexpected properties, and custom validation refinement rules."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-zod-schema",
+        "src-doc-typescript-handbook"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-ts-03",
+      "roleId": "backend-developer",
+      "skillId": "typescript",
+      "subskills": [
+        "ts-advanced-types"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "In a backend application, you want to create a generic repository or data mapper that transforms domain entities into database update payloads, making all properties optional EXCEPT the id property, while stripping any methods. How would you implement this using mapped types, conditional types, and utility types (like Omit, Pick, Partial)? Explain how the infer keyword works in conditional types.",
+      "expectedSignals": [
+        "Utilizes utility types: Pick<T, 'id'> & Partial<Omit<T, 'id'>> or custom mapped type",
+        "Uses conditional type filtering (e.g. T[K] extends Function ? never : K) to strip functions",
+        "Explains conditional type syntax: T extends U ? X : Y",
+        "Explains infer keyword: introduces a type variable within a conditional type check to extract inner types (e.g. unpacking Promise return type T extends Promise<infer R> ? R : T)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot construct utility types or has no understanding of conditional types.",
+        "Beginner": "Uses Partial<T> but cannot preserve mandatory id or explain how conditional type resolution operates.",
+        "Intermediate": "Combines utility types (Pick, Omit, Partial) to produce the required shape; explains conditional types and the infer keyword for type extraction.",
+        "Advanced": "Constructs custom mapped types with key remapping (as), handles deep partial structures, and explains distributive conditional types over naked type parameters."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-typescript-handbook"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-go-01",
+      "roleId": "backend-developer",
+      "skillId": "go",
+      "subskills": [
+        "go-interfaces-composition"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "In Go, what is the internal memory difference between an Array and a Slice? How does Go's interface implementation model (implicit structural satisfaction) differ from explicit interfaces in Java/C#? Finally, why does Go use explicit multiple return values (result, error) instead of exceptions for error handling?",
+      "expectedSignals": [
+        "Arrays have fixed compile-time lengths and are passed by value (entire memory copied); Slices are 24-byte headers containing a pointer to an underlying array, length, and capacity",
+        "Implicit interfaces: a type implements an interface automatically by implementing its methods; no implements keyword required",
+        "Decouples packages: consumers define the interfaces they need rather than producers forcing them",
+        "Explicit error handling: errors are values that must be checked, preventing unhandled runtime exception propagation and keeping control flow explicit"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not understand slices or claims Go has class inheritance.",
+        "Beginner": "Knows slices are resizable arrays and errors are returned, but cannot explain the 3-word slice header or implicit interface mechanics.",
+        "Intermediate": "Accurately explains slice header (ptr, len, cap) vs fixed arrays; explains implicit interface satisfaction; articulates why Go treats errors as explicit values.",
+        "Advanced": "Details slice reallocation behavior (append copying underlying array when exceeding capacity), interface fat pointers (itab + data pointer), and error wrapping with fmt.Errorf('%w') and errors.Is."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-golang-effective-go"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-go-02",
+      "roleId": "backend-developer",
+      "skillId": "go",
+      "subskills": [
+        "go-goroutines-channels"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "You are implementing an asynchronous batch processor in Go that fetches 1,000 external API records. How would you implement a Worker Pool using buffered channels and sync.WaitGroup to limit concurrency to 10 workers? What constitutes a Goroutine Leak, and how do you ensure goroutines terminate cleanly when an error occurs or when the client cancels the HTTP request?",
+      "expectedSignals": [
+        "Creates a jobs channel and results channel; spawns 10 worker goroutines that read from the jobs channel until closed",
+        "Uses sync.WaitGroup to wait for all workers or processed results to complete",
+        "Goroutine leak occurs when a goroutine is blocked indefinitely on a channel send/receive or lock, preventing garbage collection of its stack",
+        "Uses context.Context (ctx.Done()) inside workers to listen for cancellation or timeouts and exit immediately"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not understand goroutines or suggests spawning 1,000 unconstrained goroutines without rate limiting or leak prevention.",
+        "Beginner": "Outlines a basic goroutine loop, but cannot properly close channels, coordinate WaitGroup, or explain goroutine leaks.",
+        "Intermediate": "Implements a bounded worker pool with jobs channel and sync.WaitGroup; explains how unbuffered channel blocks cause goroutine leaks; integrates context.Context for clean termination.",
+        "Advanced": "Manages bidirectional cancellation, handles channel draining on early error abort, avoids closing already-closed channels, and analyzes scheduler overhead."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-golang-concurrency"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-go-03",
+      "roleId": "backend-developer",
+      "skillId": "go",
+      "subskills": [
+        "go-goroutines-channels"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "Explain how the Go runtime schedules goroutines using the GMP model (Goroutines, Machines/OS threads, Processors/logical contexts). How does the scheduler handle blocking system calls vs cooperative preemption? When architecting a high-performance backend, when should you use sync.Mutex / sync.RWMutex instead of Go Channels, and why is the phrase 'Share memory by communicating' not a universal replacement for mutexes?",
+      "expectedSignals": [
+        "G (Goroutine with small stack), M (OS thread), P (logical processor representing resource context, equal to GOMAXPROCS)",
+        "Work-stealing algorithm: when a P runs out of Gs in its local run queue, it steals work from another P's queue or the global queue",
+        "Syscalls: M blocks on OS syscall, P detaches and pairs with a new/idle M to continue running other Gs; cooperative preemption via compiler-inserted function prologue checks and signal-based preemption",
+        "Mutex vs Channel: Channels excel for passing data ownership, streaming, and coordinating pipelines; Mutexes are faster and simpler for fine-grained in-memory state protection (e.g. counters, shared maps)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not know what the GMP model is or believes Go channels have zero memory/allocation overhead.",
+        "Beginner": "Knows Go has a scheduler and channels pass data, but cannot explain P (processors), work-stealing, or when mutexes outperform channels.",
+        "Intermediate": "Accurately explains the GMP model, local run queues, and work-stealing; articulates clear criteria for choosing mutexes (in-memory state) vs channels (data ownership and synchronization).",
+        "Advanced": "Analyzes non-cooperative signal preemption in Go 1.14+, cache contention on channel synchronization, lock-free primitives in sync/atomic, and memory allocation costs of channel queues."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-golang-effective-go"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-rust-01",
+      "roleId": "backend-developer",
+      "skillId": "rust",
+      "subskills": [
+        "rust-ownership-borrowing"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "Explain Rust's core ownership model: what are the three rules of ownership, and how do they eliminate garbage collection while preventing memory leaks and double-frees? Explain the borrowing rules for immutable references (&T) versus mutable references (&mut T). How does the Result<T, E> enum with the ? operator enable compile-time error handling?",
+      "expectedSignals": [
+        "Three rules: 1) Each value has an owner; 2) There can only be one owner at a time; 3) When the owner goes out of scope, the value is dropped",
+        "Borrowing rules: either any number of immutable references (&T) OR exactly one mutable reference (&mut T), but never both simultaneously",
+        "Prevents data races at compile time without runtime garbage collection overhead",
+        "Result<T, E> is an enum with Ok(T) and Err(E); the ? operator unwrap Ok or early-returns Err, converting error types via From/Into"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot state the ownership rules or believes Rust uses a tracing garbage collector.",
+        "Beginner": "States that Rust doesn't use a GC and has borrow checking, but cannot explain the aliasing XOR mutability principle or the ? operator.",
+        "Intermediate": "Clearly explains the three ownership rules and the single-writer OR multiple-readers borrowing rules; explains how Result<T, E> and ? provide safe, explicit error propagation.",
+        "Advanced": "Details move semantics and drop flags, lifetime elision rules in function signatures, and custom error types using thiserror or anyhow."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-rust-book"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-rust-02",
+      "roleId": "backend-developer",
+      "skillId": "rust",
+      "subskills": [
+        "rust-async-tokio"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "In an asynchronous backend web service built with Tokio and Axum, multiple request handler tasks need to update a shared in-memory state (such as a database connection pool or session cache). Why does passing a standard Rc<RefCell<T>> fail to compile across async tasks? Why is Arc<tokio::sync::Mutex<T>> or Arc<std::sync::Mutex<T>> required, and when must you use an async-aware mutex instead of the standard library mutex?",
+      "expectedSignals": [
+        "Rc and RefCell do not implement the Send trait, preventing them from safely crossing thread boundaries in a multi-threaded Tokio runtime",
+        "Arc (Atomic Reference Counted) implements Send and Sync for thread-safe shared ownership",
+        "std::sync::Mutex blocks the underlying OS thread; holding it across an .await point will block the Tokio worker thread and can cause deadlocks",
+        "tokio::sync::Mutex yields execution to the runtime when awaiting the lock, making it safe across .await suspension points"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not understand why Rc fails in async Rust or cannot differentiate Send from Sync.",
+        "Beginner": "Knows Arc is for multi-threading, but cannot explain the Send trait or when to choose Tokio's mutex over std::sync::Mutex.",
+        "Intermediate": "Explains Send and Sync requirements for spawned Tokio tasks; explains that std::sync::MutexGuard held across .await causes deadlocks or prevents compilation; uses Arc<tokio::sync::Mutex<T>> correctly.",
+        "Advanced": "Explains when a standard mutex is actually preferable (short, non-awaiting critical sections for lower overhead), alternatives like message passing via mpsc channels, and lock contention profiling in Tokio."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-rust-tokio"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-rust-03",
+      "roleId": "backend-developer",
+      "skillId": "rust",
+      "subskills": [
+        "rust-async-tokio"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "How does Rust's poll-based Future model differ from Promise-based runtimes (like JavaScript or C# Tasks)? What is the purpose of Pin<&mut T>, and why is memory self-referentiality an issue in generated async state machines? Finally, what is 'Cancellation Safety' in async Rust, and what data corruption occurs if a Future is dropped midway through an operation in a tokio::select! block?",
+      "expectedSignals": [
+        "Rust futures are lazy and do nothing unless polled via Future::poll(Pin<&mut Self>, &mut Context<'_>)",
+        "Async functions compile into state machines where local variables held across .await points can borrow other fields of the same state machine (self-referential structs)",
+        "Moving a self-referential struct invalidates internal pointers; Pin guarantees that the value will not be moved in memory before being dropped",
+        "Cancellation safety: dropping a future (e.g. when another branch of tokio::select! completes) aborts execution at the .await point; if partial state was written, cancellation can cause invariant violations or data loss"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Thinks Rust futures execute eagerly upon creation or does not understand Pin or cancellation.",
+        "Beginner": "Knows futures need to be awaited and Pin prevents moving, but cannot explain self-referential structures or cancellation safety.",
+        "Intermediate": "Explains lazy poll-based evaluation; explains how compiler-generated async state machines contain self-references requiring Pin; explains cancellation safety hazards in tokio::select!.",
+        "Advanced": "Details the Waker contract and wake-by-ref mechanism, analyzes unpin types vs !Unpin, and designs cancellation-safe state machine patterns (e.g. transactional staging or dedicated spawned background tasks)."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-rust-book",
+        "src-doc-rust-tokio"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    }
+  ]
+}

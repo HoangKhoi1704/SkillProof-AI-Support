@@ -1,0 +1,428 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SkillProof Backend Sources Catalog",
+  "version": "1.2.0",
+  "description": "Authoritative frameworks, official standards, official documentation, professional references, interview preparation resources, and company-published interview guidance anchoring backend competencies.",
+  "sources": [
+    {
+      "sourceId": "src-cf-roadmap-backend",
+      "publisher": "roadmap.sh / Kamran Ahmed",
+      "title": "Backend Developer Roadmap",
+      "url": "https://roadmap.sh/backend",
+      "sourceType": "career-framework",
+      "verificationStatus": "community-curated-verified",
+      "accessedAt": "2026-09-16",
+      "notes": "Community-curated visual reference guide for backend development skills and technologies. Widely adopted community framework; not an official accredited occupational standard."
+    },
+    {
+      "sourceId": "src-cf-sfia-9-software-dev",
+      "publisher": "SFIA Foundation",
+      "title": "Skills Framework for the Information Age (SFIA 9) - Software Development (PROG)",
+      "url": "https://sfia-online.org/en/sfia-9/skills/software-development",
+      "sourceType": "career-framework",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "SFIA 9 global competency framework defining software development behaviors across proficiency levels. Does not prescribe a single universal backend developer job definition."
+    },
+    {
+      "sourceId": "src-doc-rfc9110-http",
+      "publisher": "Internet Engineering Task Force (IETF)",
+      "title": "RFC 9110: HTTP Semantics",
+      "url": "https://www.rfc-editor.org/rfc/rfc9110.html",
+      "sourceType": "official-standard",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Authoritative Internet standard defining HTTP request methods, idempotency, safety, conditional headers, and status codes."
+    },
+    {
+      "sourceId": "src-doc-rfc7519-jwt",
+      "publisher": "Internet Engineering Task Force (IETF)",
+      "title": "RFC 7519: JSON Web Token (JWT)",
+      "url": "https://www.rfc-editor.org/rfc/rfc7519.html",
+      "sourceType": "official-standard",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Authoritative Internet standard defining compact, URL-safe claim representations and cryptographic signature validation."
+    },
+    {
+      "sourceId": "src-doc-postgresql-explain",
+      "publisher": "PostgreSQL Global Development Group",
+      "title": "PostgreSQL Documentation: Using EXPLAIN",
+      "url": "https://www.postgresql.org/docs/current/using-explain.html",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official relational database engine documentation explaining query execution plans, index scans, cost estimation, and optimizer decisions."
+    },
+    {
+      "sourceId": "src-doc-owasp-api-security",
+      "publisher": "OWASP Foundation",
+      "title": "OWASP API Security Top 10 (2023)",
+      "url": "https://owasp.org/API-Security/editions/2023/en/0x11-t10/",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Industry-standard security awareness resource cataloging critical security vulnerabilities in modern web APIs."
+    },
+    {
+      "sourceId": "src-ref-ddia-kleppmann",
+      "publisher": "O'Reilly Media / Martin Kleppmann",
+      "title": "Designing Data-Intensive Applications",
+      "url": "https://dataintensive.net/",
+      "sourceType": "professional-reference",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Definitive professional engineering reference on database storage engines, transaction isolation, replication, and distributed systems."
+    },
+    {
+      "sourceId": "src-ref-xunit-test-patterns",
+      "publisher": "Addison-Wesley Professional / Gerard Meszaros",
+      "title": "xUnit Test Patterns: Refactoring Test Code",
+      "url": "http://xunitpatterns.com/",
+      "sourceType": "professional-reference",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Authoritative architectural reference cataloging test doubles (mocks, stubs, fakes, spies), assertion practices, and test code smells."
+    },
+    {
+      "sourceId": "src-ref-google-sre-book",
+      "publisher": "O'Reilly Media / Google",
+      "title": "Site Reliability Engineering: How Google Runs Production Systems",
+      "url": "https://sre.google/sre-book/table-of-contents/",
+      "sourceType": "professional-reference",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Industry engineering reference on cascading failures, distributed rate limiting, graceful degradation, and system reliability."
+    },
+    {
+      "sourceId": "src-ipr-system-design-primer",
+      "publisher": "Donne Martin / Open Source Community",
+      "title": "The System Design Primer",
+      "url": "https://github.com/donnemartin/system-design-primer",
+      "sourceType": "interview-preparation-resource",
+      "verificationStatus": "community-curated-verified",
+      "accessedAt": "2026-09-16",
+      "notes": "Open-source community educational resource curating system design concepts, patterns, trade-offs, and interview preparation guides. Reclassified from candidate-reported-interview to interview-preparation-resource."
+    },
+    {
+      "sourceId": "src-ipr-leetcode-175-combine-two-tables",
+      "publisher": "LeetCode",
+      "title": "LeetCode Database Problem #175: Combine Two Tables",
+      "url": "https://leetcode.com/problems/combine-two-tables/",
+      "sourceType": "interview-preparation-resource",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Canonical SQL interview problem testing candidate understanding of LEFT JOIN vs INNER JOIN to preserve records without foreign key matches."
+    },
+    {
+      "sourceId": "src-ipr-bytebytego-system-design",
+      "publisher": "ByteByteGo / Alex Xu",
+      "title": "System Design Interview – An Insider's Guide",
+      "url": "https://bytebytego.com/",
+      "sourceType": "interview-preparation-resource",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Industry-standard interview preparation curriculum covering practical architectural patterns including distributed rate limiting, API pagination, and cache stampede mitigations."
+    },
+    {
+      "sourceId": "src-cpig-amazon-tech-topics",
+      "publisher": "Amazon",
+      "title": "Amazon Jobs: Technical Interview Topics & Software Development Preparation",
+      "url": "https://www.amazon.jobs/en/landing_pages/in-tech-interview-topics",
+      "sourceType": "company-published-interview-guidance",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official Amazon hiring documentation outlining technical assessment focus areas, explicitly highlighting data structures (Arrays, Hash Tables), object-oriented design, databases, and distributed systems."
+    },
+    {
+      "sourceId": "src-cpig-google-tech-dev-guide",
+      "publisher": "Google",
+      "title": "Google Tech Dev Guide: Data Structures and Algorithms Path",
+      "url": "https://techdevguide.withgoogle.com/paths/data-structures-and-algorithms/",
+      "sourceType": "company-published-interview-guidance",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official Google-published learning and interview preparation curriculum detailing arrays, hash table lookup complexities, bucket addressing, and collision handling."
+    },
+    {
+      "sourceId": "src-cpig-stripe-rate-limiters",
+      "publisher": "Stripe",
+      "title": "Stripe Engineering: Scaling your API with rate limiters",
+      "url": "https://stripe.com/blog/rate-limiters",
+      "sourceType": "company-published-interview-guidance",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Authoritative engineering publication from Stripe frequently referenced in interview loops, detailing Token Bucket vs Sliding Window algorithms, Redis atomic coordination, and traffic burst management."
+    },
+    {
+      "sourceId": "src-cpig-slack-api-pagination",
+      "publisher": "Slack Engineering",
+      "title": "Slack Engineering: Evolving API Pagination at Slack",
+      "url": "https://slack.engineering/evolving-api-pagination-at-slack/",
+      "sourceType": "company-published-interview-guidance",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official Slack engineering publication analyzing production database performance degradation with offset pagination and justifying cursor/keyset pagination for scalable APIs."
+    },
+    {
+      "sourceId": "src-cpig-google-test-doubles",
+      "publisher": "Google",
+      "title": "Google Testing Blog: Testing on the Toilet: Know Your Test Doubles",
+      "url": "https://testing.googleblog.com/2013/05/testing-on-toilet-know-your-test.html",
+      "sourceType": "company-published-interview-guidance",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Google engineering guidance defining mocks, stubs, and fakes, explaining behavioral verification versus state verification in automated unit testing."
+    },
+    {
+      "sourceId": "src-cpig-google-flaky-tests",
+      "publisher": "Google",
+      "title": "Google Testing Blog: Flaky Tests at Google -- Tools and Mitigation",
+      "url": "https://testing.googleblog.com/2016/05/flaky-tests-at-google-tools-and.html",
+      "sourceType": "company-published-interview-guidance",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Google engineering publication documenting test non-determinism root causes in CI, including shared mutable state, timing dependencies, and isolation strategies."
+    },
+    {
+      "sourceId": "src-cpig-meta-scaling-memcache",
+      "publisher": "Meta / USENIX",
+      "title": "Meta / USENIX NSDI '13: Scaling Memcache at Facebook",
+      "url": "https://www.usenix.org/system/files/conference/nsdi13/nsdi13-final170_update.pdf",
+      "sourceType": "company-published-interview-guidance",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Seminal engineering paper by Facebook/Meta infrastructure engineers documenting the cache stampede (thundering herd) problem under read load and lease/mutex mitigation mechanisms."
+    },
+    {
+      "sourceId": "src-doc-mongodb-modeling",
+      "publisher": "MongoDB, Inc.",
+      "title": "MongoDB Documentation: Data Model Design",
+      "url": "https://www.mongodb.com/docs/manual/core/data-model-design/",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official MongoDB documentation detailing embedded subdocument vs reference relationships, atomicity, and schema design access patterns."
+    },
+    {
+      "sourceId": "src-doc-redis-data-types",
+      "publisher": "Redis Ltd.",
+      "title": "Redis Documentation: Redis Data Types and In-Memory Architecture",
+      "url": "https://redis.io/docs/latest/develop/data-types/",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official documentation covering Strings, Hashes, Sets, Sorted Sets, and single-threaded in-memory execution guarantees."
+    },
+    {
+      "sourceId": "src-doc-redis-eviction",
+      "publisher": "Redis Ltd.",
+      "title": "Redis Documentation: Key Eviction and Memory Management (maxmemory-policy)",
+      "url": "https://redis.io/docs/latest/develop/reference/eviction/",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official Redis specification describing LRU, LFU, volatile vs allkeys eviction algorithms, and maxmemory limits."
+    },
+    {
+      "sourceId": "src-doc-dotnet-async",
+      "publisher": "Microsoft",
+      "title": "Microsoft Learn: Asynchronous programming with async and await in C#",
+      "url": "https://learn.microsoft.com/en-us/dotnet/csharp/asynchronous-programming/",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official Microsoft language reference explaining Roslyn state machine compilation, Task/ValueTask allocations, and thread pool execution."
+    },
+    {
+      "sourceId": "src-doc-aspnetcore-di",
+      "publisher": "Microsoft",
+      "title": "Microsoft Learn: Dependency injection in ASP.NET Core",
+      "url": "https://learn.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official ASP.NET Core architecture guide detailing Transient, Scoped, and Singleton lifetimes and warning against captive dependencies."
+    },
+    {
+      "sourceId": "src-doc-dotnet-memory",
+      "publisher": "Microsoft",
+      "title": "Microsoft Learn: Memory- and span-related types in .NET",
+      "url": "https://learn.microsoft.com/en-us/dotnet/standard/memory-and-spans/",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official .NET documentation detailing stack value types, reference types, GC overhead, and zero-allocation Span and Memory representations."
+    },
+    {
+      "sourceId": "src-doc-oracle-java-concurrency",
+      "publisher": "Oracle",
+      "title": "Oracle Java Documentation: Concurrency and Thread Synchronization",
+      "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official Java SE documentation covering thread lifecycles, synchronized locks, memory visibility, and thread-pool execution."
+    },
+    {
+      "sourceId": "src-doc-spring-framework",
+      "publisher": "Broadcom / Spring",
+      "title": "Spring Framework Documentation: Core Technologies & AOP Transaction Management",
+      "url": "https://docs.spring.io/spring-framework/reference/core.html",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official Spring reference documentation detailing IoC bean creation, AOP proxy interceptor behavior, and transaction rollback rules."
+    },
+    {
+      "sourceId": "src-doc-openjdk-virtual-threads",
+      "publisher": "OpenJDK",
+      "title": "JEP 444: Virtual Threads",
+      "url": "https://openjdk.org/jeps/444",
+      "sourceType": "official-standard",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Authoritative Java Enhancement Proposal standard introducing user-mode virtual threads, carrier thread mounting, and pinning constraints."
+    },
+    {
+      "sourceId": "src-doc-python-data-model",
+      "publisher": "Python Software Foundation",
+      "title": "The Python Language Reference: Data Model and Generator Execution",
+      "url": "https://docs.python.org/3/reference/datamodel.html",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official CPython language specification defining hashability, dictionary table structures, iterator protocol, and generator frames."
+    },
+    {
+      "sourceId": "src-doc-python-asyncio",
+      "publisher": "Python Software Foundation",
+      "title": "Python Standard Library: asyncio — Asynchronous I/O",
+      "url": "https://docs.python.org/3/library/asyncio.html",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official Python documentation describing event loops, coroutines, non-blocking tasks, and offloading to worker threads via asyncio.to_thread."
+    },
+    {
+      "sourceId": "src-doc-fastapi",
+      "publisher": "Tiangolo / FastAPI",
+      "title": "FastAPI Documentation: Concurrency and async / await Execution",
+      "url": "https://fastapi.tiangolo.com/async/",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Authoritative FastAPI guide explaining asynchronous event loops, path operation thread pools for def vs async def, and request concurrency."
+    },
+    {
+      "sourceId": "src-doc-cppreference-raii",
+      "publisher": "CppReference",
+      "title": "CppReference: Resource Acquisition Is Initialization (RAII) and Smart Pointers",
+      "url": "https://en.cppreference.com/w/cpp/language/raii",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Authoritative C++ reference on deterministic stack unwinding, destructor execution, unique_ptr, and move semantics."
+    },
+    {
+      "sourceId": "src-doc-cppreference-concurrency",
+      "publisher": "CppReference",
+      "title": "CppReference: Concurrency Support Library and Atomic Operations",
+      "url": "https://en.cppreference.com/w/cpp/thread",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Authoritative C++ memory model and concurrency specification defining data races, memory orderings, and atomic primitives."
+    },
+    {
+      "sourceId": "src-ref-effective-modern-cpp",
+      "publisher": "O'Reilly Media / Scott Meyers",
+      "title": "Effective Modern C++: 42 Specific Ways to Improve Your Use of C++11 and C++14",
+      "url": "https://www.oreilly.com/library/view/effective-modern-c/9781491908419/",
+      "sourceType": "professional-reference",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Canonical professional C++ reference detailing smart pointers, move semantics, perfect forwarding, and concurrency hazards."
+    },
+    {
+      "sourceId": "src-doc-nodejs-event-loop",
+      "publisher": "OpenJS Foundation / Node.js",
+      "title": "Node.js Documentation: The Node.js Event Loop, Timers, and process.nextTick()",
+      "url": "https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official Node.js architecture guide explaining phases of the libuv event loop, microtask draining, and worker execution."
+    },
+    {
+      "sourceId": "src-doc-nodejs-streams",
+      "publisher": "OpenJS Foundation / Node.js",
+      "title": "Node.js Documentation: Stream API and Backpressure Handling",
+      "url": "https://nodejs.org/api/stream.html",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official Node.js stream specification detailing chunk buffers, highWaterMark limits, backpressure flow control, and stream.pipeline."
+    },
+    {
+      "sourceId": "src-doc-typescript-handbook",
+      "publisher": "Microsoft",
+      "title": "The TypeScript Handbook: Narrowing, Discriminated Unions, and Generics",
+      "url": "https://www.typescriptlang.org/docs/handbook/",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official TypeScript language specification defining structural typing, compile-time type erasure, discriminated unions, and mapped types."
+    },
+    {
+      "sourceId": "src-doc-zod-schema",
+      "publisher": "Colin McDonnell / Zod",
+      "title": "Zod Documentation: TypeScript-first schema validation with static type inference",
+      "url": "https://zod.dev/",
+      "sourceType": "official-documentation",
+      "verificationStatus": "community-curated-verified",
+      "accessedAt": "2026-09-16",
+      "notes": "Industry-standard schema validation library documentation bridging runtime API boundary validation and compile-time TypeScript types."
+    },
+    {
+      "sourceId": "src-doc-golang-effective-go",
+      "publisher": "The Go Project",
+      "title": "Effective Go: Interfaces, Slices, and Concurrency",
+      "url": "https://go.dev/doc/effective_go",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official Go language design reference explaining implicit interface satisfaction, slice headers, and idiomatic error return values."
+    },
+    {
+      "sourceId": "src-doc-golang-concurrency",
+      "publisher": "The Go Project",
+      "title": "Go Blog: Go Concurrency Patterns: Pipelines and cancellation",
+      "url": "https://go.dev/blog/pipelines",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official Go engineering publication detailing bounded worker pools, context cancellation propagation, and goroutine leak prevention."
+    },
+    {
+      "sourceId": "src-doc-rust-book",
+      "publisher": "Rust Foundation",
+      "title": "The Rust Programming Language: Ownership, Borrowing, and Lifetimes",
+      "url": "https://doc.rust-lang.org/book/",
+      "sourceType": "official-documentation",
+      "verificationStatus": "verified-official-publication",
+      "accessedAt": "2026-09-16",
+      "notes": "Official Rust foundational book defining ownership invariants, reference borrowing rules, drop semantics, and Result error handling."
+    },
+    {
+      "sourceId": "src-doc-rust-tokio",
+      "publisher": "Tokio Project",
+      "title": "Tokio Documentation: Asynchronous Programming in Rust and Shared State",
+      "url": "https://tokio.rs/tokio/tutorial",
+      "sourceType": "official-documentation",
+      "verificationStatus": "community-curated-verified",
+      "accessedAt": "2026-09-16",
+      "notes": "Authoritative documentation for the Tokio runtime covering async tasks, Send/Sync bounds, async mutexes, and Pin guarantees."
+    }
+  ]
+}
