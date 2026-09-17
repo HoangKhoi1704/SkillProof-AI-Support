@@ -262,27 +262,41 @@ export default function SkillsPage() {
         )}
 
         {/* Action Button */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+        <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-800">
           <button
             type="button"
             onClick={() => router.push('/roles')}
             className="px-4 py-2 rounded-lg text-xs text-slate-400 hover:text-white transition-colors"
           >
-            Back to Roles
+            ← Back to Roles
           </button>
-          <button
-            type="button"
-            onClick={handleContinue}
-            disabled={selectedIds.length === 0}
-            className={`px-5 py-2.5 rounded-lg text-xs font-semibold transition-all ${
-              selectedIds.length > 0
-                ? 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-[0_0_15px_rgba(6,182,212,0.3)]'
-                : 'bg-slate-800 text-slate-500 cursor-not-allowed'
-            }`}
-            data-testid="start-interview-button"
-          >
-            Continue to Assessment ({selectedIds.length})
-          </button>
+
+          <div className="flex items-center gap-3">
+            {(state.careerProfile || state.evaluationResult) && (
+              <button
+                type="button"
+                onClick={() => router.push('/assessment/result')}
+                className="px-4 py-2 rounded-lg text-xs font-medium text-cyan-400 hover:text-cyan-300 border border-cyan-800/80 hover:bg-cyan-950/40 transition-colors"
+                data-testid="skip-to-results-button"
+              >
+                Go to Results & Roadmap →
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={handleContinue}
+              disabled={selectedIds.length === 0}
+              className={`px-5 py-2.5 rounded-lg text-xs font-semibold transition-all ${
+                selectedIds.length > 0
+                  ? 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-[0_0_15px_rgba(6,182,212,0.3)]'
+                  : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+              }`}
+              data-testid="start-interview-button"
+            >
+              Continue to Assessment ({selectedIds.length})
+            </button>
+          </div>
         </div>
       </div>
     </JourneyShell>

@@ -50,8 +50,8 @@ export default function InterviewPage() {
     }
 
     async function initSession() {
-      // If already active in session, restore it
-      if (state.adaptiveSession && state.adaptiveSession.status !== 'completed') {
+      // If already active in session (or already completed), restore it cleanly
+      if (state.adaptiveSession) {
         setCurrentSession(state.adaptiveSession);
         setIsInitializing(false);
         return;
@@ -355,6 +355,38 @@ export default function InterviewPage() {
                 ) : (
                   <span>Submit Answer →</span>
                 )}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* When Assessment is Already Completed and user returns to interview page */}
+        {currentSession?.status === 'completed' && !lastExplanation && (
+          <div className="p-8 rounded-2xl border border-cyan-800 bg-slate-900/80 text-center mb-6 shadow-xl" data-testid="completed-interview-card">
+            <div className="w-12 h-12 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center mx-auto mb-4 text-xl">
+              ✓
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">
+              Assessment Completed
+            </h3>
+            <p className="text-xs text-slate-400 max-w-md mx-auto mb-6 leading-relaxed">
+              You have already completed all diagnostic questions for this session. Your career readiness skill matrix and personalized roadmap are ready.
+            </p>
+            <div className="flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => router.push('/assessment/skills')}
+                className="px-4 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white border border-slate-800 hover:border-slate-700 transition-colors"
+              >
+                ← Change Skills
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push('/assessment/result')}
+                className="px-6 py-2.5 rounded-lg text-xs font-semibold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-[0_0_15px_rgba(6,182,212,0.35)] transition-all flex items-center gap-2"
+                data-testid="view-results-button"
+              >
+                <span>View Career Readiness Skill Matrix →</span>
               </button>
             </div>
           </div>

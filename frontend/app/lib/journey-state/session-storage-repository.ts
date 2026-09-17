@@ -53,16 +53,48 @@ export class SessionStorageJourneyStateRepository implements IJourneyStateReposi
   private inMemoryFallback: JourneyState = createInitialJourneyState();
 
   private isStorageAvailable(): boolean {
-    return typeof window !== 'undefined' && typeof window.sessionStorage !== 'undefined';
+    return typeof window !== 'undefined';
+  }
+
+  private getStorage(): Storage | null {
+    if (typeof window === 'undefined') return null;
+    try {
+      if (typeof window.localStorage !== 'undefined') {
+        return window.localStorage;
+      }
+    } catch {
+      // Fallback
+    }
+    try {
+      if (typeof window.sessionStorage !== 'undefined') {
+        return window.sessionStorage;
+      }
+    } catch {
+      // Fallback
+    }
+    return null;
   }
 
   public getState(): JourneyState {
-    if (!this.isStorageAvailable()) {
+    const storage = this.getStorage();
+    if (!storage) {
       return this.inMemoryFallback;
     }
 
     try {
-      const raw = window.sessionStorage.getItem(STORAGE_KEY);
+      let raw = storage.getItem(STORAGE_KEY);
+      // If not in localStorage yet, check sessionStorage for backwards compatibility
+      if (!raw && typeof window !== 'undefined' && window.sessionStorage) {
+        raw = window.sessionStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          try {
+            storage.setItem(STORAGE_KEY, raw);
+          } catch {
+            // ignore
+          }
+        }
+      }
+
       if (!raw) {
         return createInitialJourneyState();
       }
@@ -76,17 +108,17 @@ export class SessionStorageJourneyStateRepository implements IJourneyStateReposi
         return createInitialJourneyState();
       }
 
-      // Check expiration (30-minute TTL)
+      // Check expiration (2-hour sliding TTL)
       const now = Date.now();
       if (parsed.expiresAt && now > parsed.expiresAt) {
-        console.info('Journey state has expired (>30 minutes). Resetting.');
+        console.info('Journey state has expired (>2 hours). Resetting.');
         this.clearState();
         return createInitialJourneyState();
       }
 
       return parsed;
     } catch (err) {
-      console.error('Failed to parse journey state from sessionStorage:', err);
+      console.error('Failed to parse journey state from storage:', err);
       this.clearState();
       return createInitialJourneyState();
     }
@@ -101,20 +133,29 @@ export class SessionStorageJourneyStateRepository implements IJourneyStateReposi
       ...updates,
       schemaVersion: CURRENT_JOURNEY_SCHEMA_VERSION,
       updatedAt: now,
-      expiresAt: now + JOURNEY_TTL_MS // Sliding expiration
+      expiresAt: now + JOURNEY_TTL_MS // Sliding expiration: 2 hours from last interaction
     };
 
-    if (!this.isStorageAvailable()) {
+    const storage = this.getStorage();
+    if (!storage) {
       this.inMemoryFallback = merged;
       return merged;
     }
 
     try {
-      window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      storage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      // Also sync to sessionStorage if available
+      if (typeof window !== 'undefined' && window.sessionStorage && storage !== window.sessionStorage) {
+        try {
+          window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+        } catch {
+          // ignore
+        }
+      }
       // Dispatch custom event for reactive tabs/components
       window.dispatchEvent(new CustomEvent('skillproof_journey_updated', { detail: merged }));
     } catch (err) {
-      console.error('Failed to persist journey state to sessionStorage:', err);
+      console.error('Failed to persist journey state to storage:', err);
     }
 
     return merged;
@@ -122,13 +163,23 @@ export class SessionStorageJourneyStateRepository implements IJourneyStateReposi
 
   public clearState(): void {
     this.inMemoryFallback = createInitialJourneyState();
-    if (this.isStorageAvailable()) {
+    const storage = this.getStorage();
+    if (storage) {
+      try {
+        storage.removeItem(STORAGE_KEY);
+      } catch (err) {
+        console.error('Failed to clear journey state from storage:', err);
+      }
+    }
+    if (typeof window !== 'undefined' && window.sessionStorage) {
       try {
         window.sessionStorage.removeItem(STORAGE_KEY);
-        window.dispatchEvent(new CustomEvent('skillproof_journey_cleared'));
-      } catch (err) {
-        console.error('Failed to clear journey state from sessionStorage:', err);
+      } catch {
+        // ignore
       }
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('skillproof_journey_cleared'));
     }
   }
 

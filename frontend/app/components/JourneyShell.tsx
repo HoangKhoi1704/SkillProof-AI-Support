@@ -173,7 +173,7 @@ export default function JourneyShell({
 
       {/* Subtle Footer */}
       <footer className="border-t border-slate-800/80 py-4 text-center text-xs text-slate-500">
-        SkillProof V2 Production Data & Navigation Foundation — 30-Minute Browser Session
+        SkillProof V2 Production Data & Navigation Foundation — 2-Hour Persistent Session
       </footer>
     </div>
   );

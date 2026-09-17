@@ -10,7 +10,7 @@ import type {
 } from '../../types';
 
 export const CURRENT_JOURNEY_SCHEMA_VERSION = 2;
-export const JOURNEY_TTL_MS = 30 * 60 * 1000; // 30 minutes in milliseconds
+export const JOURNEY_TTL_MS = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
 
 export interface JourneyState {
   schemaVersion: number;
