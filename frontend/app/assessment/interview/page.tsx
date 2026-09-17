@@ -13,6 +13,7 @@ import {
 import { AdaptiveSessionResponse } from '../../types';
 import { useJourneyState, journeyStateRepository } from '../../lib/journey-state';
 import { normalizeTechnicalText } from '../../lib/text-utils';
+import { TechnicalText } from '../../components/TechnicalText';
 
 export default function InterviewPage() {
   const router = useRouter();
@@ -232,7 +233,7 @@ export default function InterviewPage() {
                   {lastExplanation.whatYouCovered.map((cov, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <span className="text-emerald-400 font-bold">•</span>
-                      <span>{cov}</span>
+                      <span><TechnicalText text={cov} /></span>
                     </li>
                   ))}
                 </ul>
@@ -249,7 +250,7 @@ export default function InterviewPage() {
                   {lastExplanation.whatCouldBeStronger.map((stronger, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <span className="text-amber-400 font-bold">•</span>
-                      <span>{stronger}</span>
+                      <span><TechnicalText text={stronger} /></span>
                     </li>
                   ))}
                 </ul>
@@ -263,7 +264,7 @@ export default function InterviewPage() {
                   Reference Explanation
                 </h4>
                 <div className="p-3.5 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300 leading-relaxed font-sans whitespace-pre-line">
-                  {normalizeTechnicalText(lastExplanation.referenceExplanation)}
+                  <TechnicalText text={lastExplanation.referenceExplanation} />
                 </div>
               </div>
             )}
@@ -308,9 +309,9 @@ export default function InterviewPage() {
               </span>
             </div>
 
-            {/* Technical Question Text with UTF-8 NFC and Safe Normalization */}
+            {/* Technical Question Text with UTF-8 NFC, Safe Normalization, and inline code formatting */}
             <h2 className="text-base sm:text-lg font-medium text-slate-100 leading-relaxed mb-6 whitespace-pre-line" data-testid="question-text">
-              {normalizeTechnicalText(currentQ.questionText)}
+              <TechnicalText text={currentQ.questionText} />
             </h2>
 
             {/* Answer Input Area */}
