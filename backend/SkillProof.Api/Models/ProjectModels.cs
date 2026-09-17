@@ -50,11 +50,16 @@ public record GapBasedProjectDto(
 );
 
 public record SubmitProjectEvidenceRequest(
-    string? RepositoryUrl,
-    string ProjectSummary,
-    string ImplementationExplanation,
-    string ArchitectureDecisions,
-    string TestingExplanation,
+    string? RepositoryUrl = null,
+    string? DeployedUrl = null,
+    string? NotebookUrl = null,
+    string? DashboardUrl = null,
+    string? DatasetUrl = null,
+    string? Notes = null,
+    string? ProjectSummary = null,
+    string? ImplementationExplanation = null,
+    string? ArchitectureDecisions = null,
+    string? TestingExplanation = null,
     List<string>? EvidenceExcerpts = null
 );
 
@@ -69,7 +74,9 @@ public record RequirementEvaluationResultDto(
     string Requirement,
     string TargetsSkill,
     string Status, // "Demonstrated" | "Partially Demonstrated" | "Insufficient Evidence"
-    string EvaluationNotes
+    string EvaluationNotes,
+    List<string>? EvidenceFound = null,
+    string? SourceArtifact = null
 );
 
 public record PortfolioProofDto(
@@ -78,7 +85,8 @@ public record PortfolioProofDto(
     List<string> DemonstratedSkills,
     List<string> PortfolioBullets,
     List<string> CvBullets,
-    List<string> EvidenceNotes
+    List<string> EvidenceNotes,
+    List<string>? ClaimTraceability = null
 );
 
 public record ProjectEvaluationDto(
@@ -89,7 +97,8 @@ public record ProjectEvaluationDto(
     List<string> DemonstratedEvidence,
     List<string> MissingEvidence,
     List<string> ImprovementSuggestions,
-    PortfolioProofDto? PortfolioProof = null
+    PortfolioProofDto? PortfolioProof = null,
+    CompositeEvidenceReport? VerificationReport = null
 );
 
 public record DevProjectInspectionDto(

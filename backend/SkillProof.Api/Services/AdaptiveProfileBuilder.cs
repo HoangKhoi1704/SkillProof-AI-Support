@@ -9,7 +9,9 @@ public interface IAdaptiveProfileBuilder
 {
     CareerReadinessProfile BuildProfile(
         DiagnosticSessionState session,
-        IReadOnlyDictionary<string, IReadOnlyList<string>> subskillsBySkillId
+        IReadOnlyDictionary<string, IReadOnlyList<string>> subskillsBySkillId,
+        IReadOnlyList<SkillProof.Api.Data.Catalog.RoleRoadmapNode>? roleNodes = null,
+        IReadOnlyDictionary<string, string>? canonicalSkillNames = null
     );
 }
 
@@ -17,7 +19,9 @@ public class AdaptiveProfileBuilder : IAdaptiveProfileBuilder
 {
     public CareerReadinessProfile BuildProfile(
         DiagnosticSessionState session,
-        IReadOnlyDictionary<string, IReadOnlyList<string>> subskillsBySkillId)
+        IReadOnlyDictionary<string, IReadOnlyList<string>> subskillsBySkillId,
+        IReadOnlyList<SkillProof.Api.Data.Catalog.RoleRoadmapNode>? roleNodes = null,
+        IReadOnlyDictionary<string, string>? canonicalSkillNames = null)
     {
         if (session == null)
         {
@@ -100,7 +104,104 @@ public class AdaptiveProfileBuilder : IAdaptiveProfileBuilder
 
         var topGaps = DeterministicDiagnosticEvaluator.CalculateTopGaps(evalItems);
 
-        // Roadmap Handoff Contract for Milestone I8
+        // Build Visual Skill Matrix with Qualitative States & Gap Types
+        var skillMatrixItems = new List<SkillMatrixItemDto>();
+
+        if (roleNodes != null && roleNodes.Count > 0)
+        {
+            foreach (var node in roleNodes.OrderBy(n => n.DisplayOrder))
+            {
+                // Only assessable competencies in role framework
+                if (!node.AssessmentEligible && node.IsToolkitOnly)
+                {
+                    continue;
+                }
+
+                var skillName = (canonicalSkillNames != null && canonicalSkillNames.TryGetValue(node.CanonicalSkillId, out var csName))
+                    ? csName
+                    : node.CanonicalSkillId;
+
+                if (session.SkillStates.TryGetValue(node.CanonicalSkillId, out var state) && state != null && state.IsCompleted)
+                {
+                    var finalLevel = state.FinalLevel ?? "Insufficient Evidence";
+                    var gapType = finalLevel switch
+                    {
+                        "Advanced" => "NONE",
+                        "Insufficient Evidence" => "EVIDENCE GAP",
+                        _ => "ASSESSED GAP"
+                    };
+
+                    var fundDim = finalLevel is "Intermediate" or "Advanced" ? "Demonstrated" : (finalLevel == "Beginner" ? "Emerging" : "Insufficient Evidence");
+                    var appDim = (finalLevel is "Intermediate" or "Advanced" && state.FirstLevel != "Beginner") ? "Demonstrated" : (finalLevel == "Beginner" ? "Emerging" : "Insufficient Evidence");
+                    var reasDim = finalLevel == "Advanced" ? "Demonstrated" : (finalLevel == "Intermediate" ? "Emerging" : "Insufficient Evidence");
+
+                    var catalogSubskills = subskillsBySkillId != null && subskillsBySkillId.TryGetValue(node.CanonicalSkillId, out var subs)
+                        ? subs
+                        : Array.Empty<string>();
+
+                    skillMatrixItems.Add(new SkillMatrixItemDto(
+                        CanonicalSkillId: node.CanonicalSkillId,
+                        SkillName: skillName,
+                        Category: node.Category,
+                        IsMandatoryFundamental: node.MandatoryFundamental,
+                        OverallStatus: finalLevel,
+                        FundamentalsDimension: fundDim,
+                        AppliedDimension: appDim,
+                        ReasoningDimension: reasDim,
+                        GapType: gapType,
+                        EvidenceObserved: state.EvidenceSummary ?? new List<string>(),
+                        WhyThisLevel: state.FinalReason ?? (state.FirstReason ?? "Assessed via calibrated interview sequence."),
+                        WhatToImproveNext: DeriveNextDevelopmentAreas(finalLevel, skillName, catalogSubskills)
+                    ));
+                }
+                else
+                {
+                    skillMatrixItems.Add(new SkillMatrixItemDto(
+                        CanonicalSkillId: node.CanonicalSkillId,
+                        SkillName: skillName,
+                        Category: node.Category,
+                        IsMandatoryFundamental: node.MandatoryFundamental,
+                        OverallStatus: "Not Assessed",
+                        FundamentalsDimension: "Not Assessed",
+                        AppliedDimension: "Not Assessed",
+                        ReasoningDimension: "Not Assessed",
+                        GapType: "ROLE COVERAGE GAP",
+                        EvidenceObserved: new List<string>(),
+                        WhyThisLevel: "This role competency was not assessed during this diagnostic session.",
+                        WhatToImproveNext: new List<string> { "Take an assessment on this competency or review foundational curriculum." }
+                    ));
+                }
+            }
+        }
+        else
+        {
+            foreach (var item in skillProfileItems)
+            {
+                var gapType = item.FinalLevel switch
+                {
+                    "Advanced" => "NONE",
+                    "Insufficient Evidence" => "EVIDENCE GAP",
+                    _ => "ASSESSED GAP"
+                };
+
+                skillMatrixItems.Add(new SkillMatrixItemDto(
+                    CanonicalSkillId: item.SkillId,
+                    SkillName: item.SkillName,
+                    Category: "core",
+                    IsMandatoryFundamental: true,
+                    OverallStatus: item.FinalLevel,
+                    FundamentalsDimension: item.FinalLevel is "Intermediate" or "Advanced" ? "Demonstrated" : "Emerging",
+                    AppliedDimension: item.FinalLevel is "Intermediate" or "Advanced" ? "Demonstrated" : "Emerging",
+                    ReasoningDimension: item.FinalLevel == "Advanced" ? "Demonstrated" : "Emerging",
+                    GapType: gapType,
+                    EvidenceObserved: item.Evidence,
+                    WhyThisLevel: item.Reasoning.FirstOrDefault() ?? "Assessed via calibrated interview sequence.",
+                    WhatToImproveNext: item.NextDevelopmentAreas
+                ));
+            }
+        }
+
+        // Roadmap Handoff Contract
         var roadmapInput = new RoadmapHandoffContract(
             RoleId: session.RoleId,
             SkillGaps: skillProfileItems.Select(s => new RoadmapSkillGapInput(
@@ -119,7 +220,8 @@ public class AdaptiveProfileBuilder : IAdaptiveProfileBuilder
             Summary: summary,
             Skills: skillProfileItems,
             TopGaps: topGaps,
-            RoadmapInput: roadmapInput
+            RoadmapInput: roadmapInput,
+            SkillMatrix: skillMatrixItems
         );
     }
 

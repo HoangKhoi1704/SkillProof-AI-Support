@@ -94,8 +94,20 @@ builder.Services.AddSingleton<IProjectRecommender>(sp =>
     return fallback;
 });
 
-// Register Project Evaluators
-builder.Services.AddSingleton<DeterministicProjectEvaluator>();
+// Register Evidence Verifiers & Project Evaluators
+builder.Services.AddSingleton<IUrlSafetyValidator, UrlSafetyValidator>();
+builder.Services.AddSingleton<IRepositoryEvidenceVerifier, RepositoryEvidenceVerifier>();
+builder.Services.AddSingleton<IDeploymentEvidenceVerifier, DeploymentEvidenceVerifier>();
+builder.Services.AddSingleton<IDataAnalystEvidenceVerifier, DataAnalystEvidenceVerifier>();
+
+builder.Services.AddSingleton<DeterministicProjectEvaluator>(sp =>
+{
+    var repoVerifier = sp.GetRequiredService<IRepositoryEvidenceVerifier>();
+    var deployVerifier = sp.GetRequiredService<IDeploymentEvidenceVerifier>();
+    var daVerifier = sp.GetRequiredService<IDataAnalystEvidenceVerifier>();
+    return new DeterministicProjectEvaluator(repoVerifier, deployVerifier, daVerifier);
+});
+
 builder.Services.AddSingleton<IProjectEvaluator>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
@@ -117,6 +129,9 @@ builder.Services.AddSingleton<IProjectEvaluator>(sp =>
 });
 
 builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<ICanonicalRoadmapResolver, CanonicalRoadmapResolver>();
+builder.Services.AddScoped<ILearningResourceService, LearningResourceService>();
+builder.Services.AddScoped<ICuratedProjectMatcher, CuratedProjectMatcher>();
 
 // Enable CORS for Next.js frontend
 const string CorsPolicy = "AllowFrontend";
@@ -236,6 +251,24 @@ app.MapPost("/api/diagnostics/adaptive/sessions/{sessionId}/answers", async (str
 .WithName("SubmitAdaptiveAnswer")
 .WithSummary("Submit an answer in an adaptive diagnostic session and trigger branch or completion");
 
+// 2d-2. POST /api/diagnostics/adaptive/sessions/{sessionId}/next (Advance to Next Question after Explanation)
+app.MapPost("/api/diagnostics/adaptive/sessions/{sessionId}/next", async (string sessionId, IAdaptiveDiagnosticService adaptiveService, CancellationToken cancellationToken) =>
+{
+    var (success, response, errorCode, errorMessage) = await adaptiveService.AdvanceNextQuestionAsync(sessionId, cancellationToken);
+    if (!success || response == null)
+    {
+        if (errorCode == "SESSION_NOT_FOUND")
+        {
+            return Results.NotFound(new ErrorResponse(new ErrorDetail(errorCode, errorMessage ?? "Session not found.")));
+        }
+        return Results.BadRequest(new ErrorResponse(new ErrorDetail(errorCode ?? "INVALID_STATE", errorMessage ?? "Cannot advance session.")));
+    }
+
+    return Results.Ok(response);
+})
+.WithName("AdvanceAdaptiveSession")
+.WithSummary("Advance to the next question after reviewing post-answer explanation");
+
 // 2e. GET /api/diagnostics/adaptive/sessions/{sessionId} (Get Adaptive Session State)
 app.MapGet("/api/diagnostics/adaptive/sessions/{sessionId}", async (string sessionId, IAdaptiveDiagnosticService adaptiveService, CancellationToken cancellationToken) =>
 {
@@ -292,6 +325,95 @@ app.MapPost("/api/diagnostics/adaptive/sessions/{sessionId}/roadmap", async (str
 .WithName("GenerateAdaptiveRoadmap")
 .WithSummary("Generate a personalized learning roadmap from an adaptive session's trusted profile handoff");
 
+// 2g-2. GET /api/diagnostics/adaptive/sessions/{sessionId}/canonical-roadmap (Personalized Visual Roadmap from Canonical Topology)
+app.MapGet("/api/diagnostics/adaptive/sessions/{sessionId}/canonical-roadmap", async (string sessionId, ICanonicalRoadmapResolver roadmapResolver, CancellationToken cancellationToken) =>
+{
+    var (success, graph, errorCode, errorMessage) = await roadmapResolver.ResolveRoadmapAsync(sessionId, cancellationToken);
+    if (!success || graph == null)
+    {
+        if (errorCode == "SESSION_IN_PROGRESS")
+        {
+            return Results.BadRequest(new ErrorResponse(new ErrorDetail(errorCode, errorMessage ?? "Diagnostic session is still in progress.")));
+        }
+        return Results.NotFound(new ErrorResponse(new ErrorDetail(errorCode ?? "SESSION_NOT_FOUND", errorMessage ?? "Session not found.")));
+    }
+
+    return Results.Ok(graph);
+})
+.WithName("GetCanonicalRoadmap")
+.WithSummary("Retrieve personalized learning roadmap graph derived from Data V3 canonical topology and Assessment V2 evidence");
+
+// 2g-3. GET /api/v3/roadmap/nodes/{nodeId}/resources (Verified Learning Resources for Canonical Node)
+app.MapGet("/api/v3/roadmap/nodes/{nodeId}/resources", async (
+    string nodeId,
+    [FromQuery] string? roleId,
+    [FromQuery] string? nodeState,
+    [FromQuery] string? gapType,
+    ILearningResourceService resourceService,
+    CancellationToken cancellationToken) =>
+{
+    var response = await resourceService.GetNodeResourcesAsync(nodeId, roleId, nodeState, gapType, cancellationToken);
+    return Results.Ok(response);
+})
+.WithName("GetNodeLearningResources")
+.WithSummary("Retrieve verified canonical learning resources for a roadmap competency node");
+
+// 2g-4. GET /api/diagnostics/adaptive/sessions/{sessionId}/projects (Curated Practice & Portfolio Projects)
+app.MapGet("/api/diagnostics/adaptive/sessions/{sessionId}/projects", async (
+    string sessionId,
+    ICuratedProjectMatcher projectMatcher,
+    CancellationToken cancellationToken) =>
+{
+    var (success, recommendations, errorCode, errorMessage) = await projectMatcher.MatchProjectsForSessionAsync(sessionId, cancellationToken);
+    if (!success || recommendations == null)
+    {
+        if (errorCode == "SESSION_IN_PROGRESS")
+        {
+            return Results.BadRequest(new ErrorResponse(new ErrorDetail(errorCode, errorMessage ?? "Diagnostic session is still in progress.")));
+        }
+        return Results.NotFound(new ErrorResponse(new ErrorDetail(errorCode ?? "SESSION_NOT_FOUND", errorMessage ?? "Session not found.")));
+    }
+
+    return Results.Ok(recommendations);
+})
+.WithName("GetCuratedAdaptiveProjects")
+.WithSummary("Retrieve curated practice and portfolio projects matched deterministically from trusted session gaps");
+
+// 2g-5. POST /api/diagnostics/adaptive/sessions/{sessionId}/projects/{projectId}/select (Select Curated Portfolio Project)
+app.MapPost("/api/diagnostics/adaptive/sessions/{sessionId}/projects/{projectId}/select", async (
+    string sessionId,
+    string projectId,
+    ICuratedProjectMatcher projectMatcher,
+    CancellationToken cancellationToken) =>
+{
+    var gapProject = await projectMatcher.MapToGapBasedProjectAsync(projectId, sessionId, cancellationToken);
+    if (gapProject == null)
+    {
+        return Results.NotFound(new ErrorResponse(new ErrorDetail("PROJECT_NOT_FOUND", $"Project '{projectId}' was not found.")));
+    }
+
+    return Results.Ok(gapProject);
+})
+.WithName("SelectCuratedProjectForSession")
+.WithSummary("Select a curated portfolio project into the adaptive session for evidence verification");
+
+// 2g-6. GET /api/v3/projects/{projectId} (Curated Project Detail)
+app.MapGet("/api/v3/projects/{projectId}", async (
+    string projectId,
+    ICuratedProjectMatcher projectMatcher,
+    CancellationToken cancellationToken) =>
+{
+    var project = await projectMatcher.GetProjectByIdAsync(projectId, cancellationToken);
+    if (project == null)
+    {
+        return Results.NotFound(new ErrorResponse(new ErrorDetail("PROJECT_NOT_FOUND", $"Curated project '{projectId}' was not found in catalog.")));
+    }
+
+    return Results.Ok(project);
+})
+.WithName("GetCuratedProjectDetail")
+.WithSummary("Retrieve detailed specification and deliverables for a curated project");
+
 // 2h. POST /api/diagnostics/adaptive/sessions/{sessionId}/project/recommend (Generate Gap-Based Project from Trusted Roadmap)
 app.MapPost("/api/diagnostics/adaptive/sessions/{sessionId}/project/recommend", async (
     string sessionId,
@@ -299,6 +421,7 @@ app.MapPost("/api/diagnostics/adaptive/sessions/{sessionId}/project/recommend", 
     IAdaptiveSessionStore sessionStore,
     IRoadmapGenerator roadmapGenerator,
     IProjectRecommender projectRecommender,
+    ICuratedProjectMatcher curatedProjectMatcher,
     CancellationToken cancellationToken) =>
 {
     var (success, profile, errorCode, errorMessage) = await adaptiveService.GetProfileAsync(sessionId, cancellationToken);
@@ -316,7 +439,19 @@ app.MapPost("/api/diagnostics/adaptive/sessions/{sessionId}/project/recommend", 
         return Results.NotFound(new ErrorResponse(new ErrorDetail("SESSION_NOT_FOUND", "Adaptive session not found.")));
     }
 
-    // Resolve or generate Roadmap
+    // Prefer curated portfolio project matched deterministically from catalog
+    var (mSuccess, mRecs, _, _) = await curatedProjectMatcher.MatchProjectsForSessionAsync(sessionId, cancellationToken);
+    if (mSuccess && mRecs != null && mRecs.PortfolioProjects.Count > 0)
+    {
+        var topPortfolio = mRecs.PortfolioProjects[0];
+        var mappedProject = await curatedProjectMatcher.MapToGapBasedProjectAsync(topPortfolio.Id, sessionId, cancellationToken);
+        if (mappedProject != null)
+        {
+            return Results.Ok(mappedProject);
+        }
+    }
+
+    // Resolve or generate Roadmap fallback
     if (sessionState.Roadmap == null)
     {
         sessionState.Roadmap = await roadmapGenerator.GenerateFromHandoffAsync(profile.RoadmapInput, sessionId, cancellationToken);
@@ -343,6 +478,7 @@ app.MapPost("/api/diagnostics/adaptive/sessions/{sessionId}/project/recommend", 
 })
 .WithName("RecommendAdaptiveProject")
 .WithSummary("Recommend a focused gap-based real-world project engineered from trusted adaptive profile gaps");
+
 
 // 2i. POST /api/diagnostics/adaptive/sessions/{sessionId}/project/submit (Submit Project Evidence & Evaluate)
 app.MapPost("/api/diagnostics/adaptive/sessions/{sessionId}/project/submit", async (
@@ -561,6 +697,40 @@ app.MapGet("/api/roles/{roleId}/skills", async (string roleId, ICatalogService c
 })
 .WithName("GetRoleSkills")
 .WithSummary("Retrieve public UI-safe skills catalog for a career role grouped by Core, Recommended, Optional, and Languages");
+
+// 7. GET /api/v3/roles (V3 Multi-Role Registry Read API)
+app.MapGet("/api/v3/roles", async (ICatalogService catalogService, CancellationToken cancellationToken) =>
+{
+    var roles = await catalogService.GetV3RolesAsync(cancellationToken);
+    return Results.Ok(roles);
+})
+.WithName("GetV3Roles")
+.WithSummary("Retrieve all supported career target roles including primary demo roles and legacy roles");
+
+// 8. GET /api/roles/{roleId}/canonical-framework (V3 Canonical Framework Read API)
+app.MapGet("/api/roles/{roleId}/canonical-framework", async (string roleId, ICatalogService catalogService, CancellationToken cancellationToken) =>
+{
+    if (string.IsNullOrWhiteSpace(roleId))
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorDetail(
+            "VALIDATION_ERROR",
+            "Route parameter 'roleId' is required."
+        )));
+    }
+
+    var framework = await catalogService.GetRoleCanonicalFrameworkAsync(roleId, cancellationToken);
+    if (framework == null)
+    {
+        return Results.NotFound(new ErrorResponse(new ErrorDetail(
+            "NOT_FOUND",
+            $"Role '{roleId}' was not found in the canonical framework."
+        )));
+    }
+
+    return Results.Ok(framework);
+})
+.WithName("GetRoleCanonicalFramework")
+.WithSummary("Retrieve the V3 canonical framework, assessable competencies, and roadmap topology for a role");
 
 // Development-Only Guard: Reject /api/dev/* outside Development environment with 404
 app.Use(async (context, next) =>

@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SkillProof V3 Backend Canonical Question Mappings",
+  "version": "3.0.0",
+  "roleId": "backend-developer",
+  "description": "Deterministic mapping from V3 canonical skills to frozen v2.0 backend questions in data/backend/questions.json.",
+  "canonicalMappings": [
+    {
+      "canonicalSkillId": "assessment-ext.programming-fundamentals",
+      "legacySkillId": "programming-fundamentals",
+      "questionIds": ["q-be-prog-01", "q-be-prog-02", "q-be-prog-03"]
+    },
+    {
+      "canonicalSkillId": "backend.rest-apis",
+      "legacySkillId": "rest-api",
+      "questionIds": ["q-be-rest-01", "q-be-rest-02", "q-be-rest-03"]
+    },
+    {
+      "canonicalSkillId": "shared.sql",
+      "legacySkillId": "sql",
+      "questionIds": ["q-be-sql-01", "q-be-sql-02", "q-be-sql-03"]
+    },
+    {
+      "canonicalSkillId": "backend.testing",
+      "legacySkillId": "testing",
+      "questionIds": ["q-be-test-01", "q-be-test-02", "q-be-test-03"]
+    },
+    {
+      "canonicalSkillId": "backend.authentication-security",
+      "legacySkillId": "authentication-security",
+      "questionIds": ["q-be-auth-01", "q-be-auth-02", "q-be-auth-03"]
+    },
+    {
+      "canonicalSkillId": "backend.system-design",
+      "legacySkillId": "system-design",
+      "questionIds": ["q-be-sys-01", "q-be-sys-02", "q-be-sys-03"]
+    },
+    {
+      "canonicalSkillId": "backend.caching",
+      "legacySkillId": "caching",
+      "questionIds": ["q-be-cache-01", "q-be-cache-02", "q-be-cache-03"]
+    },
+    {
+      "canonicalSkillId": "backend.nosql-databases",
+      "legacySkillId": "nosql",
+      "questionIds": ["q-be-nosql-01", "q-be-nosql-02", "q-be-nosql-03"]
+    },
+    {
+      "canonicalSkillId": "backend.lang-csharp",
+      "legacySkillId": "csharp",
+      "questionIds": ["q-be-cs-01", "q-be-cs-02", "q-be-cs-03"]
+    },
+    {
+      "canonicalSkillId": "backend.lang-java",
+      "legacySkillId": "java",
+      "questionIds": ["q-be-java-01", "q-be-java-02", "q-be-java-03"]
+    },
+    {
+      "canonicalSkillId": "shared.python",
+      "legacySkillId": "python",
+      "questionIds": ["q-be-py-01", "q-be-py-02", "q-be-py-03"]
+    },
+    {
+      "canonicalSkillId": "backend.lang-cpp",
+      "legacySkillId": "cpp",
+      "questionIds": ["q-be-cpp-01", "q-be-cpp-02", "q-be-cpp-03"]
+    },
+    {
+      "canonicalSkillId": "shared.javascript",
+      "legacySkillId": "javascript",
+      "questionIds": ["q-be-js-01", "q-be-js-02", "q-be-js-03"]
+    },
+    {
+      "canonicalSkillId": "backend.lang-typescript",
+      "legacySkillId": "typescript",
+      "questionIds": ["q-be-ts-01", "q-be-ts-02", "q-be-ts-03"]
+    },
+    {
+      "canonicalSkillId": "backend.lang-go",
+      "legacySkillId": "go",
+      "questionIds": ["q-be-go-01", "q-be-go-02", "q-be-go-03"]
+    },
+    {
+      "canonicalSkillId": "backend.lang-rust",
+      "legacySkillId": "rust",
+      "questionIds": ["q-be-rust-01", "q-be-rust-02", "q-be-rust-03"]
+    }
+  ]
+}

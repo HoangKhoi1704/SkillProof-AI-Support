@@ -14,7 +14,7 @@ const dataDir = process.argv[2]
 const catalogPath = path.join(dataDir, "skill-catalog.json");
 const sourcesPath = path.join(dataDir, "sources.json");
 const questionsPath = path.join(dataDir, "questions.json");
-const baselinePath = path.resolve(__dirname, "../baselines/v1.2-core-questions-baseline.json");
+const baselinePath = path.resolve(__dirname, "../baselines/v2.0-core-questions-baseline.json");
 
 const errors = [];
 
@@ -42,7 +42,7 @@ function canonicalStringify(obj) {
 const catalogData = loadJson(catalogPath, "skill-catalog.json");
 const sourcesData = loadJson(sourcesPath, "sources.json");
 const questionsData = loadJson(questionsPath, "questions.json");
-const baselineData = loadJson(baselinePath, "v1.2-core-questions-baseline.json");
+const baselineData = loadJson(baselinePath, "v2.0-core-questions-baseline.json");
 
 if (errors.length > 0) {
     console.error("FAIL: Unable to load assessment dataset files:");
@@ -51,10 +51,14 @@ if (errors.length > 0) {
 }
 
 // -------------------------------------------------------------
-// 1. Validate Sources Catalog (sources.json)
+// 1. Validate Sources Catalog (sources.json) - Strict Provenance Gate
 // -------------------------------------------------------------
 const sourceIds = new Set();
 const sourcesById = new Map();
+const invalidSourceIds = new Set();
+const referenceOnlySourceIds = new Set();
+const claimVerifiedSourceIds = new Set();
+
 const allowedSourceTypes = new Set([
     "career-framework",
     "official-standard",
@@ -65,10 +69,21 @@ const allowedSourceTypes = new Set([
     "company-published-interview-guidance"
 ]);
 
+const allowedAccessStatuses = new Set([
+    "accessible",
+    "partially-accessible",
+    "paywalled",
+    "unavailable",
+    "redirected",
+    "not-verifiable"
+]);
+
 const allowedVerificationStatuses = new Set([
-    "verified-official-publication",
+    "claim-verified",
+    "source-identity-verified",
     "community-curated-verified",
-    "candidate-reported-unverified"
+    "reference-only",
+    "rejected"
 ]);
 
 if (!Array.isArray(sourcesData.sources)) {
@@ -97,8 +112,16 @@ if (!Array.isArray(sourcesData.sources)) {
             errors.push(`[Source ${id || idx}] url must be a valid HTTP/HTTPS URL.`);
         }
 
+        if (!src.canonicalUrl || typeof src.canonicalUrl !== "string" || !src.canonicalUrl.startsWith("http")) {
+            errors.push(`[Source ${id || idx}] canonicalUrl must be a valid HTTP/HTTPS URL.`);
+        }
+
         if (!allowedSourceTypes.has(src.sourceType)) {
             errors.push(`[Source ${id || idx}] Invalid sourceType: '${src.sourceType}'. Allowed: ${[...allowedSourceTypes].join(", ")}`);
+        }
+
+        if (!allowedAccessStatuses.has(src.accessStatus)) {
+            errors.push(`[Source ${id || idx}] Invalid accessStatus: '${src.accessStatus}'. Allowed: ${[...allowedAccessStatuses].join(", ")}`);
         }
 
         if (!allowedVerificationStatuses.has(src.verificationStatus)) {
@@ -109,8 +132,24 @@ if (!Array.isArray(sourcesData.sources)) {
             errors.push(`[Source ${id || idx}] accessedAt must be a valid date string.`);
         }
 
-        if (src.sourceType === "candidate-reported-interview" && src.verificationStatus !== "candidate-reported-unverified") {
-            errors.push(`[Source ${id || idx}] Candidate-reported interviews must be marked as candidate-reported-unverified.`);
+        // Check verification invariants
+        if (src.verificationStatus === "rejected" || src.accessStatus === "unavailable") {
+            invalidSourceIds.add(id);
+        }
+
+        if (src.verificationStatus === "reference-only") {
+            referenceOnlySourceIds.add(id);
+        }
+
+        if (src.verificationStatus === "claim-verified" || src.verificationStatus === "community-curated-verified") {
+            claimVerifiedSourceIds.add(id);
+            if (!src.verifiedAt || typeof src.verifiedAt !== "string") {
+                errors.push(`[Source ${id || idx}] Claim-verified source requires verifiedAt date.`);
+            }
+        }
+
+        if (src.sourceType === "candidate-reported-interview" && src.verificationStatus !== "rejected") {
+            errors.push(`[Source ${id || idx}] Unaudited candidate-reported interviews are not permitted in v2.`);
         }
     });
 }
@@ -264,29 +303,29 @@ const assessableCompetencyIds = new Set([...coreCompetencyIds, ...recommendedCom
 const assessableSkillIds = new Set([...assessableCompetencyIds, ...languageSkillIds]);
 
 // -------------------------------------------------------------
-// 3. Frozen Data Foundation v1.2 Core Baseline & Integrity Lock
+// 3. Frozen Data Foundation v2.0 Core Baseline & Integrity Lock
 // -------------------------------------------------------------
-const EXPECTED_BASELINE_FILE_SHA256 = "449b8db3d8b21ea9bac4567fef9fe5df85212a25503e62856fe3ae5792ed7e1b";
+const EXPECTED_BASELINE_FILE_SHA256 = "42a6b6b3a6b83f0fbb8c69163d23f178d0ad46c4b3ed1c81245ee04f27f23eb3";
 
 const FROZEN_CORE_QUESTION_FINGERPRINTS = {
-    "q-be-prog-01": "b9f57c02769f5597bdfddf2dd8e7211db7db473ed72fa4380e0819d5b3d9e937",
+    "q-be-prog-01": "8c54c0e89b6fd77664bc2442cdd559e9438f17c982ed96742b35b4a420cada29",
     "q-be-prog-02": "befac0b1d617805add91b4171fe251843f55254e73af61e51bcd38484dcfd8e3",
-    "q-be-prog-03": "67724f2856a2ca0824680c8cc1b809d6587e8d723b62885c14e905bbb86b607f",
-    "q-be-rest-01": "8bbab3045319cd42125a3a5ae6549dd6565fb1f706dffa1e6ec8146b60499249",
-    "q-be-rest-02": "73a5f56ea78ad6144e4d9ca5fad0d5ec09e55b89d5c5b648095ff1c477cfa2d0",
+    "q-be-prog-03": "c8a311692d30430372c90b19005357a1a5fe186dd7466a88a31d246878d0fa9f",
+    "q-be-rest-01": "10d4dc2ebf6579831797b5fbaba3ccedc506710b97d14eb2420b917f965c5fba",
+    "q-be-rest-02": "954a7c7097fe62a9d873af6a2d028f876eed5855d215910965fe5bce4e263404",
     "q-be-rest-03": "bec29f920ce7bcd0b03368e21b67e3c06d87f99319574e133a916e2abb3a4816",
-    "q-be-sql-01": "bbceca980d30b892d2d78b2fce5f33b5ce716abb635ac702cb7f99c439bc2e70",
-    "q-be-sql-02": "f3e38beb77806b167d67e14b045430fca031a634bd8b795093fbd73d9958d4ad",
+    "q-be-sql-01": "74e6feda7262c53f7109ee7b6866f28f3bba41c3b1c2032ea8a01caa97a8368e",
+    "q-be-sql-02": "9c0518f4fb7f07f5b0b5fa41da5cc428ad73752520e7736965382159331a1254",
     "q-be-sql-03": "a7cc43d56260a4d495f24f11d59107d95c32c27238475a104a7eaa0dff69f154",
-    "q-be-test-01": "56f0e4d76bedd2dfdb34b931da3cd3bf852576a412bbd363fb40c6a6b25aa88c",
-    "q-be-test-02": "11475e62639102223b879f07c149d2560382df9dacdf3e49ba1562441b18fdb8",
-    "q-be-test-03": "4322a5204c2d1c6a692f09745603e30e2977a438e4fb364f37669b2c01f92319",
+    "q-be-test-01": "69ee4c50f6e7aa57a4836d5a603ce330504e13db39a693400896cfc9ed2ecbf9",
+    "q-be-test-02": "aafbb0916b01ebc1fd5ad37c244a707a3256d56b8950717a34798f2fe5cb89d7",
+    "q-be-test-03": "465c9129eb240bd6404002830e40b4079061b51575149c2927aef2dea2b9aa39",
     "q-be-auth-01": "abfecdddeb1015f834591f161358abc761bf19d44e665e64c6af0b0d21908973",
     "q-be-auth-02": "a093cf3cf6a104e5baddd8fbb62345433be63fd19f1f7e4a072c45092bf63aa1",
-    "q-be-auth-03": "9cf612a47f1fbc996441b0efc1f483a9583edf4244ec1199baa6fde2efb14bef",
-    "q-be-sys-01": "239038b373b1e11da775fd8a55747242d4e1b90b92dd78fd192cc1ec45b5dfc5",
-    "q-be-sys-02": "d8f95ac5c2325bf9b741beaf5706e555c98cfd200a06334ea6aa5aed012730e7",
-    "q-be-sys-03": "ba4d661ea2240196af0cab158c48f56cd82c96559fcf5a7b2eefd2d3440706d7"
+    "q-be-auth-03": "595c4c89f62302a489f2ddfae0510bf790a914ef1a99392a1fe7c34e90c6257a",
+    "q-be-sys-01": "4a4ed8d74b7575bd99e42b5f9f2c69e0f1448d9e89c9d34b166b32644d2183ba",
+    "q-be-sys-02": "3d3f7eadcb30c57b2724e9066492a60f75c3754bba81085125bd7a833dfbf05e",
+    "q-be-sys-03": "2efc55456ecf74cb3b02bb4107508f2249440fae289382b434fcb3185d54ebe7"
 };
 
 const protectedFields = [
@@ -428,7 +467,6 @@ if (!Array.isArray(questionsData.questions)) {
         if (!q.skillId || !assessableSkillIds.has(q.skillId)) {
             errors.push(`[Question ${qId || idx}] skillId '${q.skillId}' must be one of the assessable skills: ${[...assessableSkillIds].join(", ")}`);
         } else {
-            // Verify semantic category purity: language questions map to language skills, not fake competencies
             if (languageSkillIds.has(q.skillId) && competencyIds.has(q.skillId)) {
                 errors.push(`[Question ${qId || idx}] Language skill '${q.skillId}' collides with competency taxonomy.`);
             }
@@ -504,6 +542,8 @@ if (!Array.isArray(questionsData.questions)) {
             q.frameworkSourceIds.forEach(fId => {
                 if (!sourceIds.has(fId)) {
                     errors.push(`[Question ${qId || idx}] frameworkSourceId '${fId}' does not exist in sources.json.`);
+                } else if (invalidSourceIds.has(fId)) {
+                    errors.push(`[Question ${qId || idx}] frameworkSourceId '${fId}' references an unavailable/rejected source.`);
                 }
             });
         }
@@ -515,6 +555,10 @@ if (!Array.isArray(questionsData.questions)) {
             q.interviewEvidenceIds.forEach(iId => {
                 if (!sourceIds.has(iId)) {
                     errors.push(`[Question ${qId || idx}] interviewEvidenceId '${iId}' does not exist in sources.json.`);
+                } else if (invalidSourceIds.has(iId)) {
+                    errors.push(`[Question ${qId || idx}] interviewEvidenceId '${iId}' references an unavailable/rejected source.`);
+                } else if (referenceOnlySourceIds.has(iId)) {
+                    errors.push(`[Question ${qId || idx}] interviewEvidenceId '${iId}' references a reference-only source.`);
                 } else {
                     const src = sourcesById.get(iId);
                     if (src && !allowedInterviewSourceTypes.has(src.sourceType)) {
@@ -538,8 +582,16 @@ if (!Array.isArray(questionsData.questions)) {
 
                     if (!ev.sourceId || !sourceIds.has(ev.sourceId)) {
                         errors.push(`[Question ${qId || idx} evidence ${eIdx}] Invalid or missing sourceId: '${ev.sourceId}'.`);
+                    } else if (evSourceIds.has(ev.sourceId)) {
+                        errors.push(`[Question ${qId || idx} evidence ${eIdx}] Duplicate evidence for sourceId '${ev.sourceId}'.`);
                     } else {
                         evSourceIds.add(ev.sourceId);
+                        if (invalidSourceIds.has(ev.sourceId)) {
+                            errors.push(`[Question ${qId || idx} evidence ${eIdx}] Evidence source '${ev.sourceId}' is unavailable/rejected.`);
+                        }
+                        if (referenceOnlySourceIds.has(ev.sourceId)) {
+                            errors.push(`[Question ${qId || idx} evidence ${eIdx}] Evidence source '${ev.sourceId}' is reference-only.`);
+                        }
                         const refSrc = sourcesById.get(ev.sourceId);
                         if (refSrc && !allowedInterviewSourceTypes.has(refSrc.sourceType)) {
                             errors.push(`[Question ${qId || idx} evidence ${eIdx}] Source '${ev.sourceId}' is type '${refSrc.sourceType}', not interview guidance/prep.`);
@@ -547,6 +599,18 @@ if (!Array.isArray(questionsData.questions)) {
                         if (refSrc && ev.evidenceType !== refSrc.sourceType) {
                             errors.push(`[Question ${qId || idx} evidence ${eIdx}] evidenceType '${ev.evidenceType}' must match source's sourceType '${refSrc.sourceType}'.`);
                         }
+                    }
+
+                    if (!ev.canonicalUrl || typeof ev.canonicalUrl !== "string" || !ev.canonicalUrl.startsWith("http")) {
+                        errors.push(`[Question ${qId || idx} evidence ${eIdx}] canonicalUrl must be a valid HTTP/HTTPS URL.`);
+                    }
+
+                    if (!ev.locator || typeof ev.locator !== "string" || ev.locator.trim().length < 5) {
+                        errors.push(`[Question ${qId || idx} evidence ${eIdx}] locator must be a substantive section/heading string.`);
+                    }
+
+                    if (!ev.verifiedAt || typeof ev.verifiedAt !== "string") {
+                        errors.push(`[Question ${qId || idx} evidence ${eIdx}] verifiedAt date is required for claim evidence.`);
                     }
 
                     if (!Array.isArray(ev.supportedTopics) || ev.supportedTopics.length === 0) {
@@ -675,10 +739,10 @@ console.log(`  - Programming Languages: ${languageSkillIds.size}`);
 console.log(`Sources: ${sourcesData.sources.length}`);
 console.log(`Questions: ${questionsData.questions.length} (Exactly 3 per Assessable Skill: 16 skills × 3 = 48)`);
 console.log("--------------------------------------------------");
-console.log("FROZEN DATA FOUNDATION v1.2 BASELINE INTEGRITY:");
+console.log("FROZEN DATA FOUNDATION v2.0 BASELINE INTEGRITY:");
 console.log(`  - Baseline Snapshot: ${path.relative(rootDir, baselinePath)}`);
 console.log(`  - SHA-256 File Checksum: ${EXPECTED_BASELINE_FILE_SHA256} (MATCH)`);
-console.log(`  - Core Questions Verified: 18/18 identical to v1.2 baseline`);
+console.log(`  - Core Questions Verified: 18/18 identical to v2.0 baseline`);
 console.log(`  - Protected Fields: ${protectedFields.join(", ")}`);
 console.log(`  - Canonical Fingerprints: 18/18 MATCH`);
 console.log("--------------------------------------------------");

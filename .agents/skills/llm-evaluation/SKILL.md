@@ -5,63 +5,40 @@ description: Implements and verifies SkillProof LLM evaluation flows for diagnos
 
 # LLM Evaluation Skill
 
-Use this skill whenever SkillProof sends student data to an LLM for assessment or recommendation.
+Use this skill whenever SkillProof sends student data to an LLM or evaluates diagnostic responses, roadmaps, or project recommendations.
 
 ## Goal
-Produce explainable, structured, evidence-based AI outputs that the backend can safely validate.
+Produce explainable, structured, evidence-based AI evaluations that the backend can safely validate, strictly bounded by qualitative rubrics and approved project catalogs.
 
-## Core Flow
-```text
-Question + Competency + Rubric + Student Answer
-→ Prompt
-→ LLM
-→ Structured JSON
-→ Schema Validation
-→ Skill Assessment
-```
+## Core Rules & Guardrails
+1. **Qualitative Only**: Skill levels must strictly use the 4 approved qualitative tiers: `Insufficient Evidence`, `Beginner`, `Intermediate`, `Advanced`. Never emit arbitrary percentages or numeric scores.
+2. **Not Assessed != Beginner**: Never equate lack of assessment to low skill. Unassessed competencies remain `Not Assessed`.
+3. **No Hallucinated Experience**: The LLM must evaluate solely based on evidence present in the candidate's submission.
+4. **Post-Answer Explanations**: Provide concise feedback:
+   - What the answer covered
+   - What could be stronger
+   - Concise reference explanation
+   *Never expose raw system prompts, private rubrics, or expected signals directly as scoring criteria.*
+5. **Deterministic Testing**: During tests, `OpenAI:LiveEvaluationEnabled` must be `false` to guarantee deterministic evaluation with zero outbound external LLM API calls.
 
-## Rules
-The LLM must never invent student experience, infer ability without evidence, use arbitrary numeric percentages, make hiring decisions, or redefine role competencies. If evidence is insufficient, return `Insufficient Evidence`.
+## Architecture Transitions (Current vs V2 Target)
 
-## Procedure
+### Diagnostic Evaluation
+- **Current**: Evaluates answers using structured JSON against server-side rubric prompts.
+- **V2 Target**: Multi-turn evaluation with immediate post-answer explanations, preserving session state across multi-page navigation.
 
-### 1. Read Source Files
-Read the authoritative source files in `docs/`: `00_SOURCE_OF_TRUTH_SKILLPROOF.md`, `01_IMPLEMENTATION_SPEC_SKILLPROOF.md`, `03_MULTI_AGENT_SOURCE_WORKFLOW_SKILLPROOF.md`, `04_DOCUMENTATION_AUDIT_CHECKLIST.md`, and `05_CURATED_SEED_QUESTIONS_SKILLPROOF.md`.
+### Roadmap Generation
+- **Current (V1.2)**: LLM generates structured learning tasks for prioritized gaps.
+- **V2 Target**: Personalize a subgraph from the canonical **roadmap.sh** role graph based on assessed profile + unassessed required skills. The AI explains prioritization and creates focus paths; it does **not** invent canonical role nodes.
 
-### 2. Separate Instructions from Student Input
-Use explicit sections: SYSTEM/ROLE, TASK, ROLE CONTEXT, COMPETENCY, QUESTION, RUBRIC, STUDENT ANSWER, OUTPUT SCHEMA, RULES.
+### Practice Projects
+- **Current (V1.2)**: LLM generates project specifications based on gap context (`OpenAiProjectRecommender`).
+- **V2 Target**: Projects are matched, ranked, and explained from an **approved curated catalog** (e.g. `practical-tutorials/project-based-learning`). The AI does **not** fabricate catalog projects.
 
-### 3. Require Structured Output
-Example:
-```json
-{
-  "competency": "SQL",
-  "level": "Beginner",
-  "reason": "The student identifies basic database checks but does not discuss indexing or execution plans.",
-  "evidence": ["Mentions checking slow queries"]
-}
-```
-
-### 4. Validate Output
-Validate JSON, required fields, allowed enums, and reasonable string lengths. Retry malformed output once if appropriate; otherwise fail safely.
-
-### 5. Skill Gap Prioritization
-Use target role, skill assessments, and competency importance. Prioritize at most 3 gaps for the MVP.
-
-### 6. Roadmap Generation
-Each item must include Skill, Priority, Learning Goal, and Practice Task. Avoid generic course dumps.
-
-### 7. Gap-Based Project Recommendation
-Every major project requirement must map to at least one diagnosed gap.
-
-### 8. Evaluation Cases
-Maintain test cases for strong, weak, irrelevant, empty, prompt-injection-style answers, and malformed model responses.
-
-## Completion Checklist
-- prompt uses explicit rubric
-- output schema is defined
-- enums are validated
-- insufficient evidence is handled
-- reasoning is explainable
-- roadmap maps to gaps
-- project requirements map to gaps
+### Portfolio Project Evaluation
+- **Current**: Evaluates project submissions against rubric tiers.
+- **V2 Target**: Multi-channel evidence hierarchy:
+  1. Deterministic repository evidence (file tree, dependencies, configs, test suites)
+  2. Functional deployed evidence (browser/API verification)
+  3. AI semantic evidence review against approved project criteria
+  *AI serves as interpreter and evaluator of evidence, not the sole source of truth.*

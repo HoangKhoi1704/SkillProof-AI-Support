@@ -1,0 +1,747 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SkillProof Data Analyst Assessment Question Bank",
+  "version": "3.0.0",
+  "roleId": "data-analyst",
+  "description": "Production question bank for Data Analyst covering role mandatory fundamentals and core assessable competencies with calibrated difficulty, reference explanations, and 4-tier qualitative rubrics.",
+  "questions": [
+    {
+      "id": "q-da-sheets-01",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.spreadsheets",
+      "subskills": [
+        "cell-referencing",
+        "lookup-formulas",
+        "formula-auditing"
+      ],
+      "difficulty": "foundation",
+      "questionType": "concept",
+      "question": "In modern spreadsheet software (such as Excel or Google Sheets), what is the difference between relative and absolute cell references (e.g., `A1` vs `$A$1` vs `$A1`), and how does `XLOOKUP` improve upon legacy `VLOOKUP` when joining columns?",
+      "referenceExplanation": "Relative references (`A1`) update dynamically when copied or filled across cells. Absolute references (`$A$1`) lock both row and column so the target cell remains fixed. Mixed references (`$A1` or `A$1`) lock only the column or row respectively. `XLOOKUP` overcomes critical `VLOOKUP` flaws: it defaults to an exact match (avoiding accidental nearest-match errors), separates the lookup vector from the return vector (allowing lookups to the left), does not break when columns are inserted or reordered, and natively handles not-found conditions with a built-in fallback argument.",
+      "expectedSignals": [
+        "Explains behavior of relative, absolute ($), and mixed cell references during drag/copy operations",
+        "Identifies that VLOOKUP requires the lookup column to be on the leftmost side of the table array",
+        "Mentions XLOOKUP defaults to exact match rather than approximate match",
+        "Explains resilience against column insertion or deletion when using XLOOKUP"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Confuses cell reference types and cannot articulate any functional difference between VLOOKUP and XLOOKUP.",
+        "Beginner": "Understands that the dollar sign locks a cell reference and that both VLOOKUP and XLOOKUP find values across tables, but lacks depth on exact match defaults and column shifting resilience.",
+        "Intermediate": "Accurately details relative, absolute, and mixed references, and explains how XLOOKUP looks to the left, defaults to exact match, and decouples lookup/return ranges.",
+        "Advanced": "Discusses computational implications of volatile functions vs indexed lookups, binary search mode flags in sorted datasets, dynamic array spill behavior (`#SPILL!`), and auditability across large corporate models."
+      },
+      "frameworkSourceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "unsupported",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": null,
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-sheets-02",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.spreadsheets",
+      "subskills": [
+        "pivot-tables",
+        "calculated-fields",
+        "data-integrity"
+      ],
+      "difficulty": "applied",
+      "questionType": "scenario",
+      "question": "You receive an export of 45,000 monthly sales transactions. Management asks for a Pivot Table showing total revenue, unique customer count, and average order value by region and product line. What steps and formulas would you use to clean dirty inputs (such as mixed date formats and leading whitespace) and compute unique customer counts accurately in your summary?",
+      "referenceExplanation": "First clean raw inputs using text and date functions: `TRIM()` and `CLEAN()` to remove leading/trailing whitespace and non-printable characters, and coerce text dates into ISO serial timestamps using `DATEVALUE()` or Power Query. In Excel, a standard pivot table cannot calculate distinct counts from a basic range without adding the data to the Data Model (Power Pivot), where a DAX measure like `DISTINCTCOUNT([CustomerID])` can be created. Alternatively, in Google Sheets or modern Excel, unique counts can be derived via `UNIQUE()` / `COUNTA(UNIQUE(FILTER(...)))` or adding to the pivot table Values area as 'Distinct Count'. Average Order Value is computed as `Sum(Revenue) / Count(Orders)` rather than averaging pre-calculated averages.",
+      "expectedSignals": [
+        "Proposes data sanitization using TRIM/CLEAN and date normalization",
+        "Recognizes that standard pivot tables sum/count occurrences rather than unique entities by default",
+        "Specifies using the Data Model / DAX DISTINCTCOUNT or UNIQUE/FILTER formulas to get distinct customer counts",
+        "Emphasizes that Average Order Value must be computed by dividing total revenue by total orders rather than taking the average of averages"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests eyeballing data or simple manual sorting without addressing whitespace cleaning, distinct counting mechanics, or the average-of-averages fallacy.",
+        "Beginner": "Knows how to create a basic pivot table with drag-and-drop fields, but relies on manual row filtering and doesn't explain how to handle distinct counts or data cleaning systematically.",
+        "Intermediate": "Outlines systematic cleaning (TRIM, standardizing date parsing) and configures distinct counting via Power Pivot/Data Model or dynamic array functions, correctly calculating weighted average order value.",
+        "Advanced": "Designs a robust, reproducible refresh pipeline using Power Query (M code) or Power Pivot relationships, addresses surrogate customer IDs, handles missing categorical keys with automated validation flags, and documents refresh performance on large tables."
+      },
+      "frameworkSourceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "unsupported",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": null,
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-sheets-03",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.spreadsheets",
+      "subskills": [
+        "scalability-limits",
+        "auditability",
+        "tool-selection"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "A finance team is maintaining a complex spreadsheet workbook with 15 interlinked sheets, hundreds of volatile formulas (`OFFSET`, `INDIRECT`, `TODAY`), and 500,000 rows. The sheet is crashing and calculations take several minutes. How would you evaluate the architectural bottlenecks of this spreadsheet, and what criteria would you use to decide which parts should stay in spreadsheets versus moving to SQL or Python?",
+      "referenceExplanation": "Bottlenecks stem from spreadsheet memory architecture and formula dependency trees. Volatile functions (`OFFSET`, `INDIRECT`) recalculate whenever any cell in the workbook changes, destroying dependency tree caching and triggering massive recalculation storms. Additionally, 500,000 rows nears spreadsheet row limits (1,048,576 in Excel) and creates bloated in-memory XML structures. Criteria to migrate: (1) Data storage, extraction, and relational joins should move to a SQL warehouse for indexed query execution, relational integrity, and ACID guarantees. (2) Heavy transformation, deduplication, and scheduled ETL should move to Python/SQL. (3) The spreadsheet should be reserved purely as a presentation or flexible ad-hoc scenario modeling layer, querying aggregated data via read-only SQL connectors.",
+      "expectedSignals": [
+        "Identifies volatile functions (OFFSET, INDIRECT) as causes of cascading recalculation overhead",
+        "Analyzes memory footprint and recalculation tree complexity at 500k rows",
+        "Establishes criteria for separation of concerns: relational storage/ETL in SQL/Python vs modeling/reporting in spreadsheets",
+        "Proposes migrating raw transaction storage to a database while preserving lightweight executive summary interfaces"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Simply suggests buying a faster computer or splitting the file into 10 smaller spreadsheets without understanding formula dependency engines or data tiering.",
+        "Beginner": "Notes that 500,000 rows is too large for Excel and suggests using SQL, but cannot explain volatile function recalculation mechanics.",
+        "Intermediate": "Identifies volatile functions and large un-indexed lookups as primary performance killers, recommending migrating storage and heavy aggregations to SQL while keeping final summaries in sheets.",
+        "Advanced": "Provides comprehensive architectural triage: replaces volatile functions with INDEX/MATCH, eliminates circular references, profiles recalculation bottlenecks using Excel Formula Profiler, establishes data governance protocols (version control, schema migrations), and constructs an automated SQL-to-BI/spreadsheet refresh model."
+      },
+      "frameworkSourceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "unsupported",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": null,
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-sql-01",
+      "roleId": "data-analyst",
+      "skillId": "shared.sql",
+      "subskills": [
+        "joins",
+        "aggregations",
+        "filtering-semantics"
+      ],
+      "difficulty": "foundation",
+      "questionType": "concept",
+      "question": "Explain the difference between `WHERE` and `HAVING` clauses in a SQL statement, and explain the semantic difference in result rows between an `INNER JOIN` and a `LEFT OUTER JOIN` when matching records from `customers` to `orders`.",
+      "referenceExplanation": "`WHERE` filters individual rows before any grouping or aggregation takes place. `HAVING` filters aggregated group records after `GROUP BY` has collapsed rows into groups. For joins: an `INNER JOIN` returns only rows where the join condition matches in both tables (customers who have placed at least one order). A `LEFT OUTER JOIN` preserves all rows from the left table (`customers`); if a customer has no matching record in `orders`, the right-side columns are filled with `NULL`.",
+      "expectedSignals": [
+        "Differentiates WHERE (pre-aggregation filter) from HAVING (post-aggregation group filter)",
+        "Explains INNER JOIN returns only records present in both joined datasets",
+        "Explains LEFT JOIN retains all left-table rows and pads non-matching right columns with NULL",
+        "Provides an example showing that aggregated functions (SUM, COUNT) cannot be used in WHERE"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Confuses WHERE and HAVING, or cannot explain how NULL padding works in a LEFT JOIN.",
+        "Beginner": "States that WHERE filters things and LEFT JOIN keeps the left table, but cannot clearly explain the order of execution regarding GROUP BY and aggregation.",
+        "Intermediate": "Accurately details the logical execution order: FROM -> WHERE -> GROUP BY -> HAVING -> SELECT, and contrasts INNER vs LEFT OUTER JOIN with correct NULL-handling descriptions.",
+        "Advanced": "Discusses query engine execution vs logical execution, optimizer predicate pushdown with outer joins (how filtering a right table in WHERE accidentally converts a LEFT JOIN into an INNER JOIN), and index usage across join keys."
+      },
+      "frameworkSourceIds": [
+        "src-doc-postgresql-queries"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "PostgreSQL Documentation Section 7.2 (Table Expressions: Joins, WHERE, HAVING)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-sql-02",
+      "roleId": "data-analyst",
+      "skillId": "shared.sql",
+      "subskills": [
+        "window-functions",
+        "cohort-analysis",
+        "ranking"
+      ],
+      "difficulty": "applied",
+      "questionType": "scenario",
+      "question": "You have a table `user_logins (user_id INT, login_date TIMESTAMP)`. Write a conceptual SQL query using window functions to find: (1) each user's previous login date, and (2) whether consecutive logins occurred within 24 hours. How do `RANK()`, `DENSE_RANK()`, and `ROW_NUMBER()` differ if you needed to assign a rank to users based on login frequency?",
+      "referenceExplanation": "To find the previous login date, use the `LAG()` window function partitioned by `user_id` and ordered by `login_date`: `LAG(login_date, 1) OVER (PARTITION BY user_id ORDER BY login_date)`. The time difference can then be calculated using timestamp arithmetic (e.g., `EXTRACT(EPOCH FROM (login_date - prev_date)) <= 86400`). Ranking differences: `ROW_NUMBER()` generates unique sequential integers without gaps regardless of ties. `RANK()` assigns identical ranks to tied values and skips the next ranks by the count of tied items (1, 2, 2, 4). `DENSE_RANK()` assigns identical ranks to tied values but does not skip any ranks (1, 2, 2, 3).",
+      "expectedSignals": [
+        "Uses LAG() or LEAD() with OVER (PARTITION BY user_id ORDER BY login_date)",
+        "Calculates time difference between current row and LAG value to identify <= 24h retention",
+        "Defines ROW_NUMBER as strictly sequential integers without ties or gaps",
+        "Contrasts RANK (skips subsequent numbers after ties) with DENSE_RANK (consecutive numbers without gaps after ties)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot explain window function syntax or confuses LAG with simple GROUP BY aggregations.",
+        "Beginner": "Understands that LAG accesses past rows, but cannot clearly distinguish the tie-handling behavior between RANK and DENSE_RANK.",
+        "Intermediate": "Writes valid window function queries using LAG with appropriate PARTITION BY and ORDER BY clauses, and clearly explains ranking differences with concrete examples.",
+        "Advanced": "Discusses window frame specifications (`ROWS BETWEEN` vs `RANGE BETWEEN`), performance implications of spilling large window partitions to tempdb/disk, and alternative gap-and-island techniques."
+      },
+      "frameworkSourceIds": [
+        "src-doc-postgresql-window"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "PostgreSQL Documentation Section 3.5 (Window Functions) & Section 9.22 (Window Functions)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-sql-03",
+      "roleId": "data-analyst",
+      "skillId": "shared.sql",
+      "subskills": [
+        "query-optimization",
+        "execution-plans",
+        "indexing"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "A daily reporting query joining a 20-million-row `orders` table to a 5-million-row `customers` table with a date filter (`WHERE order_date >= NOW() - INTERVAL '30 days'`) has slowed down from 3 seconds to 90 seconds. How would you inspect the database execution plan (`EXPLAIN ANALYZE`), what signs indicate an inefficient join or table scan, and what indexing or query refactoring strategies would you test?",
+      "referenceExplanation": "Run `EXPLAIN (ANALYZE, BUFFERS)` to compare estimated vs actual row counts and execution times. Key warning signs: (1) `Seq Scan` (Sequential Table Scan) on `orders` indicating missing index on `order_date`, causing the engine to read 20M rows from disk into shared memory. (2) `Hash Join` with memory overflow spilling to temporary disk files (work_mem exhaustion). (3) Large disparity between planner estimates and actual rows, indicating stale database statistics (`ANALYZE` needed). Optimization strategies: Add a composite or B-tree index on `(order_date, customer_id)` or partition `orders` by date range; ensure foreign key index on `customers(customer_id)`; increase `work_mem` for the query session; and evaluate whether the query can aggregate orders by customer before performing the join.",
+      "expectedSignals": [
+        "Mentions inspecting EXPLAIN / EXPLAIN ANALYZE for estimated vs actual costs and scan types",
+        "Identifies Sequential Scans (Seq Scan) and disk spills during Hash Joins or Sorts as major red flags",
+        "Proposes B-tree indexing on filter and join columns (order_date, customer_id)",
+        "Addresses table statistics (running ANALYZE) and date-based partitioning or pre-aggregation"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests restarting the server or deleting older records without inspecting execution plans or indexes.",
+        "Beginner": "Suggests adding an index to order_date, but cannot interpret EXPLAIN ANALYZE output or diagnose memory spills.",
+        "Intermediate": "Explains how to interpret Seq Scans, cost estimates, and Hash Join memory overhead in execution plans, proposing composite indexes and filtered queries.",
+        "Advanced": "Analyzes index selectivity, leaf-page I/O using BUFFERS, partial indexes for active date ranges, partition pruning, and column-store/covering index tradeoffs."
+      },
+      "frameworkSourceIds": [
+        "src-doc-postgresql-explain"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "PostgreSQL Documentation Section 14.1 (Using EXPLAIN) & Section 14.2 (Planner Statistics)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-py-01",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.python-or-r",
+      "subskills": [
+        "vectorization",
+        "data-structures",
+        "core-libraries"
+      ],
+      "difficulty": "foundation",
+      "questionType": "concept",
+      "question": "In Python data analysis (e.g., Pandas and NumPy) or R (e.g., dplyr and data.table), why is vectorized calculation vastly faster than iterating through rows with native `for` loops, and what is the difference between a Pandas `Series` and a standard Python `list`?",
+      "referenceExplanation": "A standard Python `list` is an array of pointers to heterogeneous Python objects stored in heap memory. Iterating over it with a `for` loop incurs Python interpreter overhead, dynamic type checking, and pointer dereferencing on every element. In contrast, Pandas `Series` and NumPy arrays store homogeneous data in contiguous blocks of memory implemented in C/Fortran. Vectorized operations leverage SIMD (Single Instruction, Multiple Data) CPU instructions and pre-compiled C routines to process entire arrays without interpreter loop overhead. Additionally, a Pandas `Series` includes an explicit index aligning data labels across operations.",
+      "expectedSignals": [
+        "Explains homogeneous contiguous C memory vs pointer-based heterogeneous Python lists",
+        "Mentions CPU SIMD instructions or pre-compiled C/Fortran routines in NumPy/Pandas",
+        "Identifies interpreter overhead and dynamic type boxing/unboxing during native loops",
+        "Notes that a Series includes an explicit index supporting label-based alignment"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot explain why loops are slow or believes Python lists and NumPy arrays store data identically.",
+        "Beginner": "States that Pandas is written in C and is faster, but lacks understanding of memory layout, type overhead, or indexing.",
+        "Intermediate": "Accurately contrasts contiguous memory storage and C-level vectorized execution with Python interpreter loop overhead and dynamic typing.",
+        "Advanced": "Discusses CPU cache locality (L1/L2 hits vs pointer chasing cache misses), branch prediction, memory alignment, and GIL (Global Interpreter Lock) circumvention in numerical libraries."
+      },
+      "frameworkSourceIds": [
+        "src-doc-pandas-performance"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "Pandas User Guide: Enhancing Performance (Vectorization & Cython Engine)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-py-02",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.python-or-r",
+      "subskills": [
+        "data-transformation",
+        "aggregation",
+        "pandas-patterns"
+      ],
+      "difficulty": "applied",
+      "questionType": "scenario",
+      "question": "You have a Pandas DataFrame `df` with columns `['customer_id', 'transaction_time', 'category', 'amount']`. You need to: (1) parse `transaction_time` to datetime, (2) filter transactions from the last 90 days, (3) calculate total spending and transaction count per customer and category, and (4) reshape the result so that categories become individual columns. How would you accomplish this cleanly?",
+      "referenceExplanation": "First convert timestamps: `df['transaction_time'] = pd.to_datetime(df['transaction_time'])`. Filter using boolean indexing: `cutoff = pd.Timestamp.now() - pd.Timedelta(days=90); recent = df[df['transaction_time'] >= cutoff]`. Aggregate per customer and category using `groupby` with `agg`: `grouped = recent.groupby(['customer_id', 'category'])['amount'].agg(total_spent='sum', tx_count='count').reset_index()`. To reshape categories into columns, use `pivot` or `pivot_table`: `pivoted = grouped.pivot(index='customer_id', columns='category', values=['total_spent', 'tx_count']).fillna(0)`. Alternatively, a direct `pivot_table` with `aggfunc=['sum', 'count']` can combine aggregation and reshaping in one step.",
+      "expectedSignals": [
+        "Uses pd.to_datetime for timestamp parsing",
+        "Applies datetime subtraction / Timedelta for date filtering",
+        "Uses groupby() with agg() or pivot_table() for summary metrics",
+        "Uses pivot() or pivot_table() to reshape long category rows into wide columns, filling missing combinations with 0"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Proposes looping row by row with dictionary accumulators or uses invalid Pandas syntax.",
+        "Beginner": "Knows how to filter and use groupby, but struggles with multi-level pivoting or fails to convert datetime strings properly.",
+        "Intermediate": "Implements clean method chaining or sequential Pandas operations with `pd.to_datetime`, `groupby().agg()`, and `pivot_table()`, handling NaN values with `.fillna(0)`.",
+        "Advanced": "Optimizes memory and performance by setting category dtype, evaluates long vs wide formats for downstream visualization, avoids chained assignment warnings, and handles timezones gracefully."
+      },
+      "frameworkSourceIds": [
+        "src-doc-pandas-reshaping"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "Pandas User Guide: Reshaping and Pivot Tables (pivot_table, pivot)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-py-03",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.python-or-r",
+      "subskills": [
+        "memory-optimization",
+        "chained-indexing",
+        "scalability"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "What causes the infamous `SettingWithCopyWarning` in Pandas, why is it dangerous for data analysis pipelines, and how do you resolve it? Additionally, if a 12GB CSV file needs to be processed on a machine with 8GB of RAM using Python, what techniques would you implement?",
+      "referenceExplanation": "`SettingWithCopyWarning` occurs during chained indexing (e.g., `df[df['a'] > 0]['b'] = 5`) because Pandas cannot guarantee whether the first subset operation returned a view (referencing the original memory) or a copy. If it returns a copy, modifications are written to a temporary object and discarded, silently failing to update `df`. Resolution: use `.loc[row_indexer, col_indexer]` for deterministic assignment, or call `.copy()` explicitly when a separate dataframe is intended. For handling a 12GB file on 8GB RAM: (1) Process in chunks using `pd.read_csv(filename, chunksize=N)` to stream and aggregate batches. (2) Optimize data types using `usecols` to load only needed columns, downcasting `float64`/`int64` to `float32`/`int16`, and converting string columns to categorical `dtype` (`df[col].astype('category')`). (3) Offload heavy processing to Polars or SQLite.",
+      "expectedSignals": [
+        "Explains views vs copies in NumPy/Pandas memory blocks behind SettingWithCopyWarning",
+        "Shows resolution using .loc[mask, col] = val or explicit .copy()",
+        "Proposes chunked streaming via pd.read_csv(chunksize=...)",
+        "Recommends memory downcasting (int32/float32, category dtypes, usecols filter)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Advises suppressing the warning with warnings.filterwarnings without explaining the data corruption risk or cannot handle large CSVs beyond buying more RAM.",
+        "Beginner": "Knows that .loc fixes the warning and that chunks can be read, but lacks understanding of memory views/copies or categorical dtype savings.",
+        "Intermediate": "Clearly articulates the danger of silent assignment failure on temporary copies, demonstrates `.loc` syntax, and details chunked processing and type downcasting.",
+        "Advanced": "Deeply details Pandas BlockManager architecture, Arrow-backed string arrays (`string[pyarrow]`), generator pipelines for memory-bounded processing, and contrasts Pandas chunking with lazy evaluation in Polars or DuckDB."
+      },
+      "frameworkSourceIds": [
+        "src-doc-pandas-indexing"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "Pandas User Guide: Indexing and Selecting Data (Returning a View versus a Copy)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-wrang-01",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.data-wrangling",
+      "subskills": [
+        "tidy-data",
+        "data-types",
+        "normalization"
+      ],
+      "difficulty": "foundation",
+      "questionType": "concept",
+      "question": "What are the three fundamental rules of 'Tidy Data' formulated by Hadley Wickham, and why is tidy tabular data preferred for statistical modeling and aggregation compared to wide presentation tables?",
+      "referenceExplanation": "The three rules of Tidy Data are: (1) Each variable forms a column. (2) Each observation forms a row. (3) Each type of observational unit forms a table. Wide presentation tables often store values as column headers (e.g., separate columns for `2021_Revenue`, `2022_Revenue`), violating tidy principles by mixing variables and values. Tidy structure allows consistent vectorized operations, simplifies grouping and filtering across dimensions, and matches the input expectations of grammar-of-graphics visualization libraries (ggplot2, seaborn) and statistical formulas.",
+      "expectedSignals": [
+        "States the three tidy data rules: variables in columns, observations in rows, observational units in tables",
+        "Identifies wide presentation tables where values are embedded in column headers",
+        "Explains how tidy data enables standard grouping, filtering, and aggregation across dimensions",
+        "Notes compatibility with modern data science tools and visualization frameworks"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot recite or explain any tidy data principles, confusing tidy data with simple spell-checking or file renaming.",
+        "Beginner": "Understands that data should be in rows and columns, but cannot explain the distinction between values and variables or why wide tables complicate analysis.",
+        "Intermediate": "Accurately articulates all three tidy data principles and demonstrates how melting/unpivoting wide headers into key-value pairs facilitates downstream calculation.",
+        "Advanced": "Contrasts tidy normalized form with dimensional modeling (star schema fact and dimension tables), discusses relational third normal form (3NF) vs tidy form, and explains cache/columnar storage efficiency in analytical engines."
+      },
+      "frameworkSourceIds": [
+        "src-doc-hadley-tidy-data"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "Hadley Wickham Tidy Data (Journal of Statistical Software) Section 2.1",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-wrang-02",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.data-wrangling",
+      "subskills": [
+        "missing-data",
+        "imputation",
+        "deduplication"
+      ],
+      "difficulty": "applied",
+      "questionType": "scenario",
+      "question": "You are cleaning a customer churn dataset where 18% of the `annual_income` column is missing and 5% of records appear to be duplicate user accounts. What statistical considerations and business logic would you evaluate before deciding whether to drop missing rows, fill them with mean/median, or use model-based imputation? How would you identify duplicate records if user IDs differ but names and emails are similar?",
+      "referenceExplanation": "For missing data, first assess the missingness mechanism: Missing Completely at Random (MCAR), Missing at Random (MAR), or Missing Not at Random (MNAR). Dropping 18% of rows risks severe selection bias if missingness correlates with income (e.g., high-earners refusing to answer = MNAR). Mean imputation distorts variance and standard error; median imputation preserves central tendency for skewed data but still artificially collapses distribution spread. Better approaches: group-median imputation based on occupation/education or multiple imputation / regression models. For duplicate detection with differing IDs: fuzzy string matching (Levenshtein distance, Jaro-Winkler) on names, email domain normalization (lowercase, stripping periods in Gmail), and phone number standardization.",
+      "expectedSignals": [
+        "Evaluates missing data mechanisms (MCAR vs MAR vs MNAR)",
+        "Explains that mean/median imputation shrinks variance and distorts statistical distributions",
+        "Considers conditional imputation based on correlated demographic variables (e.g., job role, zip code)",
+        "Applies fuzzy string matching or standardized hashing on names and emails to detect cross-account duplicates"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests blindly dropping all missing rows or filling everything with 0 without assessing bias or distribution impact.",
+        "Beginner": "Recognizes that dropping 18% loses data and suggests filling with the mean, but does not identify variance collapse or fuzzy matching techniques.",
+        "Intermediate": "Distinguishes between mean and median for skewed data, discusses group-wise imputation, and applies fuzzy matching (Levenshtein/Jaro-Winkler) for near-duplicate identity resolution.",
+        "Advanced": "Deeply details multiple imputation by chained equations (MICE), investigates non-response bias via logistic modeling, and outlines automated entity resolution with confidence thresholds and manual review queues."
+      },
+      "frameworkSourceIds": [
+        "src-doc-pandas-missing"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "source-identity-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "Pandas User Guide: Working with Missing Data",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-wrang-03",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.data-wrangling",
+      "subskills": [
+        "outlier-detection",
+        "data-quality",
+        "schema-drift"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "In an e-commerce order dataset, transaction amounts contain several extreme values that are 50 times the interquartile range (IQR). When is it appropriate to remove, transform, or retain these extreme values? How do you distinguish between legitimate high-value outlier transactions (e.g., B2B bulk orders) and data entry errors, and how should your cleaning pipeline document and monitor these transformations?",
+      "referenceExplanation": "Extreme values should never be deleted automatically without domain investigation. Distinguish data entry errors (e.g., negative prices, repetitive '999999', or impossible decimal shifts) from legitimate business phenomena (e.g., corporate wholesale purchases) by cross-referencing auxiliary signals (payment method, items purchased, user account type). For legitimate heavy-tailed values: (1) Retain them for financial accounting and total revenue reporting. (2) For predictive modeling or regression, use log/box-cox transformation or robust statistics (median, Huber loss, winsorization) to prevent model distortion. The pipeline must establish audit trails: never overwrite raw inputs, log rows flagged by IQR/Z-score thresholds, store boolean outlier flags, and trigger schema/data-quality alerts (e.g., Great Expectations).",
+      "expectedSignals": [
+        "Distinguishes between corrupt input errors and legitimate heavy-tailed business transactions",
+        "Opposes automatic deletion of outliers that represent real financial volume",
+        "Recommends transformations (log, Box-Cox) or winsorization when modeling rather than deleting data",
+        "Emphasizes data lineage, audit logging, and never mutating raw source data in place"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Believes all outliers must be deleted immediately to make charts look clean, ignoring business reality and data provenance.",
+        "Beginner": "Knows how to calculate IQR or Z-score thresholds, but cannot explain how to separate genuine B2B orders from corrupted records.",
+        "Intermediate": "Accurately contrasts reporting requirements (retaining actual transaction totals) with modeling requirements (log transforms, capping), proposing audit flags and non-destructive cleaning.",
+        "Advanced": "Designs a production data-quality framework using tools like Great Expectations, implements automated drift and anomaly detection, and formulates rigorous business governance policies for data transformations."
+      },
+      "frameworkSourceIds": [
+        "src-doc-nist-handbook"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "NIST/SEMATECH e-Handbook Section 1.3.5.17 (Detection of Outliers)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-eda-01",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.eda",
+      "subskills": [
+        "univariate-analysis",
+        "bivariate-analysis",
+        "summary-statistics"
+      ],
+      "difficulty": "foundation",
+      "questionType": "concept",
+      "question": "What is the purpose of Exploratory Data Analysis (EDA), what is the difference between univariate and bivariate analysis, and why do summary statistics (mean, standard deviation, correlation) alone fail to reveal the true structure of datasets (e.g., Anscombe's Quartet or the Datasaurus Dozen)?",
+      "referenceExplanation": "EDA is the iterative process of investigating data to uncover underlying structure, detect anomalies, test hypotheses, and verify assumptions through visual and quantitative exploration before formal modeling. Univariate analysis examines the distribution, central tendency, spread, and frequency of a single variable in isolation (e.g., histogram, box plot). Bivariate analysis investigates relationships, dependencies, and covariation between two variables (e.g., scatter plot, contingency table). Anscombe's Quartet demonstrates that wildly different distributions (linear, curved, outlier-driven) can produce identical means, variances, and regression lines, proving that visualization is essential to understand data shape.",
+      "expectedSignals": [
+        "Defines EDA as hypothesis generation, pattern detection, and assumption testing before modeling",
+        "Contrasts univariate analysis (single variable distributions) with bivariate analysis (relationships between pairs)",
+        "Explains Anscombe's Quartet / Datasaurus Dozen as identical summary statistics hiding drastically different underlying geometries",
+        "Advocates visual exploration (scatter plots, box plots, histograms) alongside numerical summaries"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Equates EDA to simply running `df.describe()` and cannot explain what Anscombe's Quartet illustrates.",
+        "Beginner": "Understands that univariate looks at one variable and bivariate at two, and notes that charts help see things numbers don't show.",
+        "Intermediate": "Clearly details EDA goals, contrasts univariate and bivariate techniques, and explains how identical summary metrics can disguise non-linear patterns or influential outliers.",
+        "Advanced": "Discusses multivariate interaction effects, exploratory dimensionality reduction (PCA, t-SNE), robust rank correlation (Spearman vs Pearson), and cognitive biases during visual data exploration."
+      },
+      "frameworkSourceIds": [
+        "src-doc-nist-handbook"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "NIST/SEMATECH e-Handbook Section 1.1 (EDA Introduction & Philosophy)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-eda-02",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.eda",
+      "subskills": [
+        "correlation-causation",
+        "simpsons-paradox",
+        "segmentation"
+      ],
+      "difficulty": "applied",
+      "questionType": "scenario",
+      "question": "During an EDA on hospital patient recovery times, you discover that Treatment A has a higher overall recovery rate (80%) than Treatment B (70%). However, when you segment the data by illness severity (Mild vs Severe), Treatment B has a higher recovery rate in both subgroups. What is this phenomenon called, why does it occur, and what analytical steps should you take to avoid drawing flawed conclusions?",
+      "referenceExplanation": "This phenomenon is Simpson's Paradox, where a trend observed across aggregated groups disappears or reverses when the groups are disaggregated. It occurs due to a confounding variable (here, illness severity) that is unevenly distributed across the treatments: Treatment B was predominantly assigned to severe cases (which have a lower baseline recovery rate regardless of treatment), while Treatment A was given mostly to mild cases. To avoid flawed conclusions: (1) Always explore data across key demographic and clinical subgroups. (2) Identify potential confounding variables. (3) Use stratified analysis or propensity score matching to compare treatments within balanced cohorts rather than relying on naive overall aggregates.",
+      "expectedSignals": [
+        "Identifies the phenomenon as Simpson's Paradox",
+        "Explains that an unevenly distributed confounding variable (illness severity) biases the aggregate result",
+        "Demonstrates that severe cases were disproportionately assigned to Treatment B",
+        "Proposes stratification, controlling for confounders, or subgroup weighting to resolve the paradox"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Claims that the math must be wrong or that the data is corrupt, failing to recognize Simpson's Paradox.",
+        "Beginner": "Recognizes that illness severity affects recovery, but cannot name Simpson's Paradox or explain the confounding mechanism clearly.",
+        "Intermediate": "Correctly names Simpson's Paradox, explains how confounding variables distort aggregated rates, and prescribes subgroup stratification.",
+        "Advanced": "Formulates causal DAGs (Directed Acyclic Graphs) to map confounders, discusses mediation analysis vs confounding, and explains standardization/re-weighting methods to compute unconfounded average treatment effects."
+      },
+      "frameworkSourceIds": [
+        "src-doc-nist-handbook"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "source-identity-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "NIST/SEMATECH e-Handbook Section 1.3.5 (Quantitative Techniques)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-eda-03",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.eda",
+      "subskills": [
+        "hypothesis-formulation",
+        "confounding-variables",
+        "stakeholder-communication"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "A product executive notices in an exploratory dashboard that users who engage with a newly launched 'Dark Mode' feature have a 35% higher 30-day retention rate, and immediately demands that Dark Mode be turned on by default for all users to boost retention. How would you methodically evaluate this finding during EDA, what biases (e.g., self-selection bias) might explain the correlation, and how would you advise leadership on next steps?",
+      "referenceExplanation": "This is a classic correlation vs causation fallacy driven by self-selection bias. Users who voluntarily seek out and enable Dark Mode are inherently more active, tech-savvy, power users who were already highly committed to the product before enabling the feature. Their high retention is a reflection of their existing engagement, not necessarily caused by Dark Mode itself. Analytical evaluation steps: (1) Check baseline activity before enabling Dark Mode (pre/post analysis). (2) Segment by historical tenure and session frequency to see if Dark Mode produces an incremental retention lift among casual users. (3) Advise leadership against making hasty global product changes based purely on observational correlation, and recommend running a controlled randomized A/B test where dark mode is enabled for a random treatment cohort.",
+      "expectedSignals": [
+        "Identifies self-selection bias and reverses causality: highly engaged power users are the ones who toggle dark mode",
+        "Explains that correlation does not imply causation in observational feature usage",
+        "Proposes pre/post engagement tracking or controlling for historical user activity",
+        "Recommends a randomized controlled experiment (A/B test) before rolling out feature defaults globally"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Agrees with the executive and advises enabling dark mode immediately without questioning causality or bias.",
+        "Beginner": "States that correlation isn't causation, but lacks concrete explanations of self-selection bias or validation methods.",
+        "Intermediate": "Articulates self-selection bias clearly, explains why power users skew observational data, and recommends a randomized A/B test.",
+        "Advanced": "Outlines quasi-experimental techniques (Difference-in-Differences, propensity score matching) if an A/B test is infeasible, details survival analysis for retention cohorts, and structures an executive communication framework that balances analytical rigor with business empathy."
+      },
+      "frameworkSourceIds": [
+        "src-doc-nist-handbook"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "NIST/SEMATECH e-Handbook Section 1.3.5.14 (Correlation Coefficient)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-stat-01",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.statistics",
+      "subskills": [
+        "central-tendency",
+        "dispersion",
+        "normal-distribution"
+      ],
+      "difficulty": "foundation",
+      "questionType": "concept",
+      "question": "What are the core measures of central tendency (mean, median, mode) and dispersion (variance, standard deviation, interquartile range)? When a distribution is heavily right-skewed (such as household income or website page visit durations), which measure of central tendency is most representative and why?",
+      "referenceExplanation": "Measures of central tendency capture the center of a distribution: mean (arithmetic average), median (50th percentile / middle value), and mode (most frequent value). Measures of dispersion quantify spread: variance (average squared deviation from the mean), standard deviation (square root of variance in original units), and IQR (interquartile range, distance between 75th and 25th percentiles). When a distribution is heavily right-skewed, extreme high outliers pull the mean substantially to the right, making it unrepresentative of typical values. The median is resistant to extreme values (robust statistic) because it depends on rank rather than magnitude, making it the most representative measure for skewed data.",
+      "expectedSignals": [
+        "Defines mean, median, mode and contrasts them with variance, standard deviation, and IQR",
+        "Explains that the mean is sensitive to extreme high values and is pulled to the right in right-skewed distributions",
+        "States that the median is robust and resistant to outliers because it relies on positional rank",
+        "Concludes median and IQR are preferred for skewed distributions like income or session duration"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot define standard deviation or confuses median with mean, unable to identify which is appropriate for skewed data.",
+        "Beginner": "Knows how to calculate mean and median and that median is better for income, but cannot explain the mathematical reason or define dispersion measures.",
+        "Intermediate": "Clearly defines central tendency and dispersion metrics, explaining why right-skewness pulls the mean and why the median/IQR provides a more truthful representation.",
+        "Advanced": "Discusses skewness and kurtosis mathematical formulations, transformations to achieve normality (log-normal distributions), and non-parametric statistical implications when choosing summary statistics."
+      },
+      "frameworkSourceIds": [
+        "src-doc-nist-handbook"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "NIST/SEMATECH e-Handbook Section 1.3.5.1 (Measures of Location) & Section 1.3.5.2 (Measures of Scale)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-stat-02",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.statistics",
+      "subskills": [
+        "hypothesis-testing",
+        "p-values",
+        "type-errors"
+      ],
+      "difficulty": "applied",
+      "questionType": "scenario",
+      "question": "An e-commerce company runs an A/B test on a new checkout button. The test yields a p-value of 0.03 for conversion rate lift. Explain what a p-value actually means in this context, what Type I and Type II errors represent in business decision-making, and why a p-value of 0.03 does not mean there is a 97% probability that the new button is superior.",
+      "referenceExplanation": "The p-value is the probability of observing a result as extreme as, or more extreme than, the observed data, assuming that the null hypothesis (no true difference between buttons) is true. It is P(Data | H0), not P(H1 | Data); claiming a 97% chance that the button is superior commits the inverse probability fallacy. Type I error (alpha) is a false positive: concluding the new button works when it actually has no effect (wasting engineering resources deploying a useless feature). Type II error (beta) is a false negative: failing to detect a real conversion improvement and abandoning a beneficial feature. A p-value of 0.03 simply means that under the null hypothesis, random sampling noise would produce this lift only 3% of the time.",
+      "expectedSignals": [
+        "Correctly defines p-value as P(Data | H0), conditional on the null hypothesis being true",
+        "Refutes the fallacy that p = 0.03 means 97% probability of the alternative hypothesis being true",
+        "Defines Type I error (False Positive) and Type II error (False Negative)",
+        "Translates statistical errors into tangible business risks (deploying false wins vs discarding real gains)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Claims that a p-value of 0.03 means the test has a 97% chance of being right or cannot define Type I/II errors.",
+        "Beginner": "Understands that p < 0.05 is generally considered statistically significant, but misinterprets the p-value as the probability of the hypothesis being true.",
+        "Intermediate": "Accurately defines p-value conditionality under the null hypothesis, debunks the 97% fallacy, and explains Type I and Type II errors in business terms.",
+        "Advanced": "Discusses statistical power (1 - beta), Minimum Detectable Effect (MDE), Bayesian alternative interpretations (P(H1 | Data) using prior probabilities), and false discovery rates in repeated testing."
+      },
+      "frameworkSourceIds": [
+        "src-doc-nist-handbook"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "NIST/SEMATECH e-Handbook Section 7.1.2 (Type I and Type II Errors) & Section 7.1.3 (Significance Levels and P-Values)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-stat-03",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.statistics",
+      "subskills": [
+        "sample-size",
+        "statistical-power",
+        "multiple-testing"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "A product team runs an experiment with 20 different metric variations and checks results daily for 14 days, stopping as soon as any single metric shows p < 0.05. Explain the statistical dangers of 'peeking' (continuous monitoring) and the 'multiple comparisons problem' (family-wise error rate). What corrections or experiment design protocols should be enforced?",
+      "referenceExplanation": "Two compounding statistical violations occur: (1) The Multiple Comparisons Problem: when testing 20 independent hypotheses at alpha = 0.05, the family-wise error rate (1 - (1 - 0.05)^20 ≈ 64%) means there is a ~64% chance of observing at least one false positive purely by chance. (2) Peeking / Optional Stopping: repeatedly evaluating significance over time inflates the false positive rate because random fluctuations will inevitably cross the p < 0.05 threshold at some point during the sample collection. Corrective protocols: Pre-specify a primary metric and fixed sample size determined by power analysis before the test; apply multiple testing corrections (Bonferroni adjustment: alpha / k, or False Discovery Rate / Benjamini-Hochberg); or adopt sequential testing frameworks (e.g., Robbins' sequential probability ratio test) or Bayesian experimentation models.",
+      "expectedSignals": [
+        "Calculates or explains family-wise error rate inflation across multiple metrics (1 - (1 - alpha)^k)",
+        "Explains how peeking (optional stopping) invalidates standard p-value assumptions through random walk fluctuations",
+        "Recommends multiple testing corrections like Bonferroni or False Discovery Rate (Benjamini-Hochberg)",
+        "Advocates pre-registration of primary metric and sample size calculation via statistical power analysis"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Believes checking daily and testing many metrics is good practice because it saves time, ignoring false positive inflation entirely.",
+        "Beginner": "Notes that testing many metrics increases error chances, but cannot explain the math of family-wise error or why daily peeking distorts significance.",
+        "Intermediate": "Explains family-wise error rate inflation, the hazard of stopping at the first sign of significance, and recommends Bonferroni correction and fixed sample sizes.",
+        "Advanced": "Deeply details sequential testing algorithms (mSPRT), alpha-spending functions (Lan-DeMets), false discovery rate control via Benjamini-Hochberg, and Bayesian multi-armed bandit approaches for optimization."
+      },
+      "frameworkSourceIds": [
+        "src-doc-nist-handbook"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "NIST/SEMATECH e-Handbook Section 7.4.7 (Multiple Comparisons and Family-Wise Error Rate)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-bi-01",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.bi-dashboards",
+      "subskills": [
+        "star-schema",
+        "data-modeling",
+        "dax-metrics"
+      ],
+      "difficulty": "applied",
+      "questionType": "scenario",
+      "question": "In a Business Intelligence tool (such as Power BI, Tableau, or Looker), why is a Star Schema (fact tables and dimension tables with 1-to-many relationships) superior to a single massive flat denormalized table for dashboard performance, and how should semi-additive metrics (like inventory snapshot balance) be handled in aggregations?",
+      "referenceExplanation": "A Star Schema separates numeric transactional events (Fact tables) from descriptive attributes (Dimension tables). Benefits: (1) Columnar analytical engines compress repeated dimension strings efficiently, reducing memory footprint compared to repeating text across millions of fact rows. (2) Relationship filtering utilizes integer surrogate keys, speeding up cross-filtering and query generation. (3) Eliminates aggregation errors caused by fan-out when joining disparate granularities. Semi-additive metrics (e.g., inventory count, bank account balance) can be summed across dimensions like store or product, but cannot be summed across the time dimension (doing so counts the same items multiple times); they require period-closing formulas (e.g., DAX `CLOSINGBALANCEMONTH` or `LASTNONBLANK`).",
+      "expectedSignals": [
+        "Contrasts Fact tables (numeric metrics) with Dimension tables (descriptive attributes) in a star schema",
+        "Explains compression and query execution advantages in columnar BI engines vs flat wide tables",
+        "Defines semi-additive metrics that can be aggregated across some dimensions (store) but not time",
+        "Explains using end-of-period or snapshot logic rather than SUM for inventory balances"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot explain what a fact or dimension table is and suggests summing inventory balances across all days.",
+        "Beginner": "Understands that star schema connects tables with relationships, but cannot explain why flat tables degrade dashboard performance.",
+        "Intermediate": "Accurately contrasts facts and dimensions, details engine performance benefits, and explains how to handle semi-additive metrics across time.",
+        "Advanced": "Discusses snowflake vs star schema tradeoffs, bidirectional cross-filtering hazards in Power BI, composite models with DirectQuery vs Import mode, and incremental refresh strategies."
+      },
+      "frameworkSourceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "unsupported",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": null,
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-bi-02",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.bi-dashboards",
+      "subskills": [
+        "kpi-hierarchy",
+        "dashboard-design",
+        "stakeholder-adoption"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "An executive complaints that their existing departmental dashboards are 'overwhelming, cluttered with 40 charts, slow to load, and nobody uses them.' How would you lead the redesign of an executive dashboard using a top-down KPI hierarchy, progressive disclosure, and user-centered design principles?",
+      "referenceExplanation": "Redesign framework: (1) Establish KPI Hierarchy: Identify 3–5 core North Star metrics at the executive tier (e.g., Net Revenue, Customer Acquisition Cost, Churn Rate) displayed with high-level KPI cards showing current value, target, and trend direction. (2) Progressive Disclosure: Design an inverted pyramid structure—Tier 1 Executive Summary (high-level KPIs), Tier 2 Category/Departmental breakdown (drill-down by region or product), and Tier 3 Operational details (filtered transaction tables). (3) Visual Clarity: Eliminate clutter by reducing charts, enforcing consistent color semantics (e.g., neutral grays for baseline, single accent for anomalies/targets), and removing visual noise. (4) Performance: Limit initial visual queries, push heavy aggregation to data models, and implement user feedback sessions to ensure metrics align directly with executive decisions.",
+      "expectedSignals": [
+        "Proposes an executive tier with 3-5 core KPIs with targets and trends rather than 40 charts",
+        "Applies progressive disclosure (high-level summary -> drill-down -> granular tables)",
+        "Enforces clean visual design (removing chartjunk, intentional color palette)",
+        "Reduces dashboard load time by limiting simultaneous visual queries and aggregating upstream"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests rearranging the 40 charts into different colors without addressing information hierarchy or executive workflow.",
+        "Beginner": "Recommends reducing the number of charts and using filters, but lacks a formal framework for KPI hierarchy or progressive disclosure.",
+        "Intermediate": "Applies top-down hierarchy (Tier 1 summary, Tier 2 drill-downs), clean visual styling, and measures to optimize query load times.",
+        "Advanced": "Integrates decision-driven design methodologies, establishes data governance and KPI definitions dictionary, measures dashboard adoption via telemetry logs, and leads user testing sessions."
+      },
+      "frameworkSourceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "unsupported",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": null,
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-vis-01",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.visualization",
+      "subskills": [
+        "chart-selection",
+        "visual-encoding",
+        "pre-attentive-attributes"
+      ],
+      "difficulty": "foundation",
+      "questionType": "concept",
+      "question": "What visual encodings (position, length, angle, area, color hue/intensity) are most accurately perceived by human vision according to perceptual psychology (e.g., Cleveland and McGill), and why are 3D pie charts considered an ineffective visualization practice for comparing data?",
+      "referenceExplanation": "According to Cleveland & McGill's hierarchy of graphical perception, human vision decodes quantitative information in decreasing order of accuracy: (1) Position along a common scale (most accurate, as in bar charts and scatter plots), (2) Position along non-aligned scales, (3) Length, (4) Angle / Slope (pie charts), (5) Area (bubble charts), and (6) Volume / Color saturation / Color hue (least accurate for quantitative comparison). 3D pie charts compound cognitive errors: angles are already hard to compare, 3D perspective distorts slice areas (slices closer to the viewer appear artificially larger due to foreshortening), and humans struggle to estimate 3D volumes on a 2D screen. Standard 2D bar charts aligned to a common baseline provide dramatically clearer and more accurate comparisons.",
+      "expectedSignals": [
+        "Cites perceptual ranking: position on common scale (most accurate) > length > angle > area > volume/color",
+        "Explains that humans perceive length and position far more accurately than angles and areas",
+        "Explains how 3D distortion foreshortens slices, making front slices look disproportionately large",
+        "Recommends horizontal or vertical bar charts as clear alternatives to pie charts"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Advocates for 3D pie charts because they look cool, showing no awareness of perceptual distortion or visual encoding principles.",
+        "Beginner": "States that pie charts are hard to read and 3D makes it worse, but cannot explain the ranking of visual encodings.",
+        "Intermediate": "Accurately references Cleveland & McGill or perceptual accuracy hierarchies (position vs length vs angle vs area) and details perspective distortion in 3D representations.",
+        "Advanced": "Discusses pre-attentive visual attributes (form, color, spatial position), color blindness accessibility (contrast ratios, color-blind friendly palettes like Viridis/ColorBrewer), and cognitive load theory in data presentation."
+      },
+      "frameworkSourceIds": [
+        "src-doc-tufte-visualization"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "reference-only",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "Edward Tufte: The Visual Display of Quantitative Information (Chapter 2: Graphical Integrity)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-da-vis-02",
+      "roleId": "data-analyst",
+      "skillId": "data-analyst.visualization",
+      "subskills": [
+        "storytelling",
+        "accessibility",
+        "misleading-charts"
+      ],
+      "difficulty": "applied",
+      "questionType": "scenario",
+      "question": "A news outlet publishes a bar chart showing a competitor's market share growing from 48% to 52%, but truncates the y-axis to start at 47% instead of 0%, making the 4% increase visually appear like a 500% surge. When is y-axis truncation permissible versus deceptive, and what design guidelines ensure data visualizations remain truthful and accessible?",
+      "referenceExplanation": "In bar charts, truncating the y-axis is almost always deceptive because the visual encoding is length/height from the baseline; truncating the baseline exaggerates differences and misrepresents proportional scale. A bar chart must virtually always start at zero. In contrast, line charts showing small fluctuations over time (e.g., stock market prices or human body temperature) may use a zoomed non-zero baseline because the visual encoding is position and slope rather than length from zero, provided the axis is clearly labeled. Guidelines for truthful visualization: (1) Always start bar chart axes at 0. (2) Use dual axes with extreme caution as scaling can deceive. (3) Ensure color accessibility (sufficient contrast, dual encoding with labels/patterns for color-blind users). (4) Annotate key context directly on charts.",
+      "expectedSignals": [
+        "Explains that bar chart height encodes magnitude from zero, making truncated y-axes deceptive",
+        "Contrasts bar charts with line charts where position/slope is encoded and non-zero baselines can be acceptable with clear labeling",
+        "Identifies ethical and perceptual risks of artificially exaggerating modest percentage differences",
+        "Proposes accessibility and clarity standards (clear scale labeling, annotations, color-blind safety)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Claims truncating the y-axis is fine whenever you want to highlight an effect, disregarding deceptive visual communication.",
+        "Beginner": "Knows that bar charts should start at zero so they don't lie, but cannot explain why line charts differ or articulate accessibility principles.",
+        "Intermediate": "Clearly explains why bar charts require zero baselines (length encoding) vs when line charts can use non-zero baselines, and articulates accessibility standards.",
+        "Advanced": "Examines Edward Tufte's Lie Factor metric, discusses chart junk vs data-ink ratio, details WCAG 2.1 contrast compliance for visualizations, and designs defensive annotations for public-facing charts."
+      },
+      "frameworkSourceIds": [
+        "src-doc-w3c-wcag-color"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "W3C WCAG 2.1 Success Criterion 1.4.1 (Use of Color) & Success Criterion 1.4.3 (Contrast Minimum)",
+      "adaptationStatus": "concept-derived"
+    }
+  ]
+}

@@ -1,0 +1,422 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SkillProof Frontend Assessment Question Bank",
+  "version": "3.0.0",
+  "roleId": "frontend-developer",
+  "description": "Production question bank for Frontend Developer covering role mandatory fundamentals and core assessable competencies with calibrated difficulty, reference explanations, and 4-tier rubrics.",
+  "questions": [
+    {
+      "id": "q-fe-http-01",
+      "roleId": "frontend-developer",
+      "skillId": "shared.internet-http",
+      "subskills": [
+        "dns",
+        "tcp-ip",
+        "browser-networking"
+      ],
+      "difficulty": "foundation",
+      "questionType": "concept",
+      "question": "When a user enters a URL like https://app.example.com into their browser and presses Enter, what network and protocol steps occur before the browser receives the first byte of HTML?",
+      "referenceExplanation": "The browser performs DNS resolution (checking cache, resolver, root/TLD/authoritative nameservers) to obtain the IP address. A TCP 3-way handshake (SYN, SYN-ACK, ACK) establishes the transport connection, followed by a TLS handshake (negotiating cipher suites, validating certificates, and establishing session keys for HTTPS). Finally, the client sends an HTTP GET request and waits for the server's HTTP response headers and initial payload bytes (TTFB).",
+      "expectedSignals": [
+        "Identifies DNS resolution flow from cache to authoritative nameservers",
+        "Explains TCP 3-way handshake (SYN, SYN-ACK, ACK)",
+        "Mentions TLS handshake for HTTPS certificate verification and key exchange",
+        "Identifies the HTTP GET request dispatch and Time to First Byte (TTFB)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Provides vague or incorrect explanation of internet navigation, omitting DNS, TCP, or TLS protocols entirely.",
+        "Beginner": "States that the browser finds the website IP address and connects to the server, but cannot articulate TCP handshake or TLS encryption steps.",
+        "Intermediate": "Accurately details DNS resolution, TCP connection establishment, and sending of HTTP request headers to receive HTML.",
+        "Advanced": "Deeply details DNS caching layers (browser, OS, recursive resolver), TLS 1.3 1-RTT/0-RTT handshake, TCP slow start, connection reuse (HTTP/2 multiplexing, HTTP/3 QUIC over UDP), and TTFB optimization factors."
+      },
+      "frameworkSourceIds": [
+        "src-doc-rfc9110-http"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "RFC 9110 Section 3.3 (Connections) & Section 9.3.1 (GET Method)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-fe-http-02",
+      "roleId": "frontend-developer",
+      "skillId": "shared.internet-http",
+      "subskills": [
+        "http-caching",
+        "cache-control",
+        "etags"
+      ],
+      "difficulty": "applied",
+      "questionType": "scenario",
+      "question": "A production Single Page Application (SPA) serves `index.html` alongside hashed JavaScript bundles (e.g., `bundle.8a7f9b.js`). How should `Cache-Control` headers and conditional validation (ETag / Last-Modified) be configured for both assets to ensure instant updates on new deployments without sacrificing caching performance?",
+      "referenceExplanation": "Static assets with content-hashed filenames should use aggressive immutable caching: `Cache-Control: public, max-age=31536000, immutable`. Because their URL changes with every build, browsers and CDNs can safely cache them indefinitely. In contrast, `index.html` references the latest bundle hashes and must never be cached indefinitely; it should use `Cache-Control: no-cache` with an ETag or `max-age=0, must-revalidate` so the browser revalidates with the origin before serving, ensuring instant propagation of new releases.",
+      "expectedSignals": [
+        "Differentiates caching policy for HTML entry point vs content-hashed bundles",
+        "Recommends 'no-cache' or 'max-age=0, must-revalidate' with ETag for index.html",
+        "Recommends long-term immutable caching ('max-age=31536000, immutable') for hashed assets",
+        "Explains how revalidation prevents stale JavaScript executions after releases"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Confuses caching directives, suggests caching index.html for a year, or does not understand how deployments update.",
+        "Beginner": "Understands that files should be cached to load faster, but does not distinguish between cache policies for mutable HTML and immutable hashed bundles.",
+        "Intermediate": "Correctly prescribes no-cache with ETag validation for index.html and long-lived cache headers for hashed bundle scripts.",
+        "Advanced": "Analyzes CDN stale-while-revalidate patterns, edge-cache invalidation vs client revalidation, cache partitioning across origins, and edge cases of mismatched chunk loading during active deployments."
+      },
+      "frameworkSourceIds": [
+        "src-doc-rfc9111-caching"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "RFC 9111 Section 5.2 (Cache-Control Directives) & Section 4.3 (Validation)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-fe-http-03",
+      "roleId": "frontend-developer",
+      "skillId": "shared.internet-http",
+      "subskills": [
+        "http2-multiplexing",
+        "http3-quic",
+        "head-of-line-blocking"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "How does HTTP/2 stream multiplexing solve HTTP/1.1 head-of-line blocking, what remaining transport-layer blocking issue does HTTP/2 still suffer from on lossy networks, and how does HTTP/3 (QUIC) address it?",
+      "referenceExplanation": "HTTP/1.1 suffered from application-layer head-of-line blocking because each TCP connection processed one request-response pair at a time (requiring multiple parallel connections). HTTP/2 introduced binary framing and multiplexed concurrent bidirectional streams over a single TCP connection. However, at the TCP transport layer, all HTTP/2 streams share one sequential byte stream; packet loss halts all streams while TCP retransmits the lost segment. HTTP/3 replaces TCP with QUIC over UDP, implementing independent transport streams where packet loss on one stream does not block unrelated streams.",
+      "expectedSignals": [
+        "Explains HTTP/1.1 application head-of-line blocking and sequential request queuing",
+        "Explains HTTP/2 binary framing layer and concurrent streams over a single TCP socket",
+        "Identifies TCP-level head-of-line blocking when packet loss stalls all multiplexed streams",
+        "Explains how HTTP/3 / QUIC over UDP isolates loss recovery to individual streams"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot explain head-of-line blocking or differences between HTTP/1, HTTP/2, and HTTP/3.",
+        "Beginner": "Mentions that HTTP/2 is faster and supports multiplexing, but cannot explain binary framing or TCP transport blocking.",
+        "Intermediate": "Contrasts HTTP/1.1 multiple connections with HTTP/2 multiplexing, and explains that QUIC uses UDP to prevent blocking across independent streams.",
+        "Advanced": "Provides comprehensive architectural analysis of binary frame headers (STREAM, DATA, HEADERS), flow control windows per stream vs connection, TCP congestion window collapse under loss, and QUIC connection migration with 0-RTT crypto handshake."
+      },
+      "frameworkSourceIds": [
+        "src-doc-rfc9114-http3"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "RFC 9114 Section 1.1 (Prior Versions of HTTP: Multiplexing and Head-of-Line Blocking)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-fe-html-01",
+      "roleId": "frontend-developer",
+      "skillId": "frontend.html-core",
+      "subskills": [
+        "semantic-html",
+        "accessibility-tree",
+        "aria-roles"
+      ],
+      "difficulty": "foundation",
+      "questionType": "concept",
+      "question": "Why is using semantic HTML elements (such as `<main>`, `<nav>`, `<article>`, `<button>`) superior to building an interface purely out of generic `<div>` and `<span>` tags, especially regarding keyboard navigation, screen readers, and SEO?",
+      "referenceExplanation": "Semantic HTML inherently communicates element intent, roles, states, and keyboard behaviors to the browser accessibility tree without extra JavaScript. For instance, `<button>` automatically provides Enter/Space key activation, focusability (`tabindex=0`), and button accessibility semantics. Screen readers expose landmark navigation via `<main>`, `<nav>`, and `<header>`, allowing assistive technology users to jump between sections. Search engines use semantic landmarks to understand document structure and priority.",
+      "expectedSignals": [
+        "Explains that semantic tags map natively to the browser accessibility tree",
+        "Notes built-in keyboard navigation and focus management (e.g. native button keyboard handlers)",
+        "Mentions landmark navigation for screen readers (nav, main, header, footer)",
+        "Highlights search engine parsing and document structural clarity"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Believes semantic tags are solely visual or stylistic preferences without accessibility implications.",
+        "Beginner": "Mentions that semantic tags make code easier to read and help SEO, but lacks knowledge of accessibility trees or keyboard behaviors.",
+        "Intermediate": "Explains how native semantic elements automatically provide accessible roles, keyboard event handling, and screen reader landmark navigation.",
+        "Advanced": "Thoroughly articulates the mapping from DOM to the platform Accessibility Object Model (AOM), keyboard trap prevention, ARIA rule #1 ('do not use ARIA when native HTML suffices'), and SEO crawling efficiency."
+      },
+      "frameworkSourceIds": [
+        "src-doc-whatwg-html-semantic",
+        "src-doc-w3c-wai-aria"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "WHATWG HTML Section 4.3 (Sections) & W3C WAI-ARIA 1.2 Section 5.3.3 (Landmark Roles)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-fe-html-02",
+      "roleId": "frontend-developer",
+      "skillId": "frontend.html-core",
+      "subskills": [
+        "modal-dialog",
+        "focus-management",
+        "inert-attribute"
+      ],
+      "difficulty": "applied",
+      "questionType": "scenario",
+      "question": "You are implementing an accessible modal dialog in HTML/JavaScript. What requirements must be satisfied for keyboard accessibility and screen readers (focus trap, Esc key, restoration of focus, and background inertness), and how does the native `<dialog>` element simplify this?",
+      "referenceExplanation": "An accessible modal dialog requires: (1) focusing the first interactive element or dialog title upon opening, (2) trapping Tab and Shift+Tab focus inside the modal, (3) closing on the 'Escape' key, (4) restoring focus to the triggering element when closed, and (5) preventing background interaction (`aria-modal='true'` or the HTML `inert` attribute). The native `<dialog>` element with `showModal()` handles the backdrop, top-layer stacking, focus trapping, and Esc key dismissal natively.",
+      "expectedSignals": [
+        "Focus moved into modal upon opening and restored to trigger button on close",
+        "Keyboard focus trapped within dialog during Tab navigation",
+        "Escape key closes the dialog cleanly",
+        "Background content made inert or hidden from assistive technology",
+        "Mentions native `<dialog>` element and `showModal()` method"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Focus is not managed; user can tab to obscured background elements and cannot escape.",
+        "Beginner": "Understands that a modal pops up and needs a close button, but does not manage focus or keyboard traps.",
+        "Intermediate": "Clearly specifies focus trapping, Escape key listener, focus restoration to the trigger button, and aria-modal usage or `<dialog>`.",
+        "Advanced": "Compares custom focus trap implementations (sentinel elements, focus listeners, `inert` attribute) with native `<dialog>` top layer behavior, backdrop styling via `::backdrop`, and screen reader announcement protocols."
+      },
+      "frameworkSourceIds": [
+        "src-doc-w3c-wai-aria",
+        "src-doc-whatwg-html-semantic"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "WHATWG HTML Section 4.11.5 (The dialog element) & W3C WAI-ARIA 1.2 Section 5.3.2 (Widget Roles: dialog)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-fe-html-03",
+      "roleId": "frontend-developer",
+      "skillId": "frontend.html-core",
+      "subskills": [
+        "dom-rendering-pipeline",
+        "html-parsing",
+        "script-loading"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "Explain how the browser constructs the DOM and CSSOM trees from raw HTML bytes. What makes external `<script>` and `<link rel='stylesheet'>` tags parser-blocking or render-blocking, and how do `async`, `defer`, and speculative preload scanners alter this process?",
+      "referenceExplanation": "HTML parsing tokenizes bytes into characters, tokens, nodes, and the DOM tree. CSS stylesheets are render-blocking because the render tree requires both DOM and CSSOM to compute layout. A standard `<script>` tag is parser-blocking: HTML parsing halts, the script is downloaded and executed immediately (because scripts can modify DOM via `document.write`). `defer` downloads the script in the background and executes in document order after parsing completes. `async` downloads in the background and executes immediately when ready, out of order. Speculative preload scanners run ahead in raw markup to discover and fetch subresources before tokenizer blocks.",
+      "expectedSignals": [
+        "Describes byte -> character -> token -> node -> DOM/CSSOM pipeline",
+        "Explains why CSS is render-blocking (prevents Flash of Unstyled Content)",
+        "Explains why standard scripts block HTML parser execution",
+        "Contrasts defer (ordered, after parse) with async (unordered, immediate execution)",
+        "Mentions speculative preload scanner"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not understand how browser parses HTML or confuses DOM with CSSOM.",
+        "Beginner": "Knows script tags can slow down page loading and recommends placing them at the bottom of the body, but cannot explain defer or CSSOM blocking.",
+        "Intermediate": "Accurately details DOM and CSSOM construction, render tree creation, and how defer/async attributes decouple downloading from parser blocking.",
+        "Advanced": "Deeply details layout/reflow and paint triggers, critical rendering path budgets, preload scanner lookahead semantics, module script deferral by default, and `fetchpriority` / resource hints (`preload`, `preconnect`)."
+      },
+      "frameworkSourceIds": [
+        "src-doc-whatwg-html-semantic"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "WHATWG HTML Section 13.2 (Parsing HTML documents) & Section 4.12.1 (The script element)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-fe-js-01",
+      "roleId": "frontend-developer",
+      "skillId": "shared.javascript",
+      "subskills": [
+        "event-loop",
+        "microtasks",
+        "macrotasks"
+      ],
+      "difficulty": "foundation",
+      "questionType": "concept",
+      "question": "In JavaScript runtime execution, what is the difference between the Call Stack, the Microtask Queue (Promises, `queueMicrotask`), and the Macrotask Queue (`setTimeout`, DOM events)? In what order are they processed during a single turn of the Event Loop?",
+      "referenceExplanation": "The JavaScript engine executes synchronous code on the Call Stack. When the stack is empty, the Event Loop checks the Microtask Queue first, draining all pending microtasks (including new microtasks queued during execution) until the queue is empty. Only after all microtasks are drained does the Event Loop take a macrotask (such as a `setTimeout` callback or I/O event) from the Task Queue. Browser rendering opportunities occur after microtask draining and before the next task.",
+      "expectedSignals": [
+        "Explains synchronous execution on the Call Stack to completion",
+        "Identifies Microtask Queue priority (Promises, queueMicrotask)",
+        "Identifies Macrotask / Task Queue (`setTimeout`, `setInterval`, I/O)",
+        "Explains that all microtasks are drained before the next macrotask executes"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot explain event loop, assumes setTimeout executes instantaneously on the stack.",
+        "Beginner": "Understands that setTimeout is asynchronous and runs later, but does not distinguish microtasks from macrotasks.",
+        "Intermediate": "Accurately details how synchronous stack execution finishes first, all microtasks are processed, and then the next macrotask is dequeued.",
+        "Advanced": "Analyzes edge cases like microtask starvation (infinite Promise loops blocking UI rendering), requestAnimationFrame timing in relation to the render step, and Node.js process.nextTick vs browser microtask queues."
+      },
+      "frameworkSourceIds": [
+        "src-doc-whatwg-eventloop"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "WHATWG HTML Section 8.1.6.3 (Event Loops: Processing Model)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-fe-js-02",
+      "roleId": "frontend-developer",
+      "skillId": "shared.javascript",
+      "subskills": [
+        "closures",
+        "memory-leaks",
+        "garbage-collection"
+      ],
+      "difficulty": "applied",
+      "questionType": "debugging",
+      "question": "Explain how lexical closures retain references to outer scope variables. In what common frontend scenarios (e.g., event listeners, timers, observer callbacks) do closures accidentally cause client-side memory leaks, and how do you clean them up?",
+      "referenceExplanation": "A closure is created when an inner function retains a reference to its lexical environment, keeping outer variables reachable in memory. Memory leaks happen when long-lived objects (like `window`, DOM elements, or global event emitters) retain references to inner functions that close over large data structures. Common scenarios include adding `addEventListener` without corresponding `removeEventListener` upon component unmount, un-cleared `setInterval` handles, and un-disconnected `ResizeObserver` or `IntersectionObserver` instances. Cleanup requires invoking unregister methods with identical function references or using `AbortController` signals.",
+      "expectedSignals": [
+        "Defines closure as function bundled with references to its surrounding lexical scope",
+        "Identifies uncleared event listeners or timers holding outer variables in memory",
+        "Explains why garbage collector cannot reclaim objects reachable via active closure chains",
+        "Provides concrete cleanup solutions (removeEventListener, clearInterval, AbortSignal)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not understand closures or claims garbage collector frees all variables immediately after function return.",
+        "Beginner": "Knows a function inside another function can access outer variables, but cannot identify how memory leaks occur or how to clean them up.",
+        "Intermediate": "Explains how closures keep outer variables alive and identifies practical cleanup patterns like removing listeners and clearing timer intervals.",
+        "Advanced": "Deeply details V8 hidden classes, Mark-and-Sweep garbage collection roots, detached DOM tree leaks through closure references, and modern `AbortController` cleanup patterns."
+      },
+      "frameworkSourceIds": [
+        "src-doc-mdn-closures"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "source-identity-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "MDN Web Docs: Closures (Memory Considerations & Common Mistakes)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-fe-js-03",
+      "roleId": "frontend-developer",
+      "skillId": "shared.javascript",
+      "subskills": [
+        "prototype-inheritance",
+        "classes",
+        "this-binding"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "How does prototypal inheritance operate under the hood in JavaScript, how do ES6 `class` syntaxes map to it, and how does the execution context determine the dynamic binding of `this` across function invocations, arrow functions, and explicit bindings (`call`, `apply`, `bind`)?",
+      "referenceExplanation": "JavaScript objects have an internal `[[Prototype]]` link (`__proto__`). Property access traverses the prototype chain until the property is found or `null` is reached. ES6 `class` is syntactic sugar over prototype delegation (methods are assigned to `Constructor.prototype`, and `extends` links child prototype to parent prototype using `Object.setPrototypeOf`). `this` is dynamically bound at call-site: default binding (`global` or `undefined` in strict mode), implicit binding (object method call), explicit binding (`call`/`apply`/`bind`), or new binding. Arrow functions do not bind their own `this`; they capture `this` lexically from their enclosing scope at declaration.",
+      "expectedSignals": [
+        "Explains [[Prototype]] delegation chain ending at Object.prototype and null",
+        "Explains that ES6 class is syntax sugar over prototype methods and constructor functions",
+        "Explains call-site determination of `this` (default, implicit, explicit with call/apply/bind, new)",
+        "Explains that arrow functions capture `this` lexically without own binding"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Confuses classical class-based inheritance with prototypal delegation; cannot explain this binding.",
+        "Beginner": "Knows arrow functions handle `this` differently, but cannot explain prototype lookup or call/apply/bind mechanics.",
+        "Intermediate": "Explains the prototype chain, class method placement on prototype, and how call-site and arrow functions determine `this`.",
+        "Advanced": "Thoroughly analyzes property descriptor lookups (getter/setter resolution on prototype), V8 prototype transition trees, `super` binding via `[[HomeObject]]`, and constructor instantiation algorithms."
+      },
+      "frameworkSourceIds": [
+        "src-doc-ecma-objects"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "ECMA-262 Section 10.1 (Ordinary Object Internal Methods) & Section 15.7 (Class Definitions)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-fe-sec-01",
+      "roleId": "frontend-developer",
+      "skillId": "frontend.web-security",
+      "subskills": [
+        "cors",
+        "same-origin-policy",
+        "preflight-options"
+      ],
+      "difficulty": "foundation",
+      "questionType": "concept",
+      "question": "Explain the Same-Origin Policy (SOP) in web browsers, how Cross-Origin Resource Sharing (CORS) relaxes it, and why cross-origin POST requests with custom headers trigger an `OPTIONS` preflight request.",
+      "referenceExplanation": "The Same-Origin Policy restricts scripts running in one origin (protocol, domain, port) from reading resources from a different origin. CORS allows servers to specify which origins are permitted to access their resources using HTTP headers like `Access-Control-Allow-Origin`. Requests that are not 'simple' (e.g., methods other than GET/POST/HEAD, or using custom headers like `Authorization` or `Content-Type: application/json`) trigger an HTTP `OPTIONS` preflight request, asking the server for permission before dispatching the actual mutation.",
+      "expectedSignals": [
+        "Defines origin as protocol + domain/host + port",
+        "Explains that Same-Origin Policy prevents unauthorized cross-origin reading",
+        "Explains CORS headers (Access-Control-Allow-Origin, Allow-Headers, Allow-Methods)",
+        "Identifies reasons for OPTIONS preflight (non-simple method, custom headers, json content type)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Thinks CORS is a frontend bug or does not know what Same-Origin Policy protects.",
+        "Beginner": "Knows CORS causes browser console errors and requires server configuration, but cannot define origin or preflight triggers.",
+        "Intermediate": "Defines the 3 origin components, explains how CORS headers permit cross-origin access, and explains why non-simple requests require preflight.",
+        "Advanced": "Analyzes credentialed CORS (`credentials: 'include'` with `Access-Control-Allow-Credentials: true` and wildcard disallowance), caching preflights via `Access-Control-Max-Age`, and SOP bypass vectors (PNA - Private Network Access)."
+      },
+      "frameworkSourceIds": [
+        "src-doc-fetch-cors"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "WHATWG Fetch Standard Section 3.2 (CORS Protocol & Preflight Requests)",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-fe-sec-02",
+      "roleId": "frontend-developer",
+      "skillId": "frontend.web-security",
+      "subskills": [
+        "xss",
+        "csrf",
+        "token-storage",
+        "samesite-cookies"
+      ],
+      "difficulty": "applied",
+      "questionType": "scenario",
+      "question": "In a web application storing user authentication tokens, what are the security trade-offs between storing tokens in browser `localStorage` vs an `HttpOnly`, `Secure`, `SameSite=Lax/Strict` cookie, and how does each choice impact vulnerability to Cross-Site Scripting (XSS) and Cross-Site Request Forgery (CSRF)?",
+      "referenceExplanation": "`localStorage` is directly readable by any JavaScript executing in the origin, making tokens vulnerable to exfiltration via XSS. However, it is immune to CSRF because requests do not automatically attach `localStorage` tokens. An `HttpOnly` cookie prevents JavaScript access, shielding the token from XSS theft; however, cookies are automatically sent with browser requests, introducing CSRF risk. Modern `SameSite=Lax` or `Strict` cookies, combined with Anti-CSRF tokens and proper Content Security Policy, mitigate CSRF while preserving XSS protection.",
+      "expectedSignals": [
+        "Explains that localStorage is vulnerable to JavaScript theft via XSS",
+        "Explains that HttpOnly cookies prevent script access to token data",
+        "Explains CSRF risk when cookies are automatically attached to cross-origin requests",
+        "Explains how SameSite cookie attributes (Strict/Lax) prevent CSRF attacks"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Confuses XSS with CSRF or claims localStorage is completely secure for sensitive secrets.",
+        "Beginner": "Knows localStorage can be read in browser dev tools, but cannot explain HttpOnly flags or how CSRF works.",
+        "Intermediate": "Accurately contrasts XSS token exfiltration risk in localStorage against CSRF automatic cookie transmission, recommending HttpOnly with SameSite attributes.",
+        "Advanced": "Evaluates defense-in-depth: strict CSP (disallowing unsafe-inline), short-lived access tokens in memory with sliding refresh cookies, Double Submit Cookie patterns, and token theft blast radiuses."
+      },
+      "frameworkSourceIds": [
+        "src-doc-owasp-token-storage"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "OWASP HTML5 Security Cheat Sheet: Local Storage & Token Storage Architecture",
+      "adaptationStatus": "concept-derived"
+    },
+    {
+      "id": "q-fe-sec-03",
+      "roleId": "frontend-developer",
+      "skillId": "frontend.web-security",
+      "subskills": [
+        "csp",
+        "trusted-types",
+        "injection-mitigation"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "How does a strict Content Security Policy (CSP) using nonces or hashes mitigate stored and reflected Cross-Site Scripting (XSS), and how does the W3C Trusted Types API prevent DOM-based XSS sink injections (e.g., `innerHTML`, `eval`)?",
+      "referenceExplanation": "A strict CSP using cryptographic nonces (`script-src 'nonce-...'`) or cryptographic hashes ensures that browsers only execute inline or external scripts that match the server-generated per-request token, blocking injected attacker scripts. `object-src 'none'` and `base-uri 'none'` close Flash/plugin and base-tag hijacking vectors. The Trusted Types API enforces type safety at the DOM sink level: assigning raw strings to dangerous sinks (`element.innerHTML`, `location.href`) throws a TypeError unless passed through a validated Trusted Type policy that sanitizes or escapes the input.",
+      "expectedSignals": [
+        "Explains cryptographic nonces generated per response for script execution authorization",
+        "Explains how nonce-based CSP prevents attacker-injected `<script>` execution",
+        "Identifies DOM XSS sinks (innerHTML, document.write, eval)",
+        "Explains Trusted Types policy enforcement before assigning data to risky sinks"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot explain CSP headers or believes sanitizing input on client side alone is sufficient.",
+        "Beginner": "Knows CSP blocks unapproved URLs, but does not understand nonces or DOM XSS sinks.",
+        "Intermediate": "Explains how CSP nonce headers authorize legitimate scripts and how Trusted Types enforces sanitization before sink assignment.",
+        "Advanced": "Deeply details strict CSP migration patterns ('strict-dynamic' fallback for older browsers), report-only CSP modes with violation reporting endpoints, and custom Trusted Type policy sanitizers (e.g. DOMPurify integration)."
+      },
+      "frameworkSourceIds": [
+        "src-doc-w3c-csp3"
+      ],
+      "provenance": "concept-derived",
+      "verificationStatus": "claim-verified",
+      "verifiedAt": "2026-09-17",
+      "sourceLocator": "W3C Content Security Policy Level 3 Section 2.3 (Cryptographic Nonces) & W3C Trusted Types API",
+      "adaptationStatus": "concept-derived"
+    }
+  ]
+}

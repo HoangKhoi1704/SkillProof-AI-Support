@@ -1,0 +1,377 @@
+{
+  "learningResources": [
+    {
+      "id": "res-fe-html-mdn-01",
+      "title": "MDN Web Docs: HTML Basics & Semantics",
+      "sourceName": "MDN Web Docs",
+      "sourceUrl": "https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "frontend.html-core"
+      ],
+      "roleIds": [
+        "frontend-developer"
+      ],
+      "level": "foundation",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics"
+    },
+    {
+      "id": "res-fe-css-mdn-01",
+      "title": "MDN Web Docs: CSS First Steps & Modern Layout",
+      "sourceName": "MDN Web Docs",
+      "sourceUrl": "https://developer.mozilla.org/en-US/docs/Learn/CSS/First_steps",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "frontend.css-styling"
+      ],
+      "roleIds": [
+        "frontend-developer"
+      ],
+      "level": "foundation",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/en-US/docs/Learn/CSS/First_steps"
+    },
+    {
+      "id": "res-shared-js-mdn-01",
+      "title": "MDN Web Docs: JavaScript Guide & Asynchronous Concurrency",
+      "sourceName": "MDN Web Docs",
+      "sourceUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "shared.javascript"
+      ],
+      "roleIds": [
+        "frontend-developer",
+        "backend-developer"
+      ],
+      "level": "foundation",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/en-US/docs/Web/JavaScript/Guide"
+    },
+    {
+      "id": "res-shared-http-mdn-01",
+      "title": "MDN Web Docs: HTTP Overview & Semantic Protocol",
+      "sourceName": "MDN Web Docs",
+      "sourceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "shared.internet-http",
+        "backend.rest-apis"
+      ],
+      "roleIds": [
+        "frontend-developer",
+        "backend-developer"
+      ],
+      "level": "foundation",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/en-US/docs/Web/HTTP/Overview"
+    },
+    {
+      "id": "res-fe-react-dev-01",
+      "title": "React.dev: Quick Start & Describing the UI",
+      "sourceName": "React Official Documentation",
+      "sourceUrl": "https://react.dev/learn",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "frontend.framework-react"
+      ],
+      "roleIds": [
+        "frontend-developer"
+      ],
+      "level": "applied",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/learn"
+    },
+    {
+      "id": "res-fe-ts-handbook-01",
+      "title": "TypeScript Handbook: The Basics & Everyday Types",
+      "sourceName": "TypeScript Official Documentation",
+      "sourceUrl": "https://www.typescriptlang.org/docs/handbook/intro.html",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "frontend.typescript",
+        "backend.lang-typescript"
+      ],
+      "roleIds": [
+        "frontend-developer",
+        "backend-developer"
+      ],
+      "level": "applied",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/docs/handbook/intro.html"
+    },
+    {
+      "id": "res-fe-sec-mdn-01",
+      "title": "MDN Web Docs: Web Client Security, CORS & CSP",
+      "sourceName": "MDN Web Docs",
+      "sourceUrl": "https://developer.mozilla.org/en-US/docs/Web/Security",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "frontend.web-security"
+      ],
+      "roleIds": [
+        "frontend-developer"
+      ],
+      "level": "applied",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/en-US/docs/Web/Security"
+    },
+    {
+      "id": "res-fe-perf-mdn-01",
+      "title": "MDN Web Docs: Web Performance & Core Web Vitals",
+      "sourceName": "MDN Web Docs",
+      "sourceUrl": "https://developer.mozilla.org/en-US/docs/Learn/Performance",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "frontend.performance"
+      ],
+      "roleIds": [
+        "frontend-developer"
+      ],
+      "level": "advanced",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/en-US/docs/Learn/Performance"
+    },
+    {
+      "id": "res-shared-git-doc-01",
+      "title": "Pro Git Book: Getting Started & Branching",
+      "sourceName": "Git SCM",
+      "sourceUrl": "https://git-scm.com/doc",
+      "resourceType": "reference",
+      "canonicalSkillIds": [
+        "shared.git"
+      ],
+      "roleIds": [
+        "frontend-developer",
+        "backend-developer",
+        "data-analyst"
+      ],
+      "level": "foundation",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/doc"
+    },
+    {
+      "id": "res-be-csharp-ms-01",
+      "title": "Microsoft Learn: A Tour of the C# Language",
+      "sourceName": "Microsoft Learn",
+      "sourceUrl": "https://learn.microsoft.com/en-us/dotnet/csharp/tour-of-csharp/",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "backend.lang-csharp"
+      ],
+      "roleIds": [
+        "backend-developer"
+      ],
+      "level": "foundation",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/en-us/dotnet/csharp/tour-of-csharp/"
+    },
+    {
+      "id": "res-be-rest-ms-01",
+      "title": "Microsoft Learn: Create a Web API with ASP.NET Core",
+      "sourceName": "Microsoft Learn",
+      "sourceUrl": "https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-web-api",
+      "resourceType": "tutorial",
+      "canonicalSkillIds": [
+        "backend.rest-apis"
+      ],
+      "roleIds": [
+        "backend-developer"
+      ],
+      "level": "applied",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/en-us/aspnet/core/tutorials/first-web-api"
+    },
+    {
+      "id": "res-be-pg-doc-01",
+      "title": "PostgreSQL Official Documentation: Indexes and Query Performance",
+      "sourceName": "PostgreSQL Global Development Group",
+      "sourceUrl": "https://www.postgresql.org/docs/current/indexes.html",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "backend.relational-databases",
+        "shared.sql"
+      ],
+      "roleIds": [
+        "backend-developer",
+        "data-analyst"
+      ],
+      "level": "applied",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/docs/current/indexes.html"
+    },
+    {
+      "id": "res-be-redis-doc-01",
+      "title": "Redis Documentation: Quick Start & In-Memory Patterns",
+      "sourceName": "Redis Documentation",
+      "sourceUrl": "https://redis.io/docs/latest/develop/get-started/",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "backend.caching"
+      ],
+      "roleIds": [
+        "backend-developer"
+      ],
+      "level": "applied",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/docs/latest/develop/get-started/"
+    },
+    {
+      "id": "res-be-jwt-guide-01",
+      "title": "JWT.io: Introduction to JSON Web Tokens & Token Flow",
+      "sourceName": "Auth0 by Okta",
+      "sourceUrl": "https://jwt.io/introduction",
+      "resourceType": "guide",
+      "canonicalSkillIds": [
+        "backend.authentication-security"
+      ],
+      "roleIds": [
+        "backend-developer"
+      ],
+      "level": "applied",
+      "isOfficial": false,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/introduction"
+    },
+    {
+      "id": "res-be-sys-fowler-01",
+      "title": "Martin Fowler: Microservices & Distributed System Boundaries",
+      "sourceName": "martinfowler.com",
+      "sourceUrl": "https://martinfowler.com/articles/microservices.html",
+      "resourceType": "guide",
+      "canonicalSkillIds": [
+        "backend.system-design"
+      ],
+      "roleIds": [
+        "backend-developer"
+      ],
+      "level": "advanced",
+      "isOfficial": false,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/articles/microservices.html"
+    },
+    {
+      "id": "res-da-excel-ms-01",
+      "title": "Microsoft Support: Excel Training & Advanced Formulas",
+      "sourceName": "Microsoft Support",
+      "sourceUrl": "https://support.microsoft.com/en-us/excel",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "data-analyst.spreadsheets"
+      ],
+      "roleIds": [
+        "data-analyst"
+      ],
+      "level": "foundation",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/en-us/excel"
+    },
+    {
+      "id": "res-da-py-doc-01",
+      "title": "Python 3 Official Tutorial: Data Structures & Modules",
+      "sourceName": "Python Software Foundation",
+      "sourceUrl": "https://docs.python.org/3/tutorial/",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "shared.python",
+        "data-analyst.python-or-r"
+      ],
+      "roleIds": [
+        "backend-developer",
+        "data-analyst"
+      ],
+      "level": "foundation",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/3/tutorial/"
+    },
+    {
+      "id": "res-da-pandas-doc-01",
+      "title": "Pandas Documentation: Getting Started & Data Wrangling",
+      "sourceName": "Pandas Community",
+      "sourceUrl": "https://pandas.pydata.org/docs/getting_started/index.html",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "data-analyst.data-wrangling",
+        "data-analyst.eda"
+      ],
+      "roleIds": [
+        "data-analyst"
+      ],
+      "level": "applied",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/docs/getting_started/index.html"
+    },
+    {
+      "id": "res-da-seaborn-doc-01",
+      "title": "Seaborn Tutorial: Statistical Data Visualization",
+      "sourceName": "Seaborn Project",
+      "sourceUrl": "https://seaborn.pydata.org/tutorial.html",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "data-analyst.visualization",
+        "data-analyst.eda"
+      ],
+      "roleIds": [
+        "data-analyst"
+      ],
+      "level": "applied",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/tutorial.html"
+    },
+    {
+      "id": "res-da-pbi-ms-01",
+      "title": "Microsoft Learn: Get Started with Power BI Desktop",
+      "sourceName": "Microsoft Learn",
+      "sourceUrl": "https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-getting-started",
+      "resourceType": "official-doc",
+      "canonicalSkillIds": [
+        "data-analyst.bi-dashboards"
+      ],
+      "roleIds": [
+        "data-analyst"
+      ],
+      "level": "applied",
+      "isOfficial": true,
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17",
+      "locator": "/en-us/power-bi/fundamentals/desktop-getting-started"
+    }
+  ]
+}

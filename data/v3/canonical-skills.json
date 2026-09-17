@@ -1,0 +1,598 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SkillProof V3 Canonical Skills Catalog",
+  "version": "3.0.0",
+  "description": "Normalized, source-anchored canonical skill definitions for SkillProof V2 multi-role architecture.",
+  "canonicalSkills": [
+    {
+      "id": "shared.internet-http",
+      "displayName": "Internet & HTTP Protocols",
+      "classification": "learning-topic",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#internet",
+      "roadmapNodeId": "what-is-http",
+      "roadmapLabel": "What is HTTP?",
+      "description": "Core networking concepts, DNS resolution, client-server models, HTTP request/response lifecycles, headers, and status codes."
+    },
+    {
+      "id": "shared.javascript",
+      "displayName": "JavaScript Core & Asynchronous Runtime",
+      "classification": "language",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#javascript",
+      "roadmapNodeId": "javascript",
+      "roadmapLabel": "JavaScript",
+      "description": "Modern ECMAScript syntax, event loop execution, microtask queue, closures, prototypes, asynchronous Promises, and DOM/fetch APIs."
+    },
+    {
+      "id": "shared.sql",
+      "displayName": "SQL & Relational Database Querying",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#relational-databases",
+      "roadmapNodeId": "relational-databases",
+      "roadmapLabel": "Relational Databases",
+      "description": "Declarative SQL syntax, multi-table joins, grouping, window functions, query execution analysis, and relational data modeling."
+    },
+    {
+      "id": "shared.python",
+      "displayName": "Python Language & Data Structures",
+      "classification": "language",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#python",
+      "roadmapNodeId": "python",
+      "roadmapLabel": "Python",
+      "description": "Python data model, generators, list comprehensions, object-oriented concepts, virtual environments, and asynchronous asyncio programming."
+    },
+    {
+      "id": "shared.git",
+      "displayName": "Git Version Control & Collaboration",
+      "classification": "career-toolkit",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#version-control-systems",
+      "roadmapNodeId": "git",
+      "roadmapLabel": "Git",
+      "description": "Distributed version control commands, branching strategies, commit history hygiene, merge conflict resolution, and pull request workflows."
+    },
+    {
+      "id": "shared.docker",
+      "displayName": "Docker & Container Fundamentals",
+      "classification": "career-toolkit",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#ci-cd",
+      "roadmapNodeId": "lxc",
+      "roadmapLabel": "LXC / Containers",
+      "description": "Container virtualization basics, Dockerfile authoring, multi-stage builds, volume mounting, and container networking."
+    },
+    {
+      "id": "frontend.html-core",
+      "displayName": "Semantic HTML & Web Accessibility (a11y)",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#html",
+      "roadmapNodeId": "e-k6EhoxYG9h0x6vWOrDh",
+      "roadmapLabel": "Accessibility",
+      "description": "Semantic HTML5 structural elements, ARIA landmark roles, accessible form design, keyboard navigation, and screen reader compatibility."
+    },
+    {
+      "id": "frontend.css-styling",
+      "displayName": "CSS Layout, Modern Styling & Responsive Design",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#css",
+      "roadmapNodeId": "css",
+      "roadmapLabel": "CSS",
+      "description": "CSS Flexbox, Grid, Cascade specificity, Box Model, media queries, CSS variables, transitions, and modern utility frameworks."
+    },
+    {
+      "id": "frontend.typescript",
+      "displayName": "TypeScript & Static Type Systems",
+      "classification": "language",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#type-checkers",
+      "roadmapNodeId": "type-checkers",
+      "roadmapLabel": "Type Checkers",
+      "description": "Static type inference, generics, discriminated unions, utility types, compile-time type narrowing, and runtime boundary validation."
+    },
+    {
+      "id": "frontend.framework-react",
+      "displayName": "React & Component-Driven UI Architecture",
+      "classification": "framework-library",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#react",
+      "roadmapNodeId": "react",
+      "roadmapLabel": "React",
+      "description": "Virtual DOM reconciliation, JSX component composition, hooks lifecycle, state management, memoization, and custom hook authoring."
+    },
+    {
+      "id": "frontend.framework-vue",
+      "displayName": "Vue.js & Reactive UI Architecture",
+      "classification": "framework-library",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#vue",
+      "roadmapNodeId": "vuejs",
+      "roadmapLabel": "Vue.js",
+      "description": "Vue 3 Composition API, reactive ref/reactive tracking, Single File Components (SFC), Pinia state management, and Vue Router."
+    },
+    {
+      "id": "frontend.framework-angular",
+      "displayName": "Angular & Enterprise Frontend Architecture",
+      "classification": "framework-library",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#angular",
+      "roadmapNodeId": "angular",
+      "roadmapLabel": "Angular",
+      "description": "TypeScript-based Angular component hierarchy, dependency injection, RxJS observables, reactive forms, and Angular CLI tooling."
+    },
+    {
+      "id": "frontend.framework-svelte",
+      "displayName": "Svelte & Compiler-First UI Architecture",
+      "classification": "framework-library",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#svelte",
+      "roadmapNodeId": "svelte",
+      "roadmapLabel": "Svelte",
+      "description": "Compile-time reactive UI architecture, runes, stores, transitions, and SvelteKit application routing."
+    },
+    {
+      "id": "frontend.build-tooling",
+      "displayName": "Modern Build Tools, Bundlers & Compilers",
+      "classification": "career-toolkit",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#build-tools",
+      "roadmapNodeId": "module-bundlers",
+      "roadmapLabel": "Module Bundlers",
+      "description": "Modern JavaScript bundlers (Vite, Webpack, Rollup, esbuild), tree-shaking, code splitting, asset optimization, and hot module replacement."
+    },
+    {
+      "id": "frontend.package-managers",
+      "displayName": "Package Managers & Dependency Management",
+      "classification": "career-toolkit",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#package-managers",
+      "roadmapNodeId": "package-managers",
+      "roadmapLabel": "Package Managers",
+      "description": "Package manager lifecycles (npm, pnpm, yarn, bun), lockfiles, semantic versioning, transitive dependencies, and workspace monorepos."
+    },
+    {
+      "id": "frontend.testing",
+      "displayName": "Frontend Testing (Unit, Integration & E2E)",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#testing",
+      "roadmapNodeId": "testing",
+      "roadmapLabel": "Testing",
+      "description": "Component unit testing (Vitest, Jest), user event simulation (Testing Library), end-to-end automation (Playwright, Cypress), and test coverage."
+    },
+    {
+      "id": "frontend.web-security",
+      "displayName": "Web Client Security (CORS, CSP, Auth & OWASP)",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#web-security",
+      "roadmapNodeId": "web-security",
+      "roadmapLabel": "Web Security",
+      "description": "Same-Origin Policy, Cross-Origin Resource Sharing (CORS), Content Security Policy (CSP), XSS/CSRF mitigations, and client-side token storage."
+    },
+    {
+      "id": "frontend.performance",
+      "displayName": "Web Performance, Core Vitals & Optimization",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#performance",
+      "roadmapNodeId": "performance",
+      "roadmapLabel": "Performance",
+      "description": "Core Web Vitals (LCP, INP, CLS), critical rendering path optimization, image lazy-loading, bundle size reduction, and Lighthouse audits."
+    },
+    {
+      "id": "frontend.meta-frameworks",
+      "displayName": "Meta-Frameworks, SSR & Static Site Generation",
+      "classification": "framework-library",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#ssr",
+      "roadmapNodeId": "ssr",
+      "roadmapLabel": "Server-Side Rendering (SSR)",
+      "description": "Hybrid web rendering architectures, Next.js, Remix, Astro, Server Components, client vs server hydration, and static site generation."
+    },
+    {
+      "id": "frontend.mobile-desktop",
+      "displayName": "Cross-Platform Client Applications",
+      "classification": "optional-advanced",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#desktop-apps",
+      "roadmapNodeId": "desktop-apps",
+      "roadmapLabel": "Desktop Applications",
+      "description": "Building hybrid native desktop and mobile applications using web technologies via Electron, Tauri, and React Native."
+    },
+    {
+      "id": "backend.language-selection",
+      "displayName": "Backend Language & Runtime Ecosystem",
+      "classification": "language",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#pick-a-language",
+      "roadmapNodeId": "pick-a-backend-language",
+      "roadmapLabel": "Pick a Language",
+      "description": "Deep proficiency in candidate-selected backend language: language runtime, thread models, memory allocations, and asynchronous programming."
+    },
+    {
+      "id": "backend.lang-csharp",
+      "displayName": "C# & .NET Enterprise Platform",
+      "classification": "language",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/aspnet-core",
+      "roadmapNodeId": "aspnet-core",
+      "roadmapLabel": "ASP.NET Core",
+      "description": "Modern C# language features, Roslyn async/await state machines, dependency injection lifetimes, ASP.NET Core middleware, and Span/Memory."
+    },
+    {
+      "id": "backend.lang-java",
+      "displayName": "Java & JVM Enterprise Ecosystem",
+      "classification": "language",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#java",
+      "roadmapNodeId": "java",
+      "roadmapLabel": "Java",
+      "description": "Java virtual machine architecture, concurrency locks, Spring Framework IoC and AOP proxy transactions, and virtual threads (JEP 444)."
+    },
+    {
+      "id": "backend.lang-cpp",
+      "displayName": "C++ Modern Systems Programming",
+      "classification": "language",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#c",
+      "roadmapNodeId": "c",
+      "roadmapLabel": "C / C++",
+      "description": "C++ RAII resource management, smart pointers, move semantics, atomic primitives, memory orderings, and low-level systems programming."
+    },
+    {
+      "id": "backend.lang-typescript",
+      "displayName": "TypeScript for Backend Systems",
+      "classification": "language",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/typescript",
+      "roadmapNodeId": "type-checkers",
+      "roadmapLabel": "TypeScript",
+      "description": "Node.js and TypeScript server architecture, strict structural typing, discriminated unions, and runtime schema validation with Zod."
+    },
+    {
+      "id": "backend.lang-go",
+      "displayName": "Go (Golang) Concurrent Systems",
+      "classification": "language",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#go",
+      "roadmapNodeId": "go",
+      "roadmapLabel": "Go",
+      "description": "Idiomatic Go interfaces, slice memory layouts, goroutines, channels, worker pool patterns, and context cancellation leak prevention."
+    },
+    {
+      "id": "backend.lang-rust",
+      "displayName": "Rust Systems & Memory Safety",
+      "classification": "language",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#rust",
+      "roadmapNodeId": "rust",
+      "roadmapLabel": "Rust",
+      "description": "Compile-time ownership invariants, borrowing rules, lifetime annotations, drop semantics, Send/Sync thread traits, and Tokio async runtimes."
+    },
+    {
+      "id": "backend.rest-apis",
+      "displayName": "REST APIs & Web Interface Design",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#apis",
+      "roadmapNodeId": "rest",
+      "roadmapLabel": "REST",
+      "description": "RESTful HTTP API design, RFC 9110 status codes, idempotency semantics, keyset pagination, OpenAPI documentation, and API versioning."
+    },
+    {
+      "id": "backend.relational-databases",
+      "displayName": "Relational Database Architecture & Indexing",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#relational-databases",
+      "roadmapNodeId": "relational-databases",
+      "roadmapLabel": "Relational Databases",
+      "description": "B-tree indexing, EXPLAIN query execution plan optimization, ACID transaction isolation levels, connection pooling, and schema normalization."
+    },
+    {
+      "id": "backend.testing",
+      "displayName": "Backend Testing (Unit, Integration & Fixtures)",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#testing",
+      "roadmapNodeId": "testing",
+      "roadmapLabel": "Testing",
+      "description": "Automated test doubles (mocks, stubs, fakes), test container integration environments, assertion discipline, and flaky test mitigation."
+    },
+    {
+      "id": "backend.authentication-security",
+      "displayName": "Authentication, Authorization & Server Security",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#authentication",
+      "roadmapNodeId": "authentication",
+      "roadmapLabel": "Authentication",
+      "description": "Stateless JSON Web Tokens (RFC 7519), cryptographically salted password hashing, OAuth2 flows, and OWASP Top 10 API vulnerability prevention."
+    },
+    {
+      "id": "backend.system-design",
+      "displayName": "System Design & Distributed Scalability",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#architectural-patterns",
+      "roadmapNodeId": "architectural-patterns",
+      "roadmapLabel": "Architectural Patterns",
+      "description": "Horizontal vs vertical scaling, load balancing, stateless service tiers, database sharding, CAP theorem trade-offs, and microservices."
+    },
+    {
+      "id": "backend.caching",
+      "displayName": "Distributed Caching & In-Memory Storage",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#caching",
+      "roadmapNodeId": "caching",
+      "roadmapLabel": "Caching",
+      "description": "Cache-aside architectures, Redis data types, key eviction policies (LRU/LFU), TTL configuration, and cache stampede / thundering herd mitigations."
+    },
+    {
+      "id": "backend.nosql-databases",
+      "displayName": "NoSQL Databases & Document / Key-Value Stores",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#nosql-databases",
+      "roadmapNodeId": "nosql-databases",
+      "roadmapLabel": "NoSQL Databases",
+      "description": "Document stores (MongoDB) vs Key-Value stores (Redis), embedding vs referencing schema patterns, eventual consistency, and quorum configurations."
+    },
+    {
+      "id": "backend.message-brokers",
+      "displayName": "Message Brokers & Asynchronous Event Pipelines",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#message-brokers",
+      "roadmapNodeId": "message-brokers",
+      "roadmapLabel": "Message Brokers",
+      "description": "Asynchronous task processing, publish-subscribe message brokers (RabbitMQ, Kafka), consumer groups, idempotent consumers, and delivery guarantees."
+    },
+    {
+      "id": "backend.resilience-patterns",
+      "displayName": "Distributed Resilience & Traffic Throttling",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#building-for-scale",
+      "roadmapNodeId": "building-for-scale",
+      "roadmapLabel": "Building for Scale",
+      "description": "Rate limiting algorithms (Token Bucket, Leaky Bucket, Sliding Window), circuit breakers, backpressure flow control, and graceful degradation."
+    },
+    {
+      "id": "backend.observability",
+      "displayName": "Observability, Telemetry & Structured Logging",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#observability",
+      "roadmapNodeId": "observability",
+      "roadmapLabel": "Observability",
+      "description": "Distributed request tracing, OpenTelemetry instrumentation, structured JSON logging, metrics collection, and alerting thresholds."
+    },
+    {
+      "id": "backend.ci-cd",
+      "displayName": "CI/CD Pipelines & Automated Delivery",
+      "classification": "career-toolkit",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#ci-cd",
+      "roadmapNodeId": "ci--cd",
+      "roadmapLabel": "CI / CD",
+      "description": "Automated test integration, build pipelines (GitHub Actions), artifact publishing, blue-green deployment strategies, and environment management."
+    },
+    {
+      "id": "backend.concurrency",
+      "displayName": "Concurrency & Asynchronous I/O Patterns",
+      "classification": "learning-topic",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#building-for-scale",
+      "roadmapNodeId": "scaling-databases",
+      "roadmapLabel": "Concurrency & Scaling",
+      "description": "Non-blocking event loops, worker thread pools, thread synchronization locks, deadlocks, and race condition avoidance."
+    },
+    {
+      "id": "backend.ai-integration",
+      "displayName": "AI Integrations, Embeddings & Vector Stores",
+      "classification": "optional-advanced",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#ai-assisted-coding",
+      "roadmapNodeId": "vectors",
+      "roadmapLabel": "Vectors & RAGs",
+      "description": "Building AI-enhanced backend features: vector embeddings, cosine similarity search, RAG pipelines, and structured LLM tool calling."
+    },
+    {
+      "id": "data-analyst.foundations",
+      "displayName": "Core Concepts & Types of Data Analysis",
+      "classification": "learning-topic",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/data-analyst#what-is-data-analytics",
+      "roadmapNodeId": "what-is-data-analytics",
+      "roadmapLabel": "What is Data Analytics?",
+      "description": "Four types of data analysis (descriptive, diagnostic, predictive, prescriptive), analytics lifecycle, and data integrity fundamentals."
+    },
+    {
+      "id": "data-analyst.spreadsheets",
+      "displayName": "Advanced Spreadsheets & Business Modeling (Excel)",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/data-analyst#excel",
+      "roadmapNodeId": "analysis--reporting-with-excel",
+      "roadmapLabel": "Analysis & Reporting with Excel",
+      "description": "Lookup formulas (XLOOKUP, VLOOKUP, INDEX/MATCH), nested conditionals, dynamic pivot tables, date transformations, and financial summaries."
+    },
+    {
+      "id": "data-analyst.python-or-r",
+      "displayName": "Programming for Analytics (Python / R)",
+      "classification": "language",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/data-analyst#programming",
+      "roadmapNodeId": "learn-a-programming-lang",
+      "roadmapLabel": "Learn a Programming Language",
+      "description": "Analytical programming in Python (or R): variables, vectorized operations, control structures, custom functions, and script automation."
+    },
+    {
+      "id": "data-analyst.data-wrangling",
+      "displayName": "Data Wrangling, Manipulation & Cleaning",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/data-analyst#data-manipulation",
+      "roadmapNodeId": "data-manipulation-libraries",
+      "roadmapLabel": "Data Manipulation Libraries",
+      "description": "Tabular data transformation with Pandas / dplyr: filtering, grouping, pivoting, merging datasets, string parsing, and type conversions."
+    },
+    {
+      "id": "data-analyst.eda",
+      "displayName": "Exploratory Data Analysis (EDA) & Data Quality",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/data-analyst#exploration",
+      "roadmapNodeId": "exploration",
+      "roadmapLabel": "Exploratory Data Analysis (EDA)",
+      "description": "Auditing raw datasets: missing value imputation strategies, duplicate record elimination, anomaly detection, and distribution profiling."
+    },
+    {
+      "id": "data-analyst.statistics",
+      "displayName": "Applied Business Statistics & Hypothesis Testing",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/data-analyst#statistics",
+      "roadmapNodeId": "statistical-analysis",
+      "roadmapLabel": "Statistical Analysis",
+      "description": "Measures of central tendency, standard deviation, skewness/kurtosis, confidence intervals, p-values, t-tests, and correlation analysis."
+    },
+    {
+      "id": "data-analyst.bi-dashboards",
+      "displayName": "Business Intelligence & Interactive Dashboards",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/data-analyst#bi-tools",
+      "roadmapNodeId": "tableau",
+      "roadmapLabel": "Tableau / Power BI",
+      "description": "Designing executive dashboards in Power BI or Tableau: dimensional modeling, calculated measures (DAX), drill-downs, and report automation."
+    },
+    {
+      "id": "data-analyst.visualization",
+      "displayName": "Data Storytelling & Visualization Principles",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/data-analyst#visualisation",
+      "roadmapNodeId": "visualisation",
+      "roadmapLabel": "Visualisation",
+      "description": "Selecting appropriate visual encodings (bar, scatter, line, heatmaps), color accessibility, chart clutter minimization, and Seaborn/Matplotlib/ggplot2."
+    },
+    {
+      "id": "data-analyst.data-collection",
+      "displayName": "Data Ingestion, CSVs & Web APIs",
+      "classification": "assessable-competency",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/data-analyst#collection",
+      "roadmapNodeId": "data-collection",
+      "roadmapLabel": "Data Collection",
+      "description": "Ingesting raw data from REST APIs, web scraping, flat CSV/JSON files, and connecting directly to analytical database tables."
+    },
+    {
+      "id": "data-analyst.ml-fundamentals",
+      "displayName": "Introductory Machine Learning for Analysts",
+      "classification": "optional-advanced",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/data-analyst#machine-learning",
+      "roadmapNodeId": "machine-learning",
+      "roadmapLabel": "Machine Learning",
+      "description": "Supervised and unsupervised regression, classification trees, and clustering applied to business forecasting."
+    },
+    {
+      "id": "data-analyst.deep-learning",
+      "displayName": "Deep Learning & Neural Networks (Elective)",
+      "classification": "optional-advanced",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/data-analyst#deep-learning-optional",
+      "roadmapNodeId": "deep-learning-optional",
+      "roadmapLabel": "Deep Learning (Optional)",
+      "description": "Elective advanced machine learning: neural networks, computer vision, PyTorch/TensorFlow. Excluded from core Data Analyst readiness."
+    },
+    {
+      "id": "data-analyst.big-data",
+      "displayName": "Big Data Technologies (Spark & Distributed Compute)",
+      "classification": "optional-advanced",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/data-analyst#big-data",
+      "roadmapNodeId": "big-data-technologies",
+      "roadmapLabel": "Big Data Technologies",
+      "description": "Distributed data compute principles: PySpark, MapReduce fundamentals, and analyzing petabyte-scale data lakes."
+    },
+    {
+      "id": "assessment-ext.programming-fundamentals",
+      "displayName": "Algorithmic Fundamentals & Complexity Analysis",
+      "classification": "assessment-policy-extension",
+      "sourceKind": "assessment-policy",
+      "roadmapSource": null,
+      "roadmapNodeId": null,
+      "roadmapLabel": null,
+      "description": "SkillProof assessment policy extension evaluating asymptotic space/time complexity O(1) vs O(N), hash collisions, and array indexing."
+    },
+    {
+      "id": "assessment-ext.oop-solid",
+      "displayName": "Object-Oriented Design & SOLID Architecture",
+      "classification": "assessment-policy-extension",
+      "sourceKind": "assessment-policy",
+      "roadmapSource": null,
+      "roadmapNodeId": null,
+      "roadmapLabel": null,
+      "description": "SkillProof assessment policy extension evaluating encapsulation, polymorphism, inheritance vs composition, and SOLID design principles."
+    },
+    {
+      "id": "assessment-ext.data-storytelling",
+      "displayName": "Executive Data Translation & Business Storytelling",
+      "classification": "assessment-policy-extension",
+      "sourceKind": "assessment-policy",
+      "roadmapSource": null,
+      "roadmapNodeId": null,
+      "roadmapLabel": null,
+      "description": "SkillProof assessment policy extension evaluating candidate ability to translate analytical statistical findings into executive business actions."
+    },
+    {
+      "id": "toolkit.ai-coding-frontend",
+      "displayName": "AI-Assisted Frontend Development (Claude Code / Antigravity)",
+      "classification": "career-toolkit",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/frontend#ai-assisted-coding",
+      "roadmapNodeId": "claude-code",
+      "roadmapLabel": "Claude Code & Modern AI Tooling",
+      "description": "Utilizing modern AI coding CLI tools (Claude Code, Google Antigravity, Cursor) for frontend scaffolding, code review, and refactoring."
+    },
+    {
+      "id": "toolkit.ai-coding-backend",
+      "displayName": "AI-Assisted Backend Engineering (Claude Code / Antigravity)",
+      "classification": "career-toolkit",
+      "sourceKind": "roadmap-derived",
+      "roadmapSource": "https://roadmap.sh/backend#ai-assisted-coding",
+      "roadmapNodeId": "claude-code",
+      "roadmapLabel": "Claude Code & Modern AI Tooling",
+      "description": "Utilizing modern AI coding CLI tools (Claude Code, Google Antigravity, Cursor) for backend test generation, API contract drafting, and debugging."
+    },
+    {
+      "id": "toolkit.portfolio-readme",
+      "displayName": "Professional Portfolio & Project Documentation",
+      "classification": "career-toolkit",
+      "sourceKind": "skillproof-toolkit",
+      "roadmapSource": null,
+      "roadmapNodeId": null,
+      "roadmapLabel": null,
+      "description": "SkillProof toolkit extension for structuring clear GitHub READMEs, deployment runbooks, and portfolio evidence for hiring managers."
+    },
+    {
+      "id": "toolkit.ide-mastery",
+      "displayName": "IDE & Debugging Mastery",
+      "classification": "career-toolkit",
+      "sourceKind": "skillproof-toolkit",
+      "roadmapSource": null,
+      "roadmapNodeId": null,
+      "roadmapLabel": null,
+      "description": "SkillProof toolkit extension for IDE proficiency (VS Code, Visual Studio, JetBrains, Antigravity IDE), breakpoint debugging, profilers, and environment configuration."
+    }
+  ]
+}

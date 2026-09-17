@@ -32,36 +32,10 @@
         "src-cf-roadmap-backend",
         "src-cf-sfia-9-software-dev"
       ],
-      "interviewEvidence": [
-        {
-          "sourceId": "src-cpig-amazon-tech-topics",
-          "evidenceType": "company-published-interview-guidance",
-          "supportedTopics": [
-            "data-structures",
-            "array-vs-hash-table-lookup",
-            "algorithmic-complexity"
-          ],
-          "evidenceStrength": "strong-topic-match",
-          "notes": "Amazon technical interview topics explicitly designate basic data structures—contrasting sequential arrays with hash tables and their time complexity trade-offs—as core screening topics."
-        },
-        {
-          "sourceId": "src-cpig-google-tech-dev-guide",
-          "evidenceType": "company-published-interview-guidance",
-          "supportedTopics": [
-            "hash-tables",
-            "array-lookup",
-            "collision-handling"
-          ],
-          "evidenceStrength": "strong-topic-match",
-          "notes": "Google Tech Dev Guide DSA pathway explicitly emphasizes understanding O(1) average hash lookup mechanisms and collision handling for interview readiness."
-        }
-      ],
-      "interviewEvidenceIds": [
-        "src-cpig-amazon-tech-topics",
-        "src-cpig-google-tech-dev-guide"
-      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
       "provenance": "skillproof-curated",
-      "verificationStatus": "interview-practice-supported"
+      "verificationStatus": "framework-supported-only"
     },
     {
       "id": "q-be-prog-02",
@@ -122,24 +96,10 @@
         "src-cf-sfia-9-software-dev",
         "src-ref-xunit-test-patterns"
       ],
-      "interviewEvidence": [
-        {
-          "sourceId": "src-cpig-amazon-tech-topics",
-          "evidenceType": "company-published-interview-guidance",
-          "supportedTopics": [
-            "object-oriented-design",
-            "dependency-inversion",
-            "loose-coupling"
-          ],
-          "evidenceStrength": "strong-topic-match",
-          "notes": "Amazon technical interview guidance emphasizes Object-Oriented Design principles, loose coupling, and dependency inversion over concrete instantiation."
-        }
-      ],
-      "interviewEvidenceIds": [
-        "src-cpig-amazon-tech-topics"
-      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
       "provenance": "skillproof-curated",
-      "verificationStatus": "interview-practice-supported"
+      "verificationStatus": "framework-supported-only"
     },
     {
       "id": "q-be-rest-01",
@@ -168,24 +128,10 @@
         "src-doc-rfc9110-http",
         "src-cf-roadmap-backend"
       ],
-      "interviewEvidence": [
-        {
-          "sourceId": "src-ipr-bytebytego-system-design",
-          "evidenceType": "interview-preparation-resource",
-          "supportedTopics": [
-            "http-methods",
-            "status-codes",
-            "idempotency-and-safety"
-          ],
-          "evidenceStrength": "strong-topic-match",
-          "notes": "ByteByteGo API design curriculum covers HTTP verbs, idempotent vs safe methods, and REST status code mappings as foundational API screening material."
-        }
-      ],
-      "interviewEvidenceIds": [
-        "src-ipr-bytebytego-system-design"
-      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
       "provenance": "skillproof-curated",
-      "verificationStatus": "interview-practice-supported"
+      "verificationStatus": "framework-supported-only"
     },
     {
       "id": "q-be-rest-02",
@@ -212,37 +158,13 @@
       },
       "frameworkSourceIds": [
         "src-cf-roadmap-backend",
-        "src-ref-ddia-kleppmann"
+        "src-ref-ddia-kleppmann",
+        "src-cpig-slack-api-pagination"
       ],
-      "interviewEvidence": [
-        {
-          "sourceId": "src-cpig-slack-api-pagination",
-          "evidenceType": "company-published-interview-guidance",
-          "supportedTopics": [
-            "cursor-based-pagination",
-            "offset-pagination-pitfalls",
-            "database-scan-costs"
-          ],
-          "evidenceStrength": "direct",
-          "notes": "Slack Engineering's 'Evolving API Pagination at Slack' is the canonical case study documenting why offset pagination fails on large datasets and how cursor pagination solves row drift."
-        },
-        {
-          "sourceId": "src-ipr-bytebytego-system-design",
-          "evidenceType": "interview-preparation-resource",
-          "supportedTopics": [
-            "pagination-strategies",
-            "keyset-pagination"
-          ],
-          "evidenceStrength": "strong-topic-match",
-          "notes": "ByteByteGo API design modules evaluate cursor vs offset pagination performance for technical interviews."
-        }
-      ],
-      "interviewEvidenceIds": [
-        "src-cpig-slack-api-pagination",
-        "src-ipr-bytebytego-system-design"
-      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
       "provenance": "skillproof-curated",
-      "verificationStatus": "interview-practice-supported"
+      "verificationStatus": "framework-supported-only"
     },
     {
       "id": "q-be-rest-03",
@@ -313,7 +235,10 @@
             "null-handling-in-joins"
           ],
           "evidenceStrength": "direct",
-          "notes": "LeetCode problem #175 (Combine Two Tables) is the classic interview question testing whether a candidate correctly uses a LEFT JOIN to include entities without foreign key matches."
+          "notes": "LeetCode problem #175 (Combine Two Tables) is the classic interview question testing whether a candidate correctly uses a LEFT JOIN to include entities without foreign key matches.",
+          "canonicalUrl": "https://leetcode.com/problems/combine-two-tables/",
+          "locator": "Problem #175: Combine Two Tables",
+          "verifiedAt": "2026-09-16"
         }
       ],
       "interviewEvidenceIds": [
@@ -349,24 +274,10 @@
         "src-doc-postgresql-explain",
         "src-ref-ddia-kleppmann"
       ],
-      "interviewEvidence": [
-        {
-          "sourceId": "src-cpig-amazon-tech-topics",
-          "evidenceType": "company-published-interview-guidance",
-          "supportedTopics": [
-            "database-indexing",
-            "query-performance-optimization",
-            "execution-plans"
-          ],
-          "evidenceStrength": "strong-topic-match",
-          "notes": "Amazon technical interview guidance designates relational database query optimization and indexing strategy as primary evaluation criteria."
-        }
-      ],
-      "interviewEvidenceIds": [
-        "src-cpig-amazon-tech-topics"
-      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
       "provenance": "skillproof-curated",
-      "verificationStatus": "interview-practice-supported"
+      "verificationStatus": "framework-supported-only"
     },
     {
       "id": "q-be-sql-03",
@@ -425,24 +336,10 @@
         "src-ref-xunit-test-patterns",
         "src-cf-roadmap-backend"
       ],
-      "interviewEvidence": [
-        {
-          "sourceId": "src-cpig-google-test-doubles",
-          "evidenceType": "company-published-interview-guidance",
-          "supportedTopics": [
-            "unit-testing",
-            "test-isolation",
-            "arrange-act-assert"
-          ],
-          "evidenceStrength": "supporting-context",
-          "notes": "Google Testing Blog guidance on test suite discipline emphasizes isolated unit tests with distinct execution phases over slow, non-isolated tests."
-        }
-      ],
-      "interviewEvidenceIds": [
-        "src-cpig-google-test-doubles"
-      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
       "provenance": "skillproof-curated",
-      "verificationStatus": "interview-practice-supported"
+      "verificationStatus": "framework-supported-only"
     },
     {
       "id": "q-be-test-02",
@@ -471,24 +368,10 @@
         "src-ref-xunit-test-patterns",
         "src-cf-roadmap-backend"
       ],
-      "interviewEvidence": [
-        {
-          "sourceId": "src-cpig-google-test-doubles",
-          "evidenceType": "company-published-interview-guidance",
-          "supportedTopics": [
-            "test-doubles",
-            "mocks-vs-stubs-vs-fakes",
-            "behavioral-verification"
-          ],
-          "evidenceStrength": "direct",
-          "notes": "Google Testing Blog: 'Testing on the Toilet: Know Your Test Doubles' explicitly defines Mocks vs Stubs vs Fakes and interaction assertions."
-        }
-      ],
-      "interviewEvidenceIds": [
-        "src-cpig-google-test-doubles"
-      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
       "provenance": "skillproof-curated",
-      "verificationStatus": "interview-practice-supported"
+      "verificationStatus": "framework-supported-only"
     },
     {
       "id": "q-be-test-03",
@@ -517,24 +400,10 @@
         "src-ref-xunit-test-patterns",
         "src-cf-sfia-9-software-dev"
       ],
-      "interviewEvidence": [
-        {
-          "sourceId": "src-cpig-google-flaky-tests",
-          "evidenceType": "company-published-interview-guidance",
-          "supportedTopics": [
-            "flaky-tests",
-            "test-determinism",
-            "shared-state-in-ci"
-          ],
-          "evidenceStrength": "direct",
-          "notes": "Google Testing Blog: 'Flaky Tests at Google -- Tools and Mitigation' provides an authoritative analysis of root causes of flaky tests in CI pipelines."
-        }
-      ],
-      "interviewEvidenceIds": [
-        "src-cpig-google-flaky-tests"
-      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
       "provenance": "skillproof-curated",
-      "verificationStatus": "interview-practice-supported"
+      "verificationStatus": "framework-supported-only"
     },
     {
       "id": "q-be-auth-01",
@@ -627,24 +496,10 @@
         "src-doc-rfc7519-jwt",
         "src-doc-owasp-api-security"
       ],
-      "interviewEvidence": [
-        {
-          "sourceId": "src-ipr-bytebytego-system-design",
-          "evidenceType": "interview-preparation-resource",
-          "supportedTopics": [
-            "jwt-authentication",
-            "stateless-token-revocation",
-            "refresh-tokens"
-          ],
-          "evidenceStrength": "strong-topic-match",
-          "notes": "ByteByteGo system design modules cover stateless token architecture, cryptographic signature checks, and dual-token (access/refresh) revocation patterns for technical interviews."
-        }
-      ],
-      "interviewEvidenceIds": [
-        "src-ipr-bytebytego-system-design"
-      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
       "provenance": "skillproof-curated",
-      "verificationStatus": "interview-practice-supported"
+      "verificationStatus": "framework-supported-only"
     },
     {
       "id": "q-be-sys-01",
@@ -682,23 +537,14 @@
             "database-scaling-limits"
           ],
           "evidenceStrength": "direct",
-          "notes": "The System Design Primer explicitly structures interview prep around vertical vs horizontal scaling trade-offs and the stateless application tier."
-        },
-        {
-          "sourceId": "src-cpig-amazon-tech-topics",
-          "evidenceType": "company-published-interview-guidance",
-          "supportedTopics": [
-            "distributed-systems",
-            "horizontal-scaling",
-            "statelessness"
-          ],
-          "evidenceStrength": "strong-topic-match",
-          "notes": "Amazon's technical topics explicitly evaluate candidate understanding of horizontal scaling and stateless distributed architectures."
+          "notes": "The System Design Primer explicitly structures interview prep around vertical vs horizontal scaling trade-offs and the stateless application tier.",
+          "canonicalUrl": "https://github.com/donnemartin/system-design-primer#horizontal-scaling",
+          "locator": "Section: Load balancer -> Horizontal scaling",
+          "verifiedAt": "2026-09-16"
         }
       ],
       "interviewEvidenceIds": [
-        "src-ipr-system-design-primer",
-        "src-cpig-amazon-tech-topics"
+        "src-ipr-system-design-primer"
       ],
       "provenance": "skillproof-curated",
       "verificationStatus": "interview-practice-supported"
@@ -728,38 +574,13 @@
       },
       "frameworkSourceIds": [
         "src-ref-ddia-kleppmann",
-        "src-ref-google-sre-book"
-      ],
-      "interviewEvidence": [
-        {
-          "sourceId": "src-ipr-system-design-primer",
-          "evidenceType": "interview-preparation-resource",
-          "supportedTopics": [
-            "cache-aside",
-            "cache-stampede",
-            "caching-mitigations"
-          ],
-          "evidenceStrength": "strong-topic-match",
-          "notes": "The System Design Primer details cache-aside architecture and cache stampede (thundering herd) failure scenarios for interview prep."
-        },
-        {
-          "sourceId": "src-cpig-meta-scaling-memcache",
-          "evidenceType": "company-published-interview-guidance",
-          "supportedTopics": [
-            "cache-stampede",
-            "thundering-herd-leases",
-            "distributed-caching"
-          ],
-          "evidenceStrength": "strong-topic-match",
-          "notes": "Meta / USENIX paper 'Scaling Memcache at Facebook' documents thundering herd cache stampedes and lease-based locking mitigations."
-        }
-      ],
-      "interviewEvidenceIds": [
-        "src-ipr-system-design-primer",
+        "src-ref-google-sre-book",
         "src-cpig-meta-scaling-memcache"
       ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
       "provenance": "skillproof-curated",
-      "verificationStatus": "interview-practice-supported"
+      "verificationStatus": "framework-supported-only"
     },
     {
       "id": "q-be-sys-03",
@@ -786,38 +607,13 @@
       },
       "frameworkSourceIds": [
         "src-ref-google-sre-book",
-        "src-ref-ddia-kleppmann"
+        "src-ref-ddia-kleppmann",
+        "src-cpig-stripe-rate-limiters"
       ],
-      "interviewEvidence": [
-        {
-          "sourceId": "src-cpig-stripe-rate-limiters",
-          "evidenceType": "company-published-interview-guidance",
-          "supportedTopics": [
-            "distributed-rate-limiting",
-            "token-bucket-vs-sliding-window",
-            "redis-lua-scripts",
-            "fail-open-resilience"
-          ],
-          "evidenceStrength": "direct",
-          "notes": "Stripe's engineering blog 'Scaling your API with rate limiters' is a definitive company publication outlining token bucket vs sliding window, Redis coordination, and graceful degradation."
-        },
-        {
-          "sourceId": "src-ipr-system-design-primer",
-          "evidenceType": "interview-preparation-resource",
-          "supportedTopics": [
-            "rate-limiting-algorithms",
-            "distributed-throttling"
-          ],
-          "evidenceStrength": "strong-topic-match",
-          "notes": "The System Design Primer includes dedicated rate limiting design patterns for system design interview preparation."
-        }
-      ],
-      "interviewEvidenceIds": [
-        "src-cpig-stripe-rate-limiters",
-        "src-ipr-system-design-primer"
-      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
       "provenance": "skillproof-curated",
-      "verificationStatus": "interview-practice-supported"
+      "verificationStatus": "framework-supported-only"
     },
     {
       "id": "q-be-nosql-01",
@@ -910,24 +706,10 @@
         "src-cf-roadmap-backend",
         "src-ref-ddia-kleppmann"
       ],
-      "interviewEvidence": [
-        {
-          "sourceId": "src-ipr-bytebytego-system-design",
-          "evidenceType": "interview-preparation-resource",
-          "supportedTopics": [
-            "cap-theorem",
-            "quorum-consistency",
-            "distributed-data-stores"
-          ],
-          "evidenceStrength": "strong-topic-match",
-          "notes": "ByteByteGo System Design curriculum provides canonical system design interview frameworks contrasting CP and AP systems and quorum read/write equations."
-        }
-      ],
-      "interviewEvidenceIds": [
-        "src-ipr-bytebytego-system-design"
-      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
       "provenance": "skillproof-curated",
-      "verificationStatus": "interview-practice-supported"
+      "verificationStatus": "framework-supported-only"
     },
     {
       "id": "q-be-cache-01",
@@ -986,24 +768,10 @@
         "src-cf-roadmap-backend",
         "src-doc-redis-eviction"
       ],
-      "interviewEvidence": [
-        {
-          "sourceId": "src-ipr-bytebytego-system-design",
-          "evidenceType": "interview-preparation-resource",
-          "supportedTopics": [
-            "cache-eviction",
-            "lru-eviction",
-            "redis-memory-management"
-          ],
-          "evidenceStrength": "strong-topic-match",
-          "notes": "ByteByteGo system design interview guide details LRU vs LFU eviction algorithms and memory capacity planning under distributed cache pressure."
-        }
-      ],
-      "interviewEvidenceIds": [
-        "src-ipr-bytebytego-system-design"
-      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
       "provenance": "skillproof-curated",
-      "verificationStatus": "interview-practice-supported"
+      "verificationStatus": "framework-supported-only"
     },
     {
       "id": "q-be-cache-03",
@@ -1029,37 +797,13 @@
       },
       "frameworkSourceIds": [
         "src-cf-roadmap-backend",
-        "src-doc-redis-data-types"
+        "src-doc-redis-data-types",
+        "src-cpig-meta-scaling-memcache"
       ],
-      "interviewEvidence": [
-        {
-          "sourceId": "src-cpig-meta-scaling-memcache",
-          "evidenceType": "company-published-interview-guidance",
-          "supportedTopics": [
-            "cache-stampede",
-            "thundering-herd",
-            "lease-mechanism"
-          ],
-          "evidenceStrength": "direct",
-          "notes": "Meta's seminal NSDI paper 'Scaling Memcache at Facebook' formally analyzes the cache stampede problem and introduces the lease token mechanism to prevent database overloading on key invalidation."
-        },
-        {
-          "sourceId": "src-ipr-bytebytego-system-design",
-          "evidenceType": "interview-preparation-resource",
-          "supportedTopics": [
-            "cache-stampede",
-            "distributed-caching-mitigation"
-          ],
-          "evidenceStrength": "strong-topic-match",
-          "notes": "ByteByteGo interview curriculum covers cache stampede mitigations including mutex locking and probabilistic refresh in production system design."
-        }
-      ],
-      "interviewEvidenceIds": [
-        "src-cpig-meta-scaling-memcache",
-        "src-ipr-bytebytego-system-design"
-      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
       "provenance": "skillproof-curated",
-      "verificationStatus": "interview-practice-supported"
+      "verificationStatus": "framework-supported-only"
     },
     {
       "id": "q-be-cs-01",

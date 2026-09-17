@@ -26,6 +26,10 @@ public interface IAdaptiveDiagnosticService
         string sessionId,
         CancellationToken cancellationToken = default);
 
+    Task<(bool Success, AdaptiveSessionResponse? Response, string? ErrorCode, string? ErrorMessage)> AdvanceNextQuestionAsync(
+        string sessionId,
+        CancellationToken cancellationToken = default);
+
     Task<(bool Success, CareerReadinessProfile? Profile, string? ErrorCode, string? ErrorMessage)> GetProfileAsync(
         string sessionId,
         CancellationToken cancellationToken = default);
@@ -54,6 +58,76 @@ public class AdaptiveDiagnosticService : IAdaptiveDiagnosticService
         _profileBuilder = profileBuilder;
         _config = config;
         _logger = logger;
+    }
+
+    private record AdaptiveQuestionModel(
+        string Id,
+        string RoleId,
+        string SkillId,
+        string Difficulty,
+        string QuestionType,
+        string QuestionText,
+        string? ReferenceExplanation,
+        string ExpectedSignalsJson
+    );
+
+    private async Task<AdaptiveQuestionModel?> FindQuestionAsync(string questionId, CancellationToken cancellationToken)
+    {
+        var q = await _db.Questions.AsNoTracking().FirstOrDefaultAsync(x => x.Id == questionId, cancellationToken);
+        if (q != null)
+        {
+            return new AdaptiveQuestionModel(q.Id, q.RoleId, q.SkillId, q.Difficulty, q.QuestionType, q.QuestionText, q.ReferenceExplanation, q.ExpectedSignalsJson);
+        }
+        var v3 = await _db.V3Questions.AsNoTracking().FirstOrDefaultAsync(x => x.Id == questionId, cancellationToken);
+        if (v3 != null)
+        {
+            return new AdaptiveQuestionModel(v3.Id, v3.RoleId, v3.CanonicalSkillId, v3.Difficulty, v3.QuestionType, v3.QuestionText, v3.ReferenceExplanation, v3.ExpectedSignalsJson);
+        }
+        return null;
+    }
+
+    private async Task<Dictionary<string, List<AdaptiveQuestionModel>>> GetQuestionsBySkillForRoleAsync(string roleId, CancellationToken cancellationToken)
+    {
+        var normalizedRoleId = roleId.Trim().ToLowerInvariant();
+        var legacyMappings = await _db.LegacySkillMappings.AsNoTracking().ToListAsync(cancellationToken);
+        var legacyToCanonical = legacyMappings.ToDictionary(m => m.LegacySkillId.ToLowerInvariant(), m => m.CanonicalSkillId.ToLowerInvariant(), StringComparer.OrdinalIgnoreCase);
+
+        var result = new Dictionary<string, List<AdaptiveQuestionModel>>(StringComparer.OrdinalIgnoreCase);
+
+        if (normalizedRoleId == "backend-developer")
+        {
+            var dbQs = await _db.Questions.AsNoTracking()
+                .Where(q => q.RoleId.ToLower() == normalizedRoleId)
+                .ToListAsync(cancellationToken);
+            foreach (var q in dbQs)
+            {
+                var model = new AdaptiveQuestionModel(q.Id, q.RoleId, q.SkillId, q.Difficulty, q.QuestionType, q.QuestionText, q.ReferenceExplanation, q.ExpectedSignalsJson);
+                var sId = q.SkillId.ToLowerInvariant();
+                if (!result.ContainsKey(sId)) result[sId] = new List<AdaptiveQuestionModel>();
+                result[sId].Add(model);
+
+                if (legacyToCanonical.TryGetValue(sId, out var canId))
+                {
+                    if (!result.ContainsKey(canId)) result[canId] = new List<AdaptiveQuestionModel>();
+                    result[canId].Add(model);
+                }
+            }
+        }
+        else
+        {
+            var v3Qs = await _db.V3Questions.AsNoTracking()
+                .Where(q => q.RoleId.ToLower() == normalizedRoleId)
+                .ToListAsync(cancellationToken);
+            foreach (var q in v3Qs)
+            {
+                var model = new AdaptiveQuestionModel(q.Id, q.RoleId, q.CanonicalSkillId, q.Difficulty, q.QuestionType, q.QuestionText, q.ReferenceExplanation, q.ExpectedSignalsJson);
+                var sId = q.CanonicalSkillId.ToLowerInvariant();
+                if (!result.ContainsKey(sId)) result[sId] = new List<AdaptiveQuestionModel>();
+                result[sId].Add(model);
+            }
+        }
+
+        return result;
     }
 
     public async Task<(bool Success, AdaptiveSessionResponse? Response, string? ErrorCode, string? ErrorMessage)> StartSessionAsync(
@@ -96,7 +170,16 @@ public class AdaptiveDiagnosticService : IAdaptiveDiagnosticService
             return (false, null, "VALIDATION_ERROR", "At least one valid skill ID must be provided.");
         }
 
-        // Fetch role skills to validate and preserve display ordering
+        // Fetch canonical framework nodes for V3 roles
+        var roleNodes = await _db.RoleRoadmapNodes.AsNoTracking()
+            .Where(rn => rn.RoleId.ToLower() == normalizedRoleId)
+            .OrderBy(rn => rn.DisplayOrder)
+            .ToListAsync(cancellationToken);
+
+        var canonicalSkills = await _db.CanonicalSkills.AsNoTracking()
+            .ToDictionaryAsync(cs => cs.Id.ToLowerInvariant(), cs => cs, cancellationToken);
+
+        // Fetch legacy role skills for V2 roles
         var roleSkills = await _db.RoleSkills.AsNoTracking()
             .Where(rs => rs.RoleId.ToLower() == normalizedRoleId)
             .Include(rs => rs.Skill)
@@ -107,72 +190,86 @@ public class AdaptiveDiagnosticService : IAdaptiveDiagnosticService
         var allCatalogSkills = await _db.Skills.AsNoTracking()
             .ToDictionaryAsync(s => s.Id.ToLowerInvariant(), s => s, cancellationToken);
 
-        // Validate selected competencies
-        foreach (var skillId in distinctRequested)
-        {
-            if (!allCatalogSkills.TryGetValue(skillId, out _))
-            {
-                return (false, null, "VALIDATION_ERROR", $"Skill '{skillId}' does not exist in catalog.");
-            }
-
-            if (!roleSkillMap.TryGetValue(skillId, out var mappedRoleSkill))
-            {
-                return (false, null, "VALIDATION_ERROR", $"Skill '{skillId}' does not belong to role '{request.RoleId}'.");
-            }
-
-            if (mappedRoleSkill.Category.Equals("language", StringComparison.OrdinalIgnoreCase) ||
-                mappedRoleSkill.Skill.SkillType.Equals("language", StringComparison.OrdinalIgnoreCase))
-            {
-                return (false, null, "VALIDATION_ERROR", $"'{skillId}' is a programming language and cannot be selected as an engineering competency.");
-            }
-        }
-
         // Validate primary language if provided
         string? normalizedLangId = null;
         if (!string.IsNullOrWhiteSpace(request.PrimaryLanguageId))
         {
             normalizedLangId = request.PrimaryLanguageId.Trim().ToLowerInvariant();
-
-            if (!allCatalogSkills.TryGetValue(normalizedLangId, out _))
+            if (!allCatalogSkills.ContainsKey(normalizedLangId) && !canonicalSkills.ContainsKey(normalizedLangId))
             {
                 return (false, null, "VALIDATION_ERROR", $"Primary language '{request.PrimaryLanguageId}' does not exist in catalog.");
             }
-
-            if (!roleSkillMap.TryGetValue(normalizedLangId, out var mappedRoleLang))
-            {
-                return (false, null, "VALIDATION_ERROR", $"Primary language '{request.PrimaryLanguageId}' does not belong to role '{request.RoleId}'.");
-            }
-
-            if (!mappedRoleLang.Category.Equals("language", StringComparison.OrdinalIgnoreCase) &&
-                !mappedRoleLang.Skill.SkillType.Equals("language", StringComparison.OrdinalIgnoreCase))
-            {
-                return (false, null, "VALIDATION_ERROR", $"'{request.PrimaryLanguageId}' is not a valid programming language.");
-            }
         }
 
-        // Query questions in SQLite for this role
-        var allQuestions = await _db.Questions.AsNoTracking()
-            .Where(q => q.RoleId.ToLower() == normalizedRoleId)
-            .ToListAsync(cancellationToken);
+        var questionsBySkill = await GetQuestionsBySkillForRoleAsync(normalizedRoleId, cancellationToken);
+        var legacyMappings = await _db.LegacySkillMappings.AsNoTracking().ToListAsync(cancellationToken);
+        var legacyToCanonical = legacyMappings.ToDictionary(m => m.LegacySkillId.ToLowerInvariant(), m => m.CanonicalSkillId.ToLowerInvariant(), StringComparer.OrdinalIgnoreCase);
+        var canonicalToLegacy = legacyMappings.ToDictionary(m => m.CanonicalSkillId.ToLowerInvariant(), m => m.LegacySkillId.ToLowerInvariant(), StringComparer.OrdinalIgnoreCase);
 
-        var questionsBySkill = allQuestions
-            .GroupBy(q => q.SkillId.ToLowerInvariant())
-            .ToDictionary(g => g.Key, g => g.ToList());
+        string ResolveSkillDisplayName(string id)
+        {
+            var lower = id.ToLowerInvariant();
+            if (canonicalSkills.TryGetValue(lower, out var cs)) return cs.DisplayName;
+            if (roleSkillMap.TryGetValue(lower, out var rs)) return rs.Skill.Name;
+            if (allCatalogSkills.TryGetValue(lower, out var sk)) return sk.Name;
+            if (legacyToCanonical.TryGetValue(lower, out var cId) && canonicalSkills.TryGetValue(cId, out var cs2)) return cs2.DisplayName;
+            if (canonicalToLegacy.TryGetValue(lower, out var lId) && allCatalogSkills.TryGetValue(lId, out var sk2)) return sk2.Name;
+            return id;
+        }
 
-        // Build deterministic ordered skills:
-        // 1. Selected competencies in RoleSkills.DisplayOrder
-        // 2. Primary language at the end
         var orderedSkillIds = new List<string>();
         var unsupportedSkillIds = new List<string>();
 
-        foreach (var rs in roleSkills)
+        bool isAssessmentV2 = normalizedRoleId != "backend-developer"
+            || distinctRequested.Any(s => s.Contains('.'))
+            || request.IncludeMandatoryFundamentals == true;
+
+        if (isAssessmentV2 && roleNodes.Count > 0)
         {
-            var sId = rs.SkillId.ToLowerInvariant();
-            if (distinctRequested.Contains(sId))
+            // Assessment V2 Composition: ROLE MANDATORY FUNDAMENTALS + USER SELECTED SKILLS
+            var mandatoryIds = roleNodes
+                .Where(rn => rn.MandatoryFundamental && rn.AssessmentEligible)
+                .Select(rn => rn.CanonicalSkillId.ToLowerInvariant())
+                .ToList();
+
+            var combinedSkillIds = mandatoryIds
+                .Union(distinctRequested, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            foreach (var rn in roleNodes)
+            {
+                var sId = rn.CanonicalSkillId.ToLowerInvariant();
+                if (combinedSkillIds.Contains(sId))
+                {
+                    if (questionsBySkill.TryGetValue(sId, out var qList) && qList.Count > 0)
+                    {
+                        if (!orderedSkillIds.Contains(sId))
+                        {
+                            orderedSkillIds.Add(sId);
+                        }
+                    }
+                    else
+                    {
+                        unsupportedSkillIds.Add(sId);
+                    }
+                }
+            }
+        }
+        else
+        {
+            // Focused / legacy selection mode (preserves single-skill test sessions e.g. ["sql"])
+            var sortedRequested = distinctRequested
+                .OrderBy(sId => roleSkillMap.TryGetValue(sId, out var rs) ? rs.DisplayOrder : int.MaxValue)
+                .ToList();
+
+            foreach (var sId in sortedRequested)
             {
                 if (questionsBySkill.TryGetValue(sId, out var qList) && qList.Count > 0)
                 {
-                    orderedSkillIds.Add(sId);
+                    if (!orderedSkillIds.Contains(sId))
+                    {
+                        orderedSkillIds.Add(sId);
+                    }
                 }
                 else
                 {
@@ -225,7 +322,7 @@ public class AdaptiveDiagnosticService : IAdaptiveDiagnosticService
         // Initialize SkillAssessmentStates
         foreach (var sId in orderedSkillIds)
         {
-            var skillName = roleSkillMap[sId].Skill.Name;
+            var skillName = ResolveSkillDisplayName(sId);
             var appliedQ = questionsBySkill[sId].FirstOrDefault(q => q.Difficulty.Equals("applied", StringComparison.OrdinalIgnoreCase))
                           ?? questionsBySkill[sId].First();
 
@@ -240,7 +337,7 @@ public class AdaptiveDiagnosticService : IAdaptiveDiagnosticService
 
         _sessionStore.CreateSession(sessionState);
 
-        var firstSkillName = roleSkillMap[firstSkillId].Skill.Name;
+        var firstSkillName = ResolveSkillDisplayName(firstSkillId);
         var publicFirstQ = new AdaptivePublicQuestionDto(
             firstAppliedQ.Id,
             firstAppliedQ.SkillId,
@@ -310,13 +407,59 @@ public class AdaptiveDiagnosticService : IAdaptiveDiagnosticService
         var (level, reason, evidence) = EvaluateAnswer(session.RoleId, session.CurrentQuestionId, request.Answer);
 
         // Fetch all questions for current role to select follow-up or next skill question
-        var roleQuestions = await _db.Questions.AsNoTracking()
-            .Where(q => q.RoleId.ToLower() == session.RoleId.ToLower())
-            .ToListAsync(cancellationToken);
+        var questionsBySkill = await GetQuestionsBySkillForRoleAsync(session.RoleId, cancellationToken);
 
-        var questionsBySkill = roleQuestions
-            .GroupBy(q => q.SkillId.ToLowerInvariant())
-            .ToDictionary(g => g.Key, g => g.ToList());
+        // Fetch current question entity to get server-side reference explanation
+        var currentQEntity = await FindQuestionAsync(session.CurrentQuestionId, cancellationToken);
+
+        List<string> whatYouCovered;
+        if (level.Equals("Insufficient Evidence", StringComparison.OrdinalIgnoreCase))
+        {
+            whatYouCovered = new List<string> { "Not enough evidence to assess this area yet." };
+        }
+        else if (evidence != null && evidence.Count > 0)
+        {
+            whatYouCovered = evidence;
+        }
+        else
+        {
+            whatYouCovered = new List<string> { reason };
+        }
+
+        List<string> whatCouldBeStronger;
+        if (level.Equals("Advanced", StringComparison.OrdinalIgnoreCase))
+        {
+            whatCouldBeStronger = new List<string> { "Strong response demonstrating mastery. Continue exploring domain edge cases and system limits." };
+        }
+        else if (level.Equals("Intermediate", StringComparison.OrdinalIgnoreCase))
+        {
+            whatCouldBeStronger = new List<string> { "Deepen your reasoning on high-scale tradeoffs, resilience boundaries, and failure mitigation." };
+        }
+        else if (level.Equals("Beginner", StringComparison.OrdinalIgnoreCase))
+        {
+            whatCouldBeStronger = new List<string> { "Provide concrete practical examples, error-handling mechanisms, and architectural context." };
+        }
+        else
+        {
+            whatCouldBeStronger = new List<string> { "Provide more detailed technical steps, reasoning, and practical explanations." };
+        }
+
+        var referenceExplanation = !string.IsNullOrWhiteSpace(currentQEntity?.ReferenceExplanation)
+            ? currentQEntity.ReferenceExplanation
+            : ("Reference explanation for " + (currentQEntity?.QuestionText ?? "the question"));
+
+        var explanation = new PostAnswerExplanationDto(
+            QuestionId: session.CurrentQuestionId,
+            SkillId: currentSkillId,
+            SkillName: skillState.SkillName,
+            EvaluatedLevel: level,
+            WhatYouCovered: whatYouCovered,
+            WhatCouldBeStronger: whatCouldBeStronger,
+            ReferenceExplanation: referenceExplanation
+        );
+
+        session.LastExplanation = explanation;
+        session.AwaitingNextQuestion = true;
 
         if (session.CurrentStage == "applied")
         {
@@ -377,7 +520,8 @@ public class AdaptiveDiagnosticService : IAdaptiveDiagnosticService
                 Progress: progress,
                 Skills: null,
                 TopGaps: null,
-                UnsupportedSkillIds: session.UnsupportedSkillIds
+                UnsupportedSkillIds: session.UnsupportedSkillIds,
+                LastExplanation: explanation
             );
 
             return (true, response, null, null);
@@ -457,7 +601,8 @@ public class AdaptiveDiagnosticService : IAdaptiveDiagnosticService
                     Progress: progress,
                     Skills: null,
                     TopGaps: null,
-                    UnsupportedSkillIds: session.UnsupportedSkillIds
+                    UnsupportedSkillIds: session.UnsupportedSkillIds,
+                    LastExplanation: explanation
                 );
 
                 return (true, response, null, null);
@@ -506,7 +651,14 @@ public class AdaptiveDiagnosticService : IAdaptiveDiagnosticService
                         StringComparer.OrdinalIgnoreCase
                     );
 
-                var profile = _profileBuilder.BuildProfile(session, subskillsBySkillId);
+                var roleNodes = await _db.RoleRoadmapNodes.AsNoTracking()
+                    .Where(rn => rn.RoleId.ToLower() == session.RoleId.ToLower())
+                    .ToListAsync(cancellationToken);
+
+                var canonicalSkills = await _db.CanonicalSkills.AsNoTracking()
+                    .ToDictionaryAsync(cs => cs.Id, cs => cs.DisplayName, StringComparer.OrdinalIgnoreCase, cancellationToken);
+
+                var profile = _profileBuilder.BuildProfile(session, subskillsBySkillId, roleNodes, canonicalSkills);
                 session.Profile = profile;
                 _sessionStore.UpdateSession(session);
 
@@ -519,12 +671,29 @@ public class AdaptiveDiagnosticService : IAdaptiveDiagnosticService
                     Skills: completedSkills,
                     TopGaps: topGaps,
                     UnsupportedSkillIds: session.UnsupportedSkillIds,
-                    Profile: profile
+                    Profile: profile,
+                    LastExplanation: explanation
                 );
 
                 return (true, response, null, null);
             }
         }
+    }
+
+    public Task<(bool Success, AdaptiveSessionResponse? Response, string? ErrorCode, string? ErrorMessage)> AdvanceNextQuestionAsync(
+        string sessionId,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(sessionId) || !_sessionStore.TryGetSession(sessionId, out var session) || session == null)
+        {
+            return Task.FromResult<(bool, AdaptiveSessionResponse?, string?, string?)>((false, null, "SESSION_NOT_FOUND", $"Diagnostic session '{sessionId}' was not found."));
+        }
+
+        session.AwaitingNextQuestion = false;
+        session.LastExplanation = null;
+        _sessionStore.UpdateSession(session);
+
+        return GetSessionAsync(sessionId, cancellationToken);
     }
 
     public async Task<(bool Success, AdaptiveSessionResponse? Response, string? ErrorCode, string? ErrorMessage)> GetSessionAsync(
@@ -553,7 +722,14 @@ public class AdaptiveDiagnosticService : IAdaptiveDiagnosticService
                         StringComparer.OrdinalIgnoreCase
                     );
 
-                session.Profile = _profileBuilder.BuildProfile(session, subskillsBySkillId);
+                var roleNodes = await _db.RoleRoadmapNodes.AsNoTracking()
+                    .Where(rn => rn.RoleId.ToLower() == session.RoleId.ToLower())
+                    .ToListAsync(cancellationToken);
+
+                var canonicalSkills = await _db.CanonicalSkills.AsNoTracking()
+                    .ToDictionaryAsync(cs => cs.Id, cs => cs.DisplayName, StringComparer.OrdinalIgnoreCase, cancellationToken);
+
+                session.Profile = _profileBuilder.BuildProfile(session, subskillsBySkillId, roleNodes, canonicalSkills);
                 _sessionStore.UpdateSession(session);
             }
 
@@ -589,7 +765,8 @@ public class AdaptiveDiagnosticService : IAdaptiveDiagnosticService
                 Skills: completedSkills,
                 TopGaps: topGaps,
                 UnsupportedSkillIds: session.UnsupportedSkillIds,
-                Profile: session.Profile
+                Profile: session.Profile,
+                LastExplanation: session.LastExplanation
             );
 
             return (true, response, null, null);
@@ -600,8 +777,7 @@ public class AdaptiveDiagnosticService : IAdaptiveDiagnosticService
             var skillState = session.SkillStates[currentSkillId];
 
             // Reconstruct current question
-            var currentQ = _db.Questions.AsNoTracking()
-                .FirstOrDefault(q => q.Id == session.CurrentQuestionId);
+            var currentQ = await FindQuestionAsync(session.CurrentQuestionId, cancellationToken);
 
             if (currentQ == null)
             {
@@ -637,7 +813,8 @@ public class AdaptiveDiagnosticService : IAdaptiveDiagnosticService
                 Progress: progress,
                 Skills: null,
                 TopGaps: null,
-                UnsupportedSkillIds: session.UnsupportedSkillIds
+                UnsupportedSkillIds: session.UnsupportedSkillIds,
+                LastExplanation: session.LastExplanation
             );
 
             return (true, response, null, null);

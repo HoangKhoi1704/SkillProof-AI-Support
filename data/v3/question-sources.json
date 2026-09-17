@@ -1,0 +1,283 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SkillProof V3 Question Sources Registry",
+  "version": "3.0.0",
+  "description": "Authoritative registry of verified open-source standards, specifications, and official technical documentation anchoring SkillProof V3 assessment questions.",
+  "sources": [
+    {
+      "sourceId": "src-doc-rfc9110-http",
+      "publisher": "Internet Engineering Task Force (IETF)",
+      "title": "RFC 9110: HTTP Semantics",
+      "url": "https://www.rfc-editor.org/rfc/rfc9110.html",
+      "canonicalUrl": "https://www.rfc-editor.org/rfc/rfc9110.html",
+      "sourceType": "official-standard",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-rfc9111-caching",
+      "publisher": "Internet Engineering Task Force (IETF)",
+      "title": "RFC 9111: HTTP Caching",
+      "url": "https://www.rfc-editor.org/rfc/rfc9111.html",
+      "canonicalUrl": "https://www.rfc-editor.org/rfc/rfc9111.html",
+      "sourceType": "official-standard",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-rfc9114-http3",
+      "publisher": "Internet Engineering Task Force (IETF)",
+      "title": "RFC 9114: HTTP/3 over QUIC",
+      "url": "https://www.rfc-editor.org/rfc/rfc9114.html",
+      "canonicalUrl": "https://www.rfc-editor.org/rfc/rfc9114.html",
+      "sourceType": "official-standard",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-whatwg-html-semantic",
+      "publisher": "Web Hypertext Application Technology Working Group (WHATWG)",
+      "title": "WHATWG HTML Living Standard: Semantic Sections & Text",
+      "url": "https://html.spec.whatwg.org/multipage/sections.html",
+      "canonicalUrl": "https://html.spec.whatwg.org/multipage/sections.html",
+      "sourceType": "official-standard",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-w3c-wai-aria",
+      "publisher": "World Wide Web Consortium (W3C)",
+      "title": "W3C Accessible Rich Internet Applications (WAI-ARIA) 1.2",
+      "url": "https://www.w3.org/TR/wai-aria-1.2/",
+      "canonicalUrl": "https://www.w3.org/TR/wai-aria-1.2/",
+      "sourceType": "official-standard",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-whatwg-form-validation",
+      "publisher": "Web Hypertext Application Technology Working Group (WHATWG)",
+      "title": "WHATWG HTML Living Standard: Form Validation Infrastructure",
+      "url": "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constraint-validation",
+      "canonicalUrl": "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html",
+      "sourceType": "official-standard",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-whatwg-eventloop",
+      "publisher": "Web Hypertext Application Technology Working Group (WHATWG)",
+      "title": "WHATWG HTML Living Standard: Event Loops and Task Queues",
+      "url": "https://html.spec.whatwg.org/multipage/webappapis.html#event-loops",
+      "canonicalUrl": "https://html.spec.whatwg.org/multipage/webappapis.html",
+      "sourceType": "official-standard",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-mdn-closures",
+      "publisher": "Mozilla Developer Network (MDN)",
+      "title": "MDN Web Docs: JavaScript Closures and Scope",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures",
+      "canonicalUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures",
+      "sourceType": "official-documentation",
+      "verificationStatus": "source-identity-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-ecma-promises",
+      "publisher": "Ecma International",
+      "title": "ECMA-262 ECMAScript Language Specification: Promise Objects",
+      "url": "https://tc39.es/ecma262/#sec-promise-objects",
+      "canonicalUrl": "https://tc39.es/ecma262/",
+      "sourceType": "official-standard",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-fetch-cors",
+      "publisher": "Web Hypertext Application Technology Working Group (WHATWG)",
+      "title": "WHATWG Fetch Standard: Cross-Origin Resource Sharing (CORS)",
+      "url": "https://fetch.spec.whatwg.org/#http-cors-protocol",
+      "canonicalUrl": "https://fetch.spec.whatwg.org/",
+      "sourceType": "official-standard",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-w3c-csp3",
+      "publisher": "World Wide Web Consortium (W3C)",
+      "title": "W3C Content Security Policy Level 3 Specification",
+      "url": "https://www.w3.org/TR/CSP3/",
+      "canonicalUrl": "https://www.w3.org/TR/CSP3/",
+      "sourceType": "official-standard",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-owasp-token-storage",
+      "publisher": "OWASP Foundation",
+      "title": "OWASP Cheat Sheet Series: HTML5 Security and Client-Side Token Storage",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html",
+      "canonicalUrl": "https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html",
+      "sourceType": "official-documentation",
+      "verificationStatus": "source-identity-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-postgresql-queries",
+      "publisher": "PostgreSQL Global Development Group",
+      "title": "PostgreSQL Documentation: Chapter 7. Queries (GROUP BY, HAVING)",
+      "url": "https://www.postgresql.org/docs/current/queries.html",
+      "canonicalUrl": "https://www.postgresql.org/docs/current/queries.html",
+      "sourceType": "official-documentation",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-postgresql-window",
+      "publisher": "PostgreSQL Global Development Group",
+      "title": "PostgreSQL Documentation: Window Functions",
+      "url": "https://www.postgresql.org/docs/current/tutorial-window.html",
+      "canonicalUrl": "https://www.postgresql.org/docs/current/tutorial-window.html",
+      "sourceType": "official-documentation",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-pandas-missing",
+      "publisher": "The Pandas Development Team",
+      "title": "Pandas Documentation: Working with Missing Data",
+      "url": "https://pandas.pydata.org/docs/user_guide/missing_data.html",
+      "canonicalUrl": "https://pandas.pydata.org/docs/user_guide/missing_data.html",
+      "sourceType": "official-documentation",
+      "verificationStatus": "source-identity-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-pandas-reshaping",
+      "publisher": "The Pandas Development Team",
+      "title": "Pandas Documentation: Reshaping and Pivot Tables",
+      "url": "https://pandas.pydata.org/docs/user_guide/reshaping.html",
+      "canonicalUrl": "https://pandas.pydata.org/docs/user_guide/reshaping.html",
+      "sourceType": "official-documentation",
+      "verificationStatus": "source-identity-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-hadley-tidy-data",
+      "publisher": "Foundation for Open Access Statistics / Hadley Wickham",
+      "title": "Tidy Data (Journal of Statistical Software, Vol. 59)",
+      "url": "https://vita.had.co.nz/papers/tidy-data.pdf",
+      "canonicalUrl": "https://vita.had.co.nz/papers/tidy-data.pdf",
+      "sourceType": "professional-reference",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-nist-handbook",
+      "publisher": "National Institute of Standards and Technology (NIST)",
+      "title": "NIST/SEMATECH e-Handbook of Statistical Methods",
+      "url": "https://www.itl.nist.gov/div898/handbook/",
+      "canonicalUrl": "https://www.itl.nist.gov/div898/handbook/",
+      "sourceType": "official-documentation",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-tufte-visualization",
+      "publisher": "Graphics Press / Edward Tufte",
+      "title": "The Visual Display of Quantitative Information",
+      "url": "https://www.edwardtufte.com/tufte/books_vdqi",
+      "canonicalUrl": "https://www.edwardtufte.com/tufte/books_vdqi",
+      "sourceType": "professional-reference",
+      "verificationStatus": "reference-only",
+      "accessStatus": "paywalled",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-w3c-wcag-color",
+      "publisher": "World Wide Web Consortium (W3C)",
+      "title": "W3C Web Content Accessibility Guidelines (WCAG) 2.1: Use of Color",
+      "url": "https://www.w3.org/TR/WCAG21/#use-of-color",
+      "canonicalUrl": "https://www.w3.org/TR/WCAG21/",
+      "sourceType": "official-standard",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    },
+    {
+      "sourceId": "src-doc-ecma-objects",
+      "publisher": "Ecma International",
+      "title": "ECMA-262 ECMAScript Language Specification: Object Model, Classes & Execution Contexts",
+      "url": "https://tc39.es/ecma262/#sec-ordinary-and-exotic-objects-behaviours",
+      "canonicalUrl": "https://tc39.es/ecma262/",
+      "sourceType": "official-standard",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-17"
+    },
+    {
+      "sourceId": "src-doc-postgresql-explain",
+      "publisher": "PostgreSQL Global Development Group",
+      "title": "PostgreSQL Documentation: Chapter 14. Performance Tips (Using EXPLAIN, Planner Statistics)",
+      "url": "https://www.postgresql.org/docs/current/performance-tips.html",
+      "canonicalUrl": "https://www.postgresql.org/docs/current/performance-tips.html",
+      "sourceType": "official-documentation",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-17"
+    },
+    {
+      "sourceId": "src-doc-pandas-performance",
+      "publisher": "The Pandas Development Team",
+      "title": "Pandas Documentation: Enhancing Performance (Vectorization, Memory Layout)",
+      "url": "https://pandas.pydata.org/docs/user_guide/enhancingperf.html",
+      "canonicalUrl": "https://pandas.pydata.org/docs/user_guide/enhancingperf.html",
+      "sourceType": "official-documentation",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-17"
+    },
+    {
+      "sourceId": "src-doc-pandas-indexing",
+      "publisher": "The Pandas Development Team",
+      "title": "Pandas Documentation: Indexing and Selecting Data (Views vs Copies, SettingWithCopy)",
+      "url": "https://pandas.pydata.org/docs/user_guide/indexing.html",
+      "canonicalUrl": "https://pandas.pydata.org/docs/user_guide/indexing.html",
+      "sourceType": "official-documentation",
+      "verificationStatus": "claim-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-17"
+    },
+    {
+      "sourceId": "src-be-backend-questions",
+      "publisher": "SkillProof Foundation",
+      "title": "SkillProof Frozen Backend Assessment Bank",
+      "url": "file:///data/backend/questions.json",
+      "canonicalUrl": "https://skillproof.internal/catalog/backend",
+      "sourceType": "verified-production-bank",
+      "verificationStatus": "baseline-verified",
+      "accessStatus": "accessible",
+      "verifiedAt": "2026-09-16"
+    }
+  ]
+}

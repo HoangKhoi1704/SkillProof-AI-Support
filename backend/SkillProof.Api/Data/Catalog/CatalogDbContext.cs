@@ -19,6 +19,13 @@ public class CatalogDbContext : DbContext
     public DbSet<Source> Sources => Set<Source>();
     public DbSet<QuestionFrameworkSource> QuestionFrameworkSources => Set<QuestionFrameworkSource>();
     public DbSet<QuestionInterviewEvidence> QuestionInterviewEvidence => Set<QuestionInterviewEvidence>();
+    public DbSet<CanonicalSkill> CanonicalSkills => Set<CanonicalSkill>();
+    public DbSet<RoleRoadmapNode> RoleRoadmapNodes => Set<RoleRoadmapNode>();
+    public DbSet<RoadmapRelationship> RoadmapRelationships => Set<RoadmapRelationship>();
+    public DbSet<LegacySkillMapping> LegacySkillMappings => Set<LegacySkillMapping>();
+    public DbSet<V3Question> V3Questions => Set<V3Question>();
+    public DbSet<LearningResource> LearningResources => Set<LearningResource>();
+    public DbSet<CuratedProject> CuratedProjects => Set<CuratedProject>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -172,6 +179,106 @@ public class CatalogDbContext : DbContext
                 .WithMany(s => s.QuestionInterviewEvidence)
                 .HasForeignKey(qie => qie.SourceId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // CanonicalSkill
+        modelBuilder.Entity<CanonicalSkill>(b =>
+        {
+            b.HasKey(cs => cs.Id);
+            b.Property(cs => cs.DisplayName).IsRequired();
+            b.Property(cs => cs.Classification).IsRequired();
+            b.Property(cs => cs.SourceKind).IsRequired();
+        });
+
+        // RoleRoadmapNode (Join Table)
+        modelBuilder.Entity<RoleRoadmapNode>(b =>
+        {
+            b.HasKey(rrn => new { rrn.RoleId, rrn.CanonicalSkillId });
+            b.Property(rrn => rrn.Category).IsRequired();
+            b.Property(rrn => rrn.Importance).IsRequired();
+
+            b.HasOne(rrn => rrn.Role)
+                .WithMany(r => r.RoleRoadmapNodes)
+                .HasForeignKey(rrn => rrn.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            b.HasOne(rrn => rrn.CanonicalSkill)
+                .WithMany(cs => cs.RoleRoadmapNodes)
+                .HasForeignKey(rrn => rrn.CanonicalSkillId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // RoadmapRelationship
+        modelBuilder.Entity<RoadmapRelationship>(b =>
+        {
+            b.HasKey(rel => rel.Id);
+            b.Property(rel => rel.RelationshipType).IsRequired();
+
+            b.HasOne(rel => rel.SourceSkill)
+                .WithMany(cs => cs.OutgoingRelationships)
+                .HasForeignKey(rel => rel.SourceSkillId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            b.HasOne(rel => rel.TargetSkill)
+                .WithMany(cs => cs.IncomingRelationships)
+                .HasForeignKey(rel => rel.TargetSkillId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // LegacySkillMapping
+        modelBuilder.Entity<LegacySkillMapping>(b =>
+        {
+            b.HasKey(lsm => new { lsm.LegacySkillId, lsm.CanonicalSkillId });
+            b.Property(lsm => lsm.RoleId).IsRequired();
+            b.Property(lsm => lsm.MappingType).IsRequired();
+
+            b.HasOne(lsm => lsm.CanonicalSkill)
+                .WithMany(cs => cs.LegacySkillMappings)
+                .HasForeignKey(lsm => lsm.CanonicalSkillId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // V3Question
+        modelBuilder.Entity<V3Question>(b =>
+        {
+            b.HasKey(q => q.Id);
+            b.Property(q => q.RoleId).IsRequired();
+            b.Property(q => q.CanonicalSkillId).IsRequired();
+            b.Property(q => q.Difficulty).IsRequired();
+            b.Property(q => q.QuestionType).IsRequired();
+            b.Property(q => q.QuestionText).IsRequired();
+
+            b.HasOne(q => q.Role)
+                .WithMany()
+                .HasForeignKey(q => q.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            b.HasOne(q => q.CanonicalSkill)
+                .WithMany()
+                .HasForeignKey(q => q.CanonicalSkillId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // LearningResource
+        modelBuilder.Entity<LearningResource>(b =>
+        {
+            b.HasKey(lr => lr.Id);
+            b.Property(lr => lr.Title).IsRequired();
+            b.Property(lr => lr.SourceName).IsRequired();
+            b.Property(lr => lr.SourceUrl).IsRequired();
+            b.Property(lr => lr.ResourceType).IsRequired();
+            b.Property(lr => lr.Level).IsRequired();
+        });
+
+        // CuratedProject
+        modelBuilder.Entity<CuratedProject>(b =>
+        {
+            b.HasKey(cp => cp.Id);
+            b.Property(cp => cp.Title).IsRequired();
+            b.Property(cp => cp.Source).IsRequired();
+            b.Property(cp => cp.ProjectType).IsRequired();
+            b.Property(cp => cp.Difficulty).IsRequired();
+            b.Property(cp => cp.Description).IsRequired();
         });
     }
 }

@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SkillProof V3 Roles Registry",
+  "version": "3.0.0",
+  "description": "Authoritative registry of career target roles supporting SkillProof V2 multi-role architecture.",
+  "roles": [
+    {
+      "id": "frontend-developer",
+      "title": "Frontend Developer",
+      "slug": "frontend-developer",
+      "isPrimaryDemoRole": true,
+      "status": "active",
+      "description": "Architects, develops, and optimizes user-facing client applications, interactive web interfaces, and modern browser experiences.",
+      "roadmapSourceUrl": "https://roadmap.sh/frontend",
+      "displayOrder": 1
+    },
+    {
+      "id": "backend-developer",
+      "title": "Backend Developer",
+      "slug": "backend-developer",
+      "isPrimaryDemoRole": true,
+      "status": "active",
+      "description": "Designs, builds, tests, and maintains scalable server-side systems, robust APIs, distributed data stores, and event-driven architectures.",
+      "roadmapSourceUrl": "https://roadmap.sh/backend",
+      "displayOrder": 2
+    },
+    {
+      "id": "data-analyst",
+      "title": "Data Analyst",
+      "slug": "data-analyst",
+      "isPrimaryDemoRole": true,
+      "status": "active",
+      "description": "Collects, cleans, transforms, models, and visualizes complex datasets to extract actionable business insights and statistical evidence.",
+      "roadmapSourceUrl": "https://roadmap.sh/data-analyst",
+      "displayOrder": 3
+    },
+    {
+      "id": "financial-analyst",
+      "title": "Financial Analyst",
+      "slug": "financial-analyst",
+      "isPrimaryDemoRole": false,
+      "status": "legacy-supported",
+      "description": "Legacy prototype role preserved for backwards compatibility with early prototype sessions.",
+      "roadmapSourceUrl": null,
+      "displayOrder": 99
+    }
+  ]
+}

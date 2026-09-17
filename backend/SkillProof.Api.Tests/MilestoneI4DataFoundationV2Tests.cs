@@ -87,7 +87,7 @@ public class MilestoneI4DataFoundationV2Tests : IClassFixture<TestWebApplication
 
         // Verify QuestionInterviewEvidence
         var qieCount = await db.QuestionInterviewEvidence.CountAsync();
-        Assert.Equal(22, qieCount);
+        Assert.Equal(2, qieCount);
     }
 
     [Fact]

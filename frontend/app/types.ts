@@ -134,10 +134,15 @@ export interface GapBasedProject {
 
 export interface SubmitProjectEvidenceRequest {
   repositoryUrl?: string;
-  projectSummary: string;
-  implementationExplanation: string;
-  architectureDecisions: string;
-  testingExplanation: string;
+  deployedUrl?: string;
+  notebookUrl?: string;
+  dashboardUrl?: string;
+  datasetUrl?: string;
+  notes?: string;
+  projectSummary?: string;
+  implementationExplanation?: string;
+  architectureDecisions?: string;
+  testingExplanation?: string;
   evidenceExcerpts?: string[];
 }
 
@@ -153,6 +158,8 @@ export interface RequirementEvaluationResult {
   targetsSkill: string;
   status: 'Demonstrated' | 'Partially Demonstrated' | 'Insufficient Evidence';
   evaluationNotes: string;
+  evidenceFound?: string[];
+  sourceArtifact?: string;
 }
 
 export interface PortfolioProof {
@@ -162,6 +169,26 @@ export interface PortfolioProof {
   portfolioBullets: string[];
   cvBullets: string[];
   evidenceNotes: string[];
+  claimTraceability?: string[];
+}
+
+export interface VerificationArtifactItem {
+  artifactType: string;
+  source: string;
+  status: string;
+  details: string;
+}
+
+export interface CompositeEvidenceReport {
+  overallStatus: string;
+  totalArtifactsChecked: number;
+  verifiedArtifactsCount: number;
+  partiallyVerifiedCount: number;
+  unverifiedCount: number;
+  verifiedEvidence: VerificationArtifactItem[];
+  partiallyVerifiedEvidence: VerificationArtifactItem[];
+  unverifiedEvidence: VerificationArtifactItem[];
+  securityWarnings: string[];
 }
 
 export interface ProjectEvaluation {
@@ -173,6 +200,7 @@ export interface ProjectEvaluation {
   missingEvidence: string[];
   improvementSuggestions: string[];
   portfolioProof?: PortfolioProof;
+  verificationReport?: CompositeEvidenceReport;
 }
 
 export interface RecommendProjectRequest {
@@ -408,6 +436,44 @@ export interface RoadmapHandoffContract {
   skillGaps: RoadmapSkillGapInput[];
 }
 
+export type SkillMatrixState =
+  | 'Advanced'
+  | 'Intermediate'
+  | 'Beginner'
+  | 'Insufficient Evidence'
+  | 'Not Assessed';
+
+export type SkillMatrixGapType =
+  | 'ASSESSED GAP'
+  | 'EVIDENCE GAP'
+  | 'ROLE COVERAGE GAP'
+  | 'NONE';
+
+export interface SkillMatrixItem {
+  canonicalSkillId: string;
+  skillName: string;
+  category: string;
+  isMandatoryFundamental: boolean;
+  overallStatus: 'Advanced' | 'Intermediate' | 'Beginner' | 'Insufficient Evidence' | 'Not Assessed' | string;
+  fundamentalsDimension: string;
+  appliedDimension: string;
+  reasoningDimension: string;
+  gapType: 'ASSESSED GAP' | 'EVIDENCE GAP' | 'ROLE COVERAGE GAP' | 'NONE' | string;
+  evidenceObserved: string[];
+  whyThisLevel: string;
+  whatToImproveNext: string[];
+}
+
+export interface PostAnswerExplanation {
+  questionId: string;
+  skillId: string;
+  skillName: string;
+  evaluatedLevel: string;
+  whatYouCovered: string[];
+  whatCouldBeStronger: string[];
+  referenceExplanation: string;
+}
+
 export interface CareerReadinessProfile {
   roleId: string;
   assessmentType: string;
@@ -416,6 +482,7 @@ export interface CareerReadinessProfile {
   skills: SkillProfileItem[];
   topGaps: string[];
   roadmapInput: RoadmapHandoffContract;
+  skillMatrix?: SkillMatrixItem[];
 }
 
 export interface AdaptiveSessionResponse {
@@ -428,6 +495,7 @@ export interface AdaptiveSessionResponse {
   topGaps?: string[] | null;
   unsupportedSkillIds: string[];
   profile?: CareerReadinessProfile | null;
+  lastExplanation?: PostAnswerExplanation | null;
 }
 
 export interface DevAiEvaluationDetail {
@@ -501,4 +569,159 @@ export interface DevAdaptiveInspection {
   roadmap?: DevRoadmapInspection | null;
   project?: DevProjectInspection | null;
 }
+
+// ==========================================
+// V3 Canonical Catalog & Framework Types
+// ==========================================
+
+export interface RoleSummaryV3 {
+  id: string;
+  title: string;
+  description: string | null;
+  isPrimaryDemoRole: boolean;
+  roadmapSourceUrl: string | null;
+  displayOrder: number;
+}
+
+export interface CanonicalSkillNodeV3 {
+  canonicalSkillId: string;
+  displayName: string;
+  classification: string;
+  category: string;
+  importance: string;
+  sourceKind: string;
+  roadmapSource: string | null;
+  roadmapNodeId: string | null;
+  roadmapLabel: string | null;
+  description: string | null;
+  assessmentEligible: boolean;
+  mandatoryFundamental: boolean;
+  isToolkitOnly: boolean;
+  isOptional: boolean;
+  hasQuestionCoverage: boolean;
+  displayOrder: number;
+}
+
+export interface RoadmapRelationshipV3 {
+  id: number;
+  sourceSkillId: string;
+  targetSkillId: string;
+  relationshipType: string;
+  rationale: string | null;
+}
+
+export interface RoleCanonicalFrameworkV3 {
+  roleId: string;
+  roleTitle: string;
+  description: string | null;
+  isPrimaryDemoRole: boolean;
+  roadmapSourceUrl: string | null;
+  nodes: CanonicalSkillNodeV3[];
+  relationships: RoadmapRelationshipV3[];
+}
+
+export type RoadmapNodeState =
+  | 'Completed'
+  | 'Current'
+  | 'Available'
+  | 'Locked'
+  | 'NeedsDevelopment'
+  | 'NotAssessed'
+  | 'Optional';
+
+export interface PersonalizedRoadmapNode {
+  canonicalSkillId: string;
+  name: string;
+  classification: string;
+  requirement: string;
+  nodeState: RoadmapNodeState;
+  gapType: string;
+  assessmentState: string;
+  whyThisNode: string;
+  nextAction: string;
+  displayOrder: number;
+  isToolkit: boolean;
+  isOptional: boolean;
+  category: string;
+  importance: string;
+  prerequisiteSkillIds: string[];
+}
+
+export interface PersonalizedRoadmapEdge {
+  from: string;
+  to: string;
+  relationshipType: string;
+  rationale?: string | null;
+}
+
+export interface RoadmapGraphSummary {
+  currentNodeIds: string[];
+  completedCount: number;
+  needsDevelopmentCount: number;
+  notAssessedCount: number;
+  availableCount: number;
+  lockedCount: number;
+  optionalCount: number;
+  totalNodes: number;
+}
+
+export interface PersonalizedRoadmapGraph {
+  roleId: string;
+  roleTitle: string;
+  sessionId?: string | null;
+  nodes: PersonalizedRoadmapNode[];
+  edges: PersonalizedRoadmapEdge[];
+  summary: RoadmapGraphSummary;
+}
+
+export interface LearningResourceDto {
+  id: string;
+  title: string;
+  sourceName: string;
+  sourceUrl: string;
+  resourceType: 'official-doc' | 'guide' | 'tutorial' | 'interactive-practice' | 'reference' | string;
+  canonicalSkillIds: string[];
+  roleIds: string[];
+  level: 'foundation' | 'applied' | 'advanced' | string;
+  isOfficial: boolean;
+  verificationStatus: string;
+  verifiedAt: string;
+  locator?: string | null;
+  relevanceReason?: string | null;
+}
+
+export interface NodeResourcesResponse {
+  canonicalSkillId: string;
+  resources: LearningResourceDto[];
+}
+
+export interface CuratedProjectDto {
+  id: string;
+  title: string;
+  source: string;
+  sourceUrl?: string | null;
+  sourceLocator?: string | null;
+  provenance: string;
+  roleIds: string[];
+  canonicalSkillIds: string[];
+  roadmapTargets: string[];
+  projectType: 'practice' | 'portfolio';
+  difficulty: string;
+  estimatedScope: string;
+  description: string;
+  deliverables: string[];
+  evidenceRequirements: string[];
+  verificationStatus: string;
+  verifiedAt: string;
+  targetedGaps: string[];
+  whyRecommended: string;
+}
+
+export interface CuratedProjectRecommendationsResponse {
+  roleId: string;
+  practiceProjects: CuratedProjectDto[];
+  portfolioProjects: CuratedProjectDto[];
+}
+
+
 

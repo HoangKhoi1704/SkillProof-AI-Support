@@ -8,6 +8,8 @@ public interface ICatalogService
 {
     Task<RoleSkillsResponse?> GetRoleSkillsAsync(string roleId, CancellationToken cancellationToken = default);
     Task<(bool Success, DynamicQuestionSelectionResponse? Response, string? ErrorCode, string? ErrorMessage)> SelectQuestionsAsync(DynamicQuestionSelectionRequest request, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<RoleSummaryDto>> GetV3RolesAsync(CancellationToken cancellationToken = default);
+    Task<RoleCanonicalFrameworkResponse?> GetRoleCanonicalFrameworkAsync(string roleId, CancellationToken cancellationToken = default);
 }
 
 public class CatalogService : ICatalogService
@@ -285,5 +287,89 @@ public class CatalogService : ICatalogService
         );
 
         return (true, response, null, null);
+    }
+
+    public async Task<IReadOnlyList<RoleSummaryDto>> GetV3RolesAsync(CancellationToken cancellationToken = default)
+    {
+        var roles = await _db.Roles.AsNoTracking()
+            .OrderBy(r => r.DisplayOrder)
+            .ToListAsync(cancellationToken);
+
+        return roles.Select(r => new RoleSummaryDto(
+            r.Id,
+            r.Title,
+            r.Description,
+            r.IsPrimaryDemoRole,
+            r.RoadmapSourceUrl,
+            r.DisplayOrder
+        )).ToList();
+    }
+
+    public async Task<RoleCanonicalFrameworkResponse?> GetRoleCanonicalFrameworkAsync(string roleId, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(roleId))
+        {
+            return null;
+        }
+
+        var normalizedRoleId = roleId.Trim().ToLowerInvariant();
+
+        var role = await _db.Roles.AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Id.ToLower() == normalizedRoleId, cancellationToken);
+
+        if (role == null)
+        {
+            return null;
+        }
+
+        var roleNodes = await _db.RoleRoadmapNodes.AsNoTracking()
+            .Where(rrn => rrn.RoleId.ToLower() == normalizedRoleId)
+            .Include(rrn => rrn.CanonicalSkill)
+            .OrderBy(rrn => rrn.DisplayOrder)
+            .ToListAsync(cancellationToken);
+
+        var skillIds = roleNodes.Select(rn => rn.CanonicalSkillId).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var relationships = await _db.RoadmapRelationships.AsNoTracking()
+            .Where(rel => skillIds.Contains(rel.SourceSkillId) && skillIds.Contains(rel.TargetSkillId))
+            .OrderBy(rel => rel.Id)
+            .ToListAsync(cancellationToken);
+
+        var nodeDtos = roleNodes.Select(rn => new CanonicalSkillNodeDto(
+            rn.CanonicalSkillId,
+            rn.CanonicalSkill.DisplayName,
+            rn.CanonicalSkill.Classification,
+            rn.Category,
+            rn.Importance,
+            rn.CanonicalSkill.SourceKind,
+            rn.CanonicalSkill.RoadmapSource,
+            rn.CanonicalSkill.RoadmapNodeId,
+            rn.CanonicalSkill.RoadmapLabel,
+            rn.CanonicalSkill.Description,
+            rn.AssessmentEligible,
+            rn.MandatoryFundamental,
+            rn.IsToolkitOnly,
+            rn.IsOptional,
+            rn.HasQuestionCoverage,
+            rn.DisplayOrder
+        )).ToList();
+
+        var relationshipDtos = relationships.Select(rel => new RoadmapRelationshipDto(
+            rel.Id,
+            rel.SourceSkillId,
+            rel.TargetSkillId,
+            rel.RelationshipType,
+            rel.Rationale
+        )).ToList();
+
+        return new RoleCanonicalFrameworkResponse(
+            role.Id,
+            role.Title,
+            role.Description,
+            role.IsPrimaryDemoRole,
+            role.RoadmapSourceUrl,
+            nodeDtos,
+            relationshipDtos
+        );
     }
 }

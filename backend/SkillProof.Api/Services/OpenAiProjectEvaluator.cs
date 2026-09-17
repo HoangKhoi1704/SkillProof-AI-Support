@@ -87,8 +87,9 @@ public class OpenAiProjectEvaluator : IProjectEvaluator
                 request.ImplementationExplanation,
                 request.ArchitectureDecisions,
                 request.TestingExplanation,
+                request.Notes,
                 string.Join(" ", request.EvidenceExcerpts ?? new List<string>())
-            }).Trim();
+            }.Where(s => !string.IsNullOrWhiteSpace(s))).Trim();
 
             if (string.IsNullOrWhiteSpace(combinedEvidence) || combinedEvidence.Length < 15)
             {

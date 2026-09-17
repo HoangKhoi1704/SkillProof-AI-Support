@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SkillProof V3 Sources Registry",
+  "version": "3.0.0",
+  "description": "Authoritative registry of external reference sources, standards, and canonical career frameworks anchoring SkillProof V3 competencies.",
+  "canonicalFrameworks": [
+    {
+      "sourceId": "src-cf-roadmap-frontend",
+      "roleId": "frontend-developer",
+      "publisher": "roadmap.sh / Kamran Ahmed",
+      "title": "Frontend Developer Roadmap",
+      "url": "https://roadmap.sh/frontend",
+      "canonicalUrl": "https://roadmap.sh/frontend",
+      "sourceType": "career-framework",
+      "verificationStatus": "community-curated-verified",
+      "accessStatus": "accessible",
+      "extractedAt": "2026-09-16",
+      "gitReference": {
+        "repository": "nilbuild/developer-roadmap",
+        "commitSha": "3cba37fa7440b2f8fafb234561c9e48f85ee1c2f",
+        "path": "roadmaps/frontend/content/"
+      }
+    },
+    {
+      "sourceId": "src-cf-roadmap-backend",
+      "roleId": "backend-developer",
+      "publisher": "roadmap.sh / Kamran Ahmed",
+      "title": "Backend Developer Roadmap",
+      "url": "https://roadmap.sh/backend",
+      "canonicalUrl": "https://roadmap.sh/backend",
+      "sourceType": "career-framework",
+      "verificationStatus": "community-curated-verified",
+      "accessStatus": "accessible",
+      "extractedAt": "2026-09-16",
+      "gitReference": {
+        "repository": "nilbuild/developer-roadmap",
+        "commitSha": "3cba37fa7440b2f8fafb234561c9e48f85ee1c2f",
+        "path": "roadmaps/backend/content/"
+      }
+    },
+    {
+      "sourceId": "src-cf-roadmap-data-analyst",
+      "roleId": "data-analyst",
+      "publisher": "roadmap.sh / Kamran Ahmed",
+      "title": "Data Analyst Roadmap",
+      "url": "https://roadmap.sh/data-analyst",
+      "canonicalUrl": "https://roadmap.sh/data-analyst",
+      "sourceType": "career-framework",
+      "verificationStatus": "community-curated-verified",
+      "accessStatus": "accessible",
+      "extractedAt": "2026-09-16",
+      "gitReference": {
+        "repository": "nilbuild/developer-roadmap",
+        "commitSha": "3cba37fa7440b2f8fafb234561c9e48f85ee1c2f",
+        "path": "roadmaps/data-analyst/content/"
+      }
+    }
+  ],
+  "provenanceCatalogReference": "data/backend/sources.json"
+}

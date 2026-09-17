@@ -76,8 +76,8 @@ public class MilestoneI41CatalogSynchronizationHardeningTests
             Assert.Equal(22, sk1);
             Assert.Equal(57, sub1);
             Assert.Equal(63, qs1);
-            Assert.Equal(103, qfs1);
-            Assert.Equal(22, qie1);
+            Assert.Equal(107, qfs1);
+            Assert.Equal(2, qie1);
 
             // Re-run seeding second time (no count-only bypass; executes full synchronization)
             await seeder.SeedAsync();
@@ -136,7 +136,7 @@ public class MilestoneI41CatalogSynchronizationHardeningTests
         {
             await seeder.SeedAsync();
             var initialCount = await db.QuestionFrameworkSources.CountAsync();
-            Assert.Equal(103, initialCount);
+            Assert.Equal(107, initialCount);
 
             // Remove 1 Framework Source relationship
             var link = await db.QuestionFrameworkSources.FirstAsync(x => x.QuestionId == "q-be-nosql-01");
@@ -144,12 +144,12 @@ public class MilestoneI41CatalogSynchronizationHardeningTests
             db.QuestionFrameworkSources.Remove(link);
             await db.SaveChangesAsync();
 
-            Assert.Equal(102, await db.QuestionFrameworkSources.CountAsync());
+            Assert.Equal(106, await db.QuestionFrameworkSources.CountAsync());
 
             // Re-synchronize
             await seeder.SeedAsync();
 
-            Assert.Equal(103, await db.QuestionFrameworkSources.CountAsync());
+            Assert.Equal(107, await db.QuestionFrameworkSources.CountAsync());
             var exists = await db.QuestionFrameworkSources.AnyAsync(x => x.QuestionId == "q-be-nosql-01" && x.SourceId == deletedSourceId);
             Assert.True(exists);
         }
@@ -223,8 +223,8 @@ public class MilestoneI41CatalogSynchronizationHardeningTests
             Assert.Equal(22, await db.Skills.CountAsync());
             Assert.Equal(57, await db.Subskills.CountAsync());
             Assert.Equal(63, await db.QuestionSubskills.CountAsync());
-            Assert.Equal(103, await db.QuestionFrameworkSources.CountAsync());
-            Assert.Equal(22, await db.QuestionInterviewEvidence.CountAsync());
+            Assert.Equal(107, await db.QuestionFrameworkSources.CountAsync());
+            Assert.Equal(2, await db.QuestionInterviewEvidence.CountAsync());
 
             // Verify all 48 questions have non-empty rubrics
             var questions = await db.Questions
@@ -244,6 +244,39 @@ public class MilestoneI41CatalogSynchronizationHardeningTests
                 Assert.NotEmpty(q.QuestionSubskills);
                 Assert.NotEmpty(q.FrameworkSources);
             }
+        }
+    }
+
+    [Fact]
+    public async Task G_DatabaseWithDeletedInterviewEvidenceRelationship_IsReconciledAndRemoved()
+    {
+        var (db, conn, seeder) = CreateIsolatedCatalog();
+        using (conn)
+        using (db)
+        {
+            await seeder.SeedAsync();
+            Assert.Equal(2, await db.QuestionInterviewEvidence.CountAsync());
+
+            // Inject a rogue/obsolete interview evidence relationship into SQLite (simulating old data)
+            db.QuestionInterviewEvidence.Add(new QuestionInterviewEvidence
+            {
+                QuestionId = "q-be-sql-02",
+                SourceId = "src-ipr-bytebytego-system-design",
+                EvidenceType = "interview-preparation-resource",
+                EvidenceStrength = "strong-topic-match",
+                Notes = "Rogue obsolete relationship that does not exist in questions.json",
+                SupportedTopicsJson = "[\"sql\"]"
+            });
+            await db.SaveChangesAsync();
+
+            Assert.Equal(3, await db.QuestionInterviewEvidence.CountAsync());
+
+            // Run synchronization: seeder must remove the deleted/stale relationship
+            await seeder.SeedAsync();
+
+            Assert.Equal(2, await db.QuestionInterviewEvidence.CountAsync());
+            var exists = await db.QuestionInterviewEvidence.AnyAsync(x => x.QuestionId == "q-be-sql-02" && x.SourceId == "src-ipr-bytebytego-system-design");
+            Assert.False(exists, "Obsolete relationship should be removed during synchronization");
         }
     }
 }

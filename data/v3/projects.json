@@ -1,0 +1,359 @@
+{
+  "projects": [
+    {
+      "id": "proj-fe-weather-practice",
+      "title": "Vanilla JavaScript Weather App & Dynamic API Integration",
+      "source": "practical-tutorials/project-based-learning",
+      "sourceUrl": "https://webdesign.tutsplus.com/tutorials/build-a-simple-weather-app-with-vanilla-javascript--cms-33893",
+      "sourceLocator": "commit:fcd321e/## JavaScript",
+      "provenance": "adapted",
+      "roleIds": [
+        "frontend-developer"
+      ],
+      "canonicalSkillIds": [
+        "shared.javascript",
+        "frontend.html-core",
+        "frontend.css-styling",
+        "shared.internet-http"
+      ],
+      "roadmapTargets": [
+        "shared.javascript",
+        "frontend.html-core",
+        "frontend.css-styling",
+        "shared.internet-http"
+      ],
+      "projectType": "practice",
+      "difficulty": "foundation",
+      "estimatedScope": "4–6 hours",
+      "description": "Build an interactive client-side weather forecasting application utilizing modern HTML5 semantic markup, CSS Grid/Flexbox layouts, asynchronous Fetch API calls, and resilient DOM update handling.",
+      "deliverables": [
+        "Semantic HTML5 interface with responsive CSS stylesheet",
+        "Asynchronous JavaScript module handling HTTP fetch, JSON parsing, and error status handling",
+        "User city input validation and local storage persistence for recent queries"
+      ],
+      "evidenceRequirements": [
+        "Clean repository structure with separated concerns (HTML, CSS, JS)",
+        "Demonstrated asynchronous error handling for network timeouts and 404 responses",
+        "README with local setup instructions and architectural overview"
+      ],
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17"
+    },
+    {
+      "id": "proj-fe-todo-practice",
+      "title": "Accessible Modular Task & Todo Application",
+      "source": "practical-tutorials/project-based-learning",
+      "sourceUrl": "https://github.com/dwyl/javascript-todo-list-tutorial",
+      "sourceLocator": "commit:fcd321e/## JavaScript",
+      "provenance": "adapted",
+      "roleIds": [
+        "frontend-developer"
+      ],
+      "canonicalSkillIds": [
+        "frontend.html-core",
+        "shared.javascript",
+        "frontend.css-styling"
+      ],
+      "roadmapTargets": [
+        "frontend.html-core",
+        "shared.javascript",
+        "frontend.css-styling"
+      ],
+      "projectType": "practice",
+      "difficulty": "foundation",
+      "estimatedScope": "3–5 hours",
+      "description": "Construct an accessible, state-driven task management application emphasizing keyboard navigation (WCAG a11y), clean state mutations, and resilient browser event delegation.",
+      "deliverables": [
+        "ARIA-compliant semantic HTML markup for screen readers and keyboard tab navigation",
+        "State management module supporting task creation, toggle, filtering, and deletion",
+        "Persistence layer utilizing localStorage with schema serialization"
+      ],
+      "evidenceRequirements": [
+        "Working source code demonstrating event delegation and state immutability",
+        "Accessibility audit documentation (WCAG 2.1 AA compliance test)",
+        "Automated unit tests for core state reducer functions"
+      ],
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17"
+    },
+    {
+      "id": "proj-fe-platform-portfolio",
+      "title": "Enterprise Component Platform: Testing, State & Web Security",
+      "source": "practical-tutorials/project-based-learning",
+      "sourceUrl": "https://teropa.info/blog/2015/09/10/full-stack-redux-tutorial.html",
+      "sourceLocator": "commit:fcd321e/#### React",
+      "provenance": "adapted",
+      "roleIds": [
+        "frontend-developer"
+      ],
+      "canonicalSkillIds": [
+        "frontend.html-core",
+        "frontend.css-styling",
+        "shared.javascript",
+        "frontend.framework-react",
+        "frontend.web-security",
+        "frontend.testing",
+        "frontend.performance"
+      ],
+      "roadmapTargets": [
+        "frontend.framework-react",
+        "frontend.testing",
+        "frontend.web-security",
+        "frontend.performance"
+      ],
+      "projectType": "portfolio",
+      "difficulty": "intermediate",
+      "estimatedScope": "20–30 hours",
+      "description": "Engineer an enterprise-grade client-side application featuring modular component architecture, automated unit/integration test suites, strict CSP/XSS defense, and performance-budgeted bundle optimizations.",
+      "deliverables": [
+        "Modular React/TypeScript component hierarchy with strongly-typed properties and decoupled state stores",
+        "Comprehensive automated test suite (Jest/Vitest & Testing Library) verifying user workflows and edge cases",
+        "Client security configuration mitigating XSS, prototype pollution, and CORS configuration",
+        "Lighthouse performance optimization report demonstrating 90+ Core Web Vitals score"
+      ],
+      "evidenceRequirements": [
+        "Production-ready Git repository with CI test automation workflow",
+        "Documented Architectural Decision Records (ADR) detailing state architecture and security controls",
+        "Automated test coverage report exceeding 80% on core business components"
+      ],
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17"
+    },
+    {
+      "id": "proj-be-database-practice",
+      "title": "Relational B-Tree & Disk Storage Engine Prototype",
+      "source": "practical-tutorials/project-based-learning",
+      "sourceUrl": "https://cstack.github.io/db_tutorial/",
+      "sourceLocator": "commit:fcd321e/## C/C++",
+      "provenance": "adapted",
+      "roleIds": [
+        "backend-developer"
+      ],
+      "canonicalSkillIds": [
+        "backend.relational-databases",
+        "shared.sql",
+        "backend.concurrency"
+      ],
+      "roadmapTargets": [
+        "backend.relational-databases",
+        "shared.sql",
+        "backend.concurrency"
+      ],
+      "projectType": "practice",
+      "difficulty": "intermediate",
+      "estimatedScope": "8–12 hours",
+      "description": "Develop a lightweight relational storage engine implementing a pager, B-tree node serialization, disk persistence, and a basic SQL token parser.",
+      "deliverables": [
+        "Storage pager handling fixed-size memory page allocation and disk synchronization",
+        "B-Tree index implementation supporting search, insertion, and page splitting",
+        "REPL interface accepting SQL schema definition and INSERT/SELECT commands"
+      ],
+      "evidenceRequirements": [
+        "Source code verifying disk page flush invariants and pointer validity",
+        "Unit test suite verifying tree balancing, duplicate handling, and bounds checking",
+        "Memory profiling benchmarks confirming bounded heap utilization"
+      ],
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17"
+    },
+    {
+      "id": "proj-be-cache-practice",
+      "title": "High-Throughput In-Memory Key-Value Caching Daemon",
+      "source": "practical-tutorials/project-based-learning",
+      "sourceUrl": "https://build-your-own.org/redis/",
+      "sourceLocator": "commit:fcd321e/## C/C++",
+      "provenance": "adapted",
+      "roleIds": [
+        "backend-developer"
+      ],
+      "canonicalSkillIds": [
+        "backend.caching",
+        "backend.system-design",
+        "backend.concurrency"
+      ],
+      "roadmapTargets": [
+        "backend.caching",
+        "backend.system-design",
+        "backend.concurrency"
+      ],
+      "projectType": "practice",
+      "difficulty": "intermediate",
+      "estimatedScope": "6–10 hours",
+      "description": "Build an asynchronous in-memory caching daemon supporting Redis-compatible serialization, TTL expiration policies, LRU eviction, and non-blocking TCP socket polling.",
+      "deliverables": [
+        "Non-blocking socket event loop handling concurrent client connections",
+        "TTL expiration engine and active/passive LRU memory eviction algorithms",
+        "Serialization parser supporting GET, SET, DEL, and EXPIRE commands"
+      ],
+      "evidenceRequirements": [
+        "Source code verifying thread safety or single-threaded event-loop guarantees",
+        "Concurrency stress test verifying zero race conditions under concurrent client traffic",
+        "Technical writeup detailing eviction trade-offs and latency benchmarks"
+      ],
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17"
+    },
+    {
+      "id": "proj-be-resilient-portfolio",
+      "title": "Production-Grade Resilient Order & Inventory Service",
+      "source": "skillproof-curated",
+      "sourceUrl": null,
+      "sourceLocator": "skillproof/backend/portfolio-01",
+      "provenance": "skillproof-curated",
+      "roleIds": [
+        "backend-developer"
+      ],
+      "canonicalSkillIds": [
+        "backend.rest-apis",
+        "backend.relational-databases",
+        "backend.testing",
+        "backend.authentication-security",
+        "backend.system-design",
+        "backend.caching"
+      ],
+      "roadmapTargets": [
+        "backend.rest-apis",
+        "backend.relational-databases",
+        "backend.testing",
+        "backend.authentication-security",
+        "backend.system-design"
+      ],
+      "projectType": "portfolio",
+      "difficulty": "intermediate",
+      "estimatedScope": "25–35 hours",
+      "description": "Engineer a distributed, high-concurrency order and inventory management service featuring idempotent REST APIs, strict relational transaction isolation, JWT token rotation, and distributed rate limiting.",
+      "deliverables": [
+        "Documented OpenAPI REST endpoints with idempotency keys and ETag optimistic concurrency",
+        "PostgreSQL schema with foreign key constraints, composite indexing, and EXPLAIN execution analysis",
+        "Automated test suite (unit + integration with test doubles/mocks) exceeding 80% coverage",
+        "Stateless JWT authentication service with refresh token rotation and RBAC",
+        "System architecture diagram and rate limiting middleware returning standard HTTP 429"
+      ],
+      "evidenceRequirements": [
+        "Production-ready Git repository with modular architecture and clean commits",
+        "Automated CI test pipeline passing all unit and integration tests",
+        "Architectural Decision Records (ADR) analyzing transaction isolation and concurrency trade-offs"
+      ],
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17"
+    },
+    {
+      "id": "proj-da-eda-practice",
+      "title": "Transactional Exploratory Data Analysis & Data Wrangling",
+      "source": "skillproof-curated",
+      "sourceUrl": null,
+      "sourceLocator": "skillproof/data-analyst/practice-01",
+      "provenance": "skillproof-curated",
+      "roleIds": [
+        "data-analyst"
+      ],
+      "canonicalSkillIds": [
+        "data-analyst.data-wrangling",
+        "data-analyst.eda",
+        "shared.python",
+        "data-analyst.python-or-r"
+      ],
+      "roadmapTargets": [
+        "data-analyst.data-wrangling",
+        "data-analyst.eda",
+        "data-analyst.python-or-r"
+      ],
+      "projectType": "practice",
+      "difficulty": "foundation",
+      "estimatedScope": "5–8 hours",
+      "description": "Perform comprehensive data auditing, cleaning, and exploratory analysis on an uncurated transactional dataset to detect anomalies, reconcile discrepancies, and quantify underlying distributions.",
+      "deliverables": [
+        "Jupyter / Python notebook documenting data cleaning pipeline (handling nulls, typing, deduplication)",
+        "Exploratory statistical profiles evaluating skewness, kurtosis, and correlation matrices",
+        "Cleaned, normalized dataset export ready for analytical modeling"
+      ],
+      "evidenceRequirements": [
+        "Executable notebook with clear markdown markdown explanations for each wrangling step",
+        "Data validation assertions verifying record integrity and constraint compliance",
+        "Visual distribution plots (box plots, histograms, heatmaps) illustrating findings"
+      ],
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17"
+    },
+    {
+      "id": "proj-da-sql-practice",
+      "title": "Relational Customer Cohort Analysis & SQL Retention Modeling",
+      "source": "skillproof-curated",
+      "sourceUrl": null,
+      "sourceLocator": "skillproof/data-analyst/practice-02",
+      "provenance": "skillproof-curated",
+      "roleIds": [
+        "data-analyst"
+      ],
+      "canonicalSkillIds": [
+        "shared.sql",
+        "data-analyst.spreadsheets",
+        "data-analyst.foundations"
+      ],
+      "roadmapTargets": [
+        "shared.sql",
+        "data-analyst.spreadsheets"
+      ],
+      "projectType": "practice",
+      "difficulty": "foundation",
+      "estimatedScope": "4–6 hours",
+      "description": "Author complex SQL queries utilizing window functions, Common Table Expressions (CTEs), and date arithmetic to calculate customer retention cohorts, churn velocity, and lifetime value.",
+      "deliverables": [
+        "Production SQL script repository with parameterized analytical queries",
+        "Cohort retention heat matrix exported to auditable spreadsheet model",
+        "Query execution plan documentation detailing index utilization and join optimizations"
+      ],
+      "evidenceRequirements": [
+        "Formatted, comment-annotated SQL queries demonstrating advanced windowing and aggregation",
+        "Validation check queries confirming mathematical consistency of cohort retention sums",
+        "Spreadsheet workbook utilizing structured tables and dynamic lookup formulas"
+      ],
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17"
+    },
+    {
+      "id": "proj-da-bi-portfolio",
+      "title": "Enterprise Revenue Intelligence: Statistical Modeling & Executive BI Dashboard",
+      "source": "skillproof-curated",
+      "sourceUrl": null,
+      "sourceLocator": "skillproof/data-analyst/portfolio-01",
+      "provenance": "skillproof-curated",
+      "roleIds": [
+        "data-analyst"
+      ],
+      "canonicalSkillIds": [
+        "shared.sql",
+        "data-analyst.data-wrangling",
+        "data-analyst.eda",
+        "data-analyst.statistics",
+        "data-analyst.bi-dashboards",
+        "data-analyst.visualization",
+        "assessment-ext.data-storytelling"
+      ],
+      "roadmapTargets": [
+        "shared.sql",
+        "data-analyst.data-wrangling",
+        "data-analyst.statistics",
+        "data-analyst.bi-dashboards",
+        "data-analyst.visualization"
+      ],
+      "projectType": "portfolio",
+      "difficulty": "intermediate",
+      "estimatedScope": "20–30 hours",
+      "description": "Construct an end-to-end analytical intelligence asset connecting raw relational data, statistical hypothesis testing (A/B testing and variance decomposition), interactive BI dashboards (Power BI / Tableau / Streamlit), and an executive storytelling brief.",
+      "deliverables": [
+        "Automated data extraction and cleansing pipeline with statistical validation checks",
+        "Hypothesis testing workbook / script evaluating margin variances with p-values and confidence intervals",
+        "Interactive executive dashboard with drill-down capabilities by region, product, and cohort",
+        "Executive memorandum translating statistical insights into actionable strategic recommendations"
+      ],
+      "evidenceRequirements": [
+        "Git repository or analytics workspace containing SQL queries, notebooks, and dashboard artifacts",
+        "Documented data dictionary, metric definitions, and statistical assumptions",
+        "Executive presentation deck or brief clearly communicating business implications and recommendations"
+      ],
+      "verificationStatus": "verified",
+      "verifiedAt": "2026-09-17"
+    }
+  ]
+}

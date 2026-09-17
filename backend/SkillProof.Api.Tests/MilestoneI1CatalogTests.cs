@@ -190,7 +190,7 @@ public class MilestoneI1CatalogTests : IClassFixture<TestWebApplicationFactory>
 
         // Check exact record counts
         var rolesCount = await db.Roles.CountAsync();
-        Assert.Equal(1, rolesCount);
+        Assert.Equal(4, rolesCount); // V3 Multi-role catalog foundation (3 primary demo roles + 1 legacy role)
 
         var skillsCount = await db.Skills.CountAsync();
         Assert.Equal(22, skillsCount); // 14 competencies + 8 languages
@@ -283,7 +283,7 @@ public class MilestoneI1CatalogTests : IClassFixture<TestWebApplicationFactory>
         var frameworkSupportedOnlyCount = questions.Count(q => q.VerificationStatus == "framework-supported-only");
         var interviewSupportedCount = questions.Count(q => q.VerificationStatus == "interview-practice-supported");
 
-        Assert.Equal(32, frameworkSupportedOnlyCount);
-        Assert.Equal(16, interviewSupportedCount);
+        Assert.Equal(46, frameworkSupportedOnlyCount);
+        Assert.Equal(2, interviewSupportedCount);
     }
 }

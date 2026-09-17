@@ -1,0 +1,616 @@
+{
+  "version": "2.0.0",
+  "description": "Immutable frozen baseline snapshot of the 18 Core competency questions for backend-developer v2.0 with verified provenance.",
+  "questions": [
+    {
+      "id": "q-be-prog-01",
+      "roleId": "backend-developer",
+      "skillId": "programming-fundamentals",
+      "subskills": [
+        "data-structures",
+        "algorithms-complexity"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "Explain the difference between an Array (or List) and a Hash Table (or Dictionary) when searching for an element by an identifier (e.g., finding a user by `userId`). How do their average lookup time complexities compare, and why does a Hash Table achieve faster lookups?",
+      "expectedSignals": [
+        "Identifies O(N) linear search for an unsorted array vs O(1) average lookup for a hash table",
+        "Explains that a hash function computes an integer bucket index directly from the key",
+        "Mentions that arrays require inspecting elements sequentially unless sorted and indexed",
+        "Acknowledges that hash collisions can occur and require resolution"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot explain how an array or hash table locates data, or confuses basic time complexity concepts.",
+        "Beginner": "Correctly states that an array is O(N) and a hash table is O(1) on average, but only states this as a memorized fact without explaining how hash functions enable direct bucket indexing.",
+        "Intermediate": "Clearly explains that a hash function transforms the key into an array index for direct memory addressing, contrasting this with sequential scanning through array elements.",
+        "Advanced": "Explains collision resolution strategies (chaining vs open addressing), load factor thresholds, memory overhead of sparse bucket arrays, and worst-case O(N) degradation under severe hash collisions."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-cf-sfia-9-software-dev"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-prog-02",
+      "roleId": "backend-developer",
+      "skillId": "programming-fundamentals",
+      "subskills": [
+        "error-exception-handling",
+        "object-oriented-design"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "In a layered web API (Controller -> Service -> Repository), a database unique-constraint violation occurs when registering a user with an existing email address. How should exceptions be propagated, translated, and logged across the layers, and what HTTP response should reach the client?",
+      "expectedSignals": [
+        "Catches persistence-specific exceptions at the repository or service boundary and maps them to a domain exception",
+        "Prevents internal database error messages, table schemas, or raw stack traces from leaking to external clients",
+        "Translates the conflict into an HTTP 409 Conflict or HTTP 422 Unprocessable Entity with a structured problem-details payload",
+        "Logs the original exception with contextual diagnostic details (e.g. correlation ID) on the server side"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests ignoring the error, catching generic Exception in the controller without handling, or returning HTTP 500 for expected validation failures.",
+        "Beginner": "Understands that a try/catch block is needed, but allows database-specific exceptions to leak directly to the client or controller.",
+        "Intermediate": "Translates the low-level database exception into a domain exception in the service layer, handled by central API middleware returning HTTP 409 Conflict without exposing internal database schemas.",
+        "Advanced": "Designs standardized error responses conforming to RFC 7807/9457 Problem Details, distinguishes client-correctable conflicts from fatal system faults, and coordinates transaction rollback."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-doc-rfc9110-http"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-prog-03",
+      "roleId": "backend-developer",
+      "skillId": "programming-fundamentals",
+      "subskills": [
+        "object-oriented-design"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "A monolithic service class contains tightly coupled `new EmailSender()` and `new S3FileUploader()` instantiations directly inside business logic methods. Explain why this violates the Dependency Inversion Principle, what maintenance and testing issues it introduces, and how you would refactor it using interfaces and dependency injection.",
+      "expectedSignals": [
+        "Defines the Dependency Inversion Principle: high-level modules should depend on abstractions, not concrete implementations",
+        "Explains the inability to write isolated unit tests without invoking real third-party network or storage infrastructure",
+        "Refactors concrete classes to interface abstractions (e.g. IEmailSender, IFileUploader)",
+        "Applies constructor injection through an Inversion of Control (IoC) container"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Does not understand dependency inversion or claims that instantiating classes directly with 'new' has no drawbacks.",
+        "Beginner": "Recognizes that 'new' causes tight coupling and makes unit testing harder, but cannot clearly outline how to refactor using interfaces or dependency injection.",
+        "Intermediate": "Explains the DIP violation, refactors concrete classes to interface abstractions (`IEmailSender`, `IFileUploader`), and applies constructor injection for mock substitution in automated tests.",
+        "Advanced": "Evaluates service lifetimes (transient, scoped, singleton) and memory implications, warns against service locator anti-patterns, and discusses interface segregation and composition over inheritance."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-cf-sfia-9-software-dev",
+        "src-ref-xunit-test-patterns"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-rest-01",
+      "roleId": "backend-developer",
+      "skillId": "rest-api",
+      "subskills": [
+        "http-semantics-idempotency",
+        "resource-modeling-contracts"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "In RESTful API design, describe the primary purpose of the GET, POST, and DELETE HTTP methods. For each method, what is the expected HTTP response status code upon successful execution, and why is GET considered a 'safe' and 'idempotent' method?",
+      "expectedSignals": [
+        "Explains GET retrieves resource representations (HTTP 200)",
+        "Explains POST creates a new resource (HTTP 201 with Location header, or 200/204)",
+        "Explains DELETE removes a resource (HTTP 200 or 204 No Content)",
+        "Defines 'safe' as producing no resource state mutation on the server, and 'idempotent' as producing the same server state when repeated"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Confuses standard HTTP methods (e.g. claiming GET modifies data or POST is used to retrieve data) or lists incorrect status codes.",
+        "Beginner": "Identifies the general purpose of GET, POST, and DELETE with basic status codes (200, 201, 204), but cannot clearly define what 'safe' or 'idempotent' means in HTTP semantics.",
+        "Intermediate": "Accurately pairs each method with its standard success code. Clearly explains that GET is safe because it does not alter server state, and idempotent because repeating it produces identical server outcomes.",
+        "Advanced": "Distinguishes safety from idempotency in depth, discusses caching implications of safe methods under RFC 9110, contrasts 200 vs 204 for DELETE, and mentions payload semantics in POST vs GET queries."
+      },
+      "frameworkSourceIds": [
+        "src-doc-rfc9110-http",
+        "src-cf-roadmap-backend"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-rest-02",
+      "roleId": "backend-developer",
+      "skillId": "rest-api",
+      "subskills": [
+        "pagination-filtering-sorting",
+        "resource-modeling-contracts"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "An API endpoint `/api/orders` returns millions of records. Compare Offset-based pagination (`?page=500&pageSize=50`) vs. Cursor-based (keyset) pagination (`?cursor=xyz&limit=50`). How do they behave under high insert frequency, and what are their database performance characteristics?",
+      "expectedSignals": [
+        "Explains that OFFSET N requires the database engine to scan and discard N rows, causing query performance to degrade at high offsets",
+        "Identifies the row-drift problem where new insertions shift records across page boundaries, causing duplicate or skipped items",
+        "Explains that Keyset/Cursor pagination uses indexed WHERE clauses (e.g. WHERE id > last_seen LIMIT 50) executing in constant time",
+        "Notes that cursor pagination prevents jumping directly to arbitrary page numbers"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests returning all records in a single payload without pagination, or fails to understand how paging queries execute.",
+        "Beginner": "Explains offset pagination with LIMIT and OFFSET, but is unaware of database scan costs at high page numbers or insertion drift.",
+        "Intermediate": "Explains that offset pagination degrades as the database scans and discards skipped rows. Explains how keyset/cursor pagination uses indexed WHERE clauses for stable, constant-time page retrieval under continuous inserts.",
+        "Advanced": "Evaluates multi-column cursor serialization (e.g. `(created_at, id)`), deterministic tie-breaking, opaque base64 cursor encoding, and trade-offs regarding random page jumping vs infinite scrolling."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-ref-ddia-kleppmann",
+        "src-cpig-slack-api-pagination"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-rest-03",
+      "roleId": "backend-developer",
+      "skillId": "rest-api",
+      "subskills": [
+        "http-semantics-idempotency",
+        "concurrency-control-etags"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "interview",
+      "question": "Explain the semantic differences between PUT and PATCH in RESTful API design. What are the idempotency rules for each method, how should a server handle concurrent partial updates to prevent the 'lost update' problem, and what role do ETags play?",
+      "expectedSignals": [
+        "PUT replaces the entire resource representation and must be idempotent",
+        "PATCH applies partial modifications and may or may not be idempotent depending on payload semantics",
+        "Identifies lost update anomalies when two clients issue concurrent updates based on stale state",
+        "Explains using ETags with If-Match conditional headers to enforce optimistic concurrency control, returning HTTP 412 Precondition Failed on conflict"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot explain the difference between PUT and PATCH or confuses them with POST.",
+        "Beginner": "States that PUT updates and PATCH partially modifies, but cannot explain idempotency guarantees or concurrent update handling.",
+        "Intermediate": "Clearly contrasts PUT idempotency with PATCH partial updates. Explains the lost update anomaly and details how ETags and `If-Match` headers enforce optimistic concurrency.",
+        "Advanced": "Analyzes JSON Merge Patch (RFC 7396) vs JSON Patch (RFC 6902), discusses side-effect handling, cache revalidation, and transactional boundary considerations on conditional updates."
+      },
+      "frameworkSourceIds": [
+        "src-doc-rfc9110-http",
+        "src-cf-roadmap-backend"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-sql-01",
+      "roleId": "backend-developer",
+      "skillId": "sql",
+      "subskills": [
+        "relational-schema-constraints",
+        "complex-queries-joins"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "You have a `Users` table and an `Orders` table linked by a foreign key `Orders.user_id = Users.id`. Explain the difference between an `INNER JOIN` and a `LEFT JOIN` when querying for users and their orders. What will be returned for a user who has never placed an order in both cases?",
+      "expectedSignals": [
+        "Explains that INNER JOIN returns only rows where a matching key exists in both tables",
+        "Explains that a user with zero orders is excluded from the INNER JOIN result set",
+        "Explains that LEFT JOIN returns all rows from the left table (Users) regardless of whether a matching order exists",
+        "Identifies that columns from the Orders table will contain NULL values for a user with zero orders in a LEFT JOIN"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Confuses INNER JOIN and LEFT JOIN or cannot describe what happens when records do not match.",
+        "Beginner": "States that INNER JOIN shows matches and LEFT JOIN shows everything from the left, but struggles to explain what values appear for non-matching columns.",
+        "Intermediate": "Accurately explains that INNER JOIN excludes users with zero orders, while LEFT JOIN includes them with NULL values for order attributes. Explains the foreign key relationship.",
+        "Advanced": "Discusses query performance implications of INNER vs LEFT joins, join elimination by query optimizers when foreign keys are non-nullable, and filtering on LEFT JOIN columns in WHERE vs ON clauses."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-cf-sfia-9-software-dev"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-ipr-leetcode-175-combine-two-tables",
+          "evidenceType": "interview-preparation-resource",
+          "supportedTopics": [
+            "sql-joins",
+            "left-join-vs-inner-join",
+            "null-handling-in-joins"
+          ],
+          "evidenceStrength": "direct",
+          "notes": "LeetCode problem #175 (Combine Two Tables) is the classic interview question testing whether a candidate correctly uses a LEFT JOIN to include entities without foreign key matches.",
+          "canonicalUrl": "https://leetcode.com/problems/combine-two-tables/",
+          "locator": "Problem #175: Combine Two Tables",
+          "verifiedAt": "2026-09-16"
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-ipr-leetcode-175-combine-two-tables"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-sql-02",
+      "roleId": "backend-developer",
+      "skillId": "sql",
+      "subskills": [
+        "indexing-execution-plans",
+        "complex-queries-joins"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "A production query joining `Orders` (10 million rows) and `OrderItems` (40 million rows) filtering on `customer_id = ?` and `order_date >= ?` takes 8 seconds. How do you use EXPLAIN / EXPLAIN ANALYZE to diagnose the bottleneck, and what index structure would you create?",
+      "expectedSignals": [
+        "Inspects the query execution plan for Sequential Scan (Full Table Scan) vs Index Scan / Index Seek",
+        "Evaluates join operator costs (Nested Loop, Hash Join, Merge Join) and row estimate accuracy",
+        "Recommends creating a composite B-Tree index on `(customer_id, order_date)`",
+        "Places the equality filter column (`customer_id`) before the range filter column (`order_date`) in the composite index definition"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests restarting the database server or adding arbitrary single-column indexes without understanding execution plans.",
+        "Beginner": "Suggests adding an index on customer_id, but cannot explain how composite indexes work or how to interpret EXPLAIN output.",
+        "Intermediate": "Uses EXPLAIN ANALYZE to identify sequential table scans. Proposes a composite B-Tree index on `(customer_id, order_date)` placing the equality predicate before the range predicate to enable index range scans.",
+        "Advanced": "Analyzes index selectivity, covering indexes (INCLUDE clause to eliminate heap table lookups), join condition foreign key indexes, statistics updates (`ANALYZE`), and write amplification tradeoffs."
+      },
+      "frameworkSourceIds": [
+        "src-doc-postgresql-explain",
+        "src-ref-ddia-kleppmann"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-sql-03",
+      "roleId": "backend-developer",
+      "skillId": "sql",
+      "subskills": [
+        "transactions-acid-isolation"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "Explain the four standard ANSI SQL transaction isolation levels. Describe the concurrency anomalies they prevent (Dirty Read, Non-Repeatable Read, Phantom Read), and explain why most production databases default to Read Committed rather than Serializable. How does Multi-Version Concurrency Control (MVCC) impact this?",
+      "expectedSignals": [
+        "Defines Read Uncommitted, Read Committed, Repeatable Read, and Serializable",
+        "Defines Dirty Read, Non-Repeatable Read, and Phantom Read concurrency anomalies",
+        "Explains that Serializable eliminates all anomalies but incurs severe lock contention or transaction abort/retry overhead",
+        "Explains that MVCC snapshot isolation allows readers to not block writers and writers to not block readers, making Read Committed practical and high-throughput"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot define ACID transactions or isolation levels.",
+        "Beginner": "Lists isolation level names but confuses them and cannot explain concurrency anomalies.",
+        "Intermediate": "Accurately defines the four isolation levels and matching anomalies. Explains why Read Committed is default in Postgres/SQL Server to balance concurrency throughput while preventing dirty reads.",
+        "Advanced": "Deeply analyzes MVCC snapshot isolation, write skew anomalies in Repeatable Read, optimistic concurrency checks, deadlock mitigation, and serialization failure retry strategies."
+      },
+      "frameworkSourceIds": [
+        "src-ref-ddia-kleppmann",
+        "src-cf-sfia-9-software-dev"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-test-01",
+      "roleId": "backend-developer",
+      "skillId": "testing",
+      "subskills": [
+        "unit-testing-assertions"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "What is a unit test, and what distinguishes it from an integration test? Describe the Arrange-Act-Assert (AAA) pattern with a simple example testing a business rule (e.g., calculating a discount or validating an age requirement).",
+      "expectedSignals": [
+        "Defines a unit test as verifying a small, isolated piece of business logic entirely in memory without real network or database calls",
+        "Distinguishes integration tests as verifying multiple integrated components, frameworks, or external persistence boundaries",
+        "Explains the Arrange phase: preparing test inputs, dependencies, and expected outcomes",
+        "Explains the Act phase (executing the target method) and Assert phase (verifying output or state matches expectations)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot define a unit test or claims unit testing requires running against a live database and web server.",
+        "Beginner": "Defines unit test vaguely as testing code, but struggles to articulate the AAA pattern or cannot distinguish unit from integration testing.",
+        "Intermediate": "Clearly distinguishes fast in-memory unit tests from integration tests that verify external dependencies. Details Arrange (setup), Act (execution), Assert (verification) with a clear example.",
+        "Advanced": "Discusses test isolation, single-concept assertion principles, deterministic test execution, readability as living documentation, and avoiding implementation coupling in assertions."
+      },
+      "frameworkSourceIds": [
+        "src-ref-xunit-test-patterns",
+        "src-cf-roadmap-backend"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-test-02",
+      "roleId": "backend-developer",
+      "skillId": "testing",
+      "subskills": [
+        "test-doubles-mocking",
+        "unit-testing-assertions"
+      ],
+      "difficulty": "applied",
+      "questionType": "interview",
+      "question": "When unit testing an OrderProcessingService that interacts with an external PaymentGateway and an InventoryRepository, distinguish between a Mock, a Stub, and a Fake. How would you test that a payment is never charged if the inventory reservation fails?",
+      "expectedSignals": [
+        "Defines Stub (provides canned responses), Mock (verifies behavioral interactions/call counts), and Fake (working in-memory implementation)",
+        "Isolates the external payment gateway using a test double interface",
+        "Simulates inventory failure (e.g. InsufficientInventoryException) and asserts zero calls to payment charge (`mock.Verify(x => x.Charge(...), Times.Never())`)",
+        "Asserts state consistency and error propagation"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests running unit tests against real live third-party payment endpoints or cannot explain test doubles.",
+        "Beginner": "Uses the word 'mock' for all test doubles without distinguishing state verification from behavior verification.",
+        "Intermediate": "Accurately distinguishes Stubs (canned inputs) from Mocks (interaction verification). Simulates inventory failure and uses a mock to verify payment was never charged.",
+        "Advanced": "Critiques over-mocking and test fragility, demonstrates Fake in-memory repositories for state-based verification, and tests idempotency key propagation."
+      },
+      "frameworkSourceIds": [
+        "src-ref-xunit-test-patterns",
+        "src-cf-roadmap-backend"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-test-03",
+      "roleId": "backend-developer",
+      "skillId": "testing",
+      "subskills": [
+        "test-determinism-flakiness",
+        "integration-testing"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "Your continuous integration (CI) pipeline fails randomly 10% of the time due to 'flaky' integration tests that pass when re-run. What are the common root causes of test non-determinism in backend test suites (e.g., shared state, timing races, time zones), and how do you systematically eliminate them?",
+      "expectedSignals": [
+        "Identifies shared mutable database or cache state between parallel test cases",
+        "Identifies reliance on real clock time (`DateTime.Now` or arbitrary `sleep` calls) causing timing race conditions",
+        "Identifies uncontrolled execution order dependencies between test suites",
+        "Proposes solutions: per-test schema isolation or transaction rollbacks, deterministic time provider abstractions, and polling condition assertions instead of sleeps"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests setting CI to automatically retry failed tests 5 times without fixing root causes.",
+        "Beginner": "Attributes flakiness vaguely to 'slow network' or adds arbitrary `sleep(5000)` pauses to tests.",
+        "Intermediate": "Identifies shared state contamination and timing race conditions. Replaces arbitrary sleeps with polling condition assertions and enforces per-test database cleanup or unique test tenant identifiers.",
+        "Advanced": "Implements deterministic time providers, parallel test execution isolation (per-worker database schemas or Testcontainers), mock server determinism, and establishes zero-tolerance flaky test quarantine pipelines."
+      },
+      "frameworkSourceIds": [
+        "src-ref-xunit-test-patterns",
+        "src-cf-sfia-9-software-dev"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-auth-01",
+      "roleId": "backend-developer",
+      "skillId": "authentication-security",
+      "subskills": [
+        "authorization-rbac-abac",
+        "owasp-api-security"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "Explain the fundamental difference between Authentication and Authorization. Why should passwords never be stored in plain text or hashed with fast general-purpose algorithms like MD5 or SHA-256, and what kind of hashing algorithm should be used instead?",
+      "expectedSignals": [
+        "Defines Authentication as verifying identity (who you are) and Authorization as verifying permissions (what you are allowed to do)",
+        "Explains that fast hash functions (MD5, SHA-256) allow attackers to test billions of candidates per second using modern GPUs",
+        "Explains that rainbow tables precompute hashes for common passwords unless unique random salts are used",
+        "Recommends adaptive, slow key derivation functions with configurable work factors (e.g. bcrypt, Argon2, PBKDF2)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Confuses authentication with authorization, or suggests storing passwords in plain text or using reversible encryption.",
+        "Beginner": "States authentication is login and authorization is permissions, but does not understand why fast algorithms like MD5/SHA-256 are dangerous for passwords.",
+        "Intermediate": "Accurately contrasts identity verification (AuthN) with permission checks (AuthZ). Explains that fast hashing allows billions of GPU guesses per second and recommends adaptive, salted algorithms like bcrypt or Argon2.",
+        "Advanced": "Discusses work factor / cost parameter tuning to resist hardware advances, explains salting preventing rainbow table lookups, and mentions pepper/KMS defense-in-depth strategies."
+      },
+      "frameworkSourceIds": [
+        "src-doc-owasp-api-security",
+        "src-cf-roadmap-backend"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-auth-02",
+      "roleId": "backend-developer",
+      "skillId": "authentication-security",
+      "subskills": [
+        "authorization-rbac-abac",
+        "owasp-api-security"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "A medical record API endpoint `GET /api/patients/{patientId}/records` must ensure that only the assigned primary physician or an emergency room doctor with an active hospital shift can access patient data. Compare implementing this using Role-Based Access Control (RBAC) vs. Attribute-Based Access Control (ABAC). Which approach is appropriate, and how is it implemented?",
+      "expectedSignals": [
+        "Explains RBAC limitations: static role `Doctor` is too coarse because doctors should not see patients they are not treating",
+        "Defines ABAC: evaluates subject attributes (doctor ID, shift status), resource attributes (patient ID, assigned physician ID), and environment attributes (shift status)",
+        "Implements policy-based evaluation at the service or data query filter level",
+        "Explains preventing Broken Object Level Authorization (BOLA/IDOR)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests granting access to any authenticated user with a valid login.",
+        "Beginner": "Suggests creating custom roles for every patient-doctor pairing in RBAC, causing role explosion.",
+        "Intermediate": "Identifies that static RBAC cannot evaluate relationship context. Proposes ABAC / policy-based authorization checking `doctor.id == patient.primaryDoctorId OR (doctor.isER && doctor.activeShift)`.",
+        "Advanced": "Implements policy enforcement points (PEP) and policy decision points (PDP), evaluates database-level predicate pushdown (multi-tenancy filters in SQL WHERE clauses), and logs authorization audit trails."
+      },
+      "frameworkSourceIds": [
+        "src-doc-owasp-api-security",
+        "src-cf-sfia-9-software-dev"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-auth-03",
+      "roleId": "backend-developer",
+      "skillId": "authentication-security",
+      "subskills": [
+        "jwt-token-lifecycle",
+        "token-revocation-logout"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "How does stateless JSON Web Token (JWT) authentication work in a web API? Explain the roles of header, payload, and signature. What is the inherent architectural challenge of revoking a stateless token before expiration, and how do production systems solve this without negating the performance benefits of statelessness?",
+      "expectedSignals": [
+        "Explains three parts of JWT: Base64URL-encoded Header (algorithm), Payload (claims), Signature (cryptographic hash)",
+        "Explains signature verification with secret key (symmetric HMAC) or public key (asymmetric RSA/ECDSA) without database query",
+        "Explains inherent challenge: tokens remain valid until expiry even if user permissions change or logout occurs",
+        "Proposes revocation strategies: short-lived access tokens (e.g. 15m) paired with rotatable refresh tokens stored in Redis/DB, or an in-memory token blocklist"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Claims JWTs are encrypted passwords or believes the server must query the database to validate every stateless signature.",
+        "Beginner": "Knows JWT contains claims, but cannot explain signature verification or how logout/revocation works.",
+        "Intermediate": "Explains cryptographic signature verification preventing tampering. Outlines dual-token strategy: short-lived access tokens (10-15 mins) with revokable refresh tokens stored in persistent store.",
+        "Advanced": "Evaluates asymmetric key rotation (JWKS endpoints), distributed revocation lists in Redis, mitigating token replay attacks through refresh token family rotation, and security considerations against algorithm 'none'."
+      },
+      "frameworkSourceIds": [
+        "src-doc-rfc7519-jwt",
+        "src-doc-owasp-api-security"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-sys-01",
+      "roleId": "backend-developer",
+      "skillId": "system-design",
+      "subskills": [
+        "stateless-service-scaling"
+      ],
+      "difficulty": "foundation",
+      "questionType": "knowledge",
+      "question": "Explain the difference between Vertical Scaling (scaling up) and Horizontal Scaling (scaling out) for a backend application. Why is it easier to scale out a stateless web server than a relational database?",
+      "expectedSignals": [
+        "Vertical scaling adds more CPU, RAM, or faster disk to a single machine; constrained by hardware limits and single point of failure",
+        "Horizontal scaling adds more machine instances behind a load balancer",
+        "Stateless web servers maintain no client session state in process memory, allowing any request to be routed to any instance",
+        "Relational databases maintain mutable persistent state, requiring complex data replication, consistency synchronization, and write coordination across nodes"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Cannot define vertical or horizontal scaling, or claims adding servers is trivial for all software components.",
+        "Beginner": "States vertical is bigger machine and horizontal is more machines, but cannot clearly explain why databases are harder to scale than web servers.",
+        "Intermediate": "Accurately contrasts hardware boundaries of vertical scaling with horizontal scale-out. Explains that stateless web servers route requests arbitrarily without synchronization, whereas databases must synchronize state, transactions, and locks.",
+        "Advanced": "Discusses cost curves of commodity hardware vs high-end hardware, database sharding and replica synchronization lag, session externalization (Redis/JWT), and auto-scaling triggers."
+      },
+      "frameworkSourceIds": [
+        "src-cf-roadmap-backend",
+        "src-ref-ddia-kleppmann"
+      ],
+      "interviewEvidence": [
+        {
+          "sourceId": "src-ipr-system-design-primer",
+          "evidenceType": "interview-preparation-resource",
+          "supportedTopics": [
+            "vertical-vs-horizontal-scaling",
+            "stateless-web-tier",
+            "database-scaling-limits"
+          ],
+          "evidenceStrength": "direct",
+          "notes": "The System Design Primer explicitly structures interview prep around vertical vs horizontal scaling trade-offs and the stateless application tier.",
+          "canonicalUrl": "https://github.com/donnemartin/system-design-primer#horizontal-scaling",
+          "locator": "Section: Load balancer -> Horizontal scaling",
+          "verifiedAt": "2026-09-16"
+        }
+      ],
+      "interviewEvidenceIds": [
+        "src-ipr-system-design-primer"
+      ],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "interview-practice-supported"
+    },
+    {
+      "id": "q-be-sys-02",
+      "roleId": "backend-developer",
+      "skillId": "system-design",
+      "subskills": [
+        "caching-patterns",
+        "resilience-fault-tolerance"
+      ],
+      "difficulty": "applied",
+      "questionType": "practical_case",
+      "question": "A product catalog service experiences high read latency during flash sales. Describe the Cache-Aside pattern, explain the 'Thundering Herd' (Cache Stampede) problem when a popular cache key expires, and propose two technical mitigations.",
+      "expectedSignals": [
+        "Defines Cache-Aside: application reads from cache first; on miss, reads from DB and populates cache before returning",
+        "Defines Cache Stampede: concurrent requests hit cache miss simultaneously upon key expiration, all querying the database at once and overwhelming it",
+        "Mitigation 1: Distributed mutex / locking (only one worker queries DB while others wait or retry)",
+        "Mitigation 2: Probabilistic early expiration (XFetch algorithm) or background refresh before actual TTL expiry"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Suggests removing caching entirely or cannot explain what happens when a cache key expires.",
+        "Beginner": "Explains cache-aside, but does not recognize that simultaneous requests can take down the database when a key expires.",
+        "Intermediate": "Accurately details cache-aside and the thundering herd phenomenon. Proposes mutex locking (e.g. Redlock / local locks) and adding jitter/randomization to TTLs to prevent synchronized expiration.",
+        "Advanced": "Implements probabilistic early recomputation (XFetch), background asynchronous worker refreshing, stale-while-revalidate serving, and soft vs hard TTL policies."
+      },
+      "frameworkSourceIds": [
+        "src-ref-ddia-kleppmann",
+        "src-ref-google-sre-book",
+        "src-cpig-meta-scaling-memcache"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    },
+    {
+      "id": "q-be-sys-03",
+      "roleId": "backend-developer",
+      "skillId": "system-design",
+      "subskills": [
+        "rate-limiting-throttling",
+        "stateless-service-scaling"
+      ],
+      "difficulty": "advanced-reasoning",
+      "questionType": "reasoning",
+      "question": "Design a distributed rate-limiting system for a public API that receives 50,000 requests per second across 20 web server instances. Explain which algorithm (Token Bucket vs. Sliding Window Counter) you would choose, how Redis is used, and how your system behaves if the Redis cluster becomes temporarily unavailable.",
+      "expectedSignals": [
+        "Evaluates Token Bucket (burst tolerance) vs Sliding Window Counter (accurate boundary limits without memory explosion)",
+        "Stores rate limit counters in centralized distributed store (Redis) with atomic increments or Lua scripts",
+        "Returns standard HTTP 429 Too Many Requests with Retry-After and X-RateLimit headers",
+        "Addresses failure mitigation: fail-open (allow traffic to preserve core business availability) vs fail-closed (block traffic to prevent backend overload)"
+      ],
+      "rubric": {
+        "Insufficient Evidence": "Proposes maintaining static local variables inside each web server without coordinating across instances.",
+        "Beginner": "Suggests using Redis but uses non-atomic multi-step read-then-write operations subject to race conditions, and has no plan for cache outages.",
+        "Intermediate": "Chooses sliding window or token bucket with atomic Redis Lua script operations. Outlines client key identification (API key or IP) and establishes clear fail-open policy during Redis outages.",
+        "Advanced": "Analyzes Redis cluster sharding by client key, network round-trip overhead (local memory batching + async Redis synchronization), tiered rate limits (anonymous vs tier-1 customers), and noisy neighbor mitigation."
+      },
+      "frameworkSourceIds": [
+        "src-ref-google-sre-book",
+        "src-ref-ddia-kleppmann",
+        "src-cpig-stripe-rate-limiters"
+      ],
+      "interviewEvidence": [],
+      "interviewEvidenceIds": [],
+      "provenance": "skillproof-curated",
+      "verificationStatus": "framework-supported-only"
+    }
+  ]
+}

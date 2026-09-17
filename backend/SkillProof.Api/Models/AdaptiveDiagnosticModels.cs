@@ -5,8 +5,9 @@ namespace SkillProof.Api.Models;
 
 public record AdaptiveSessionRequest(
     string RoleId,
-    List<string> SelectedSkillIds,
-    string? PrimaryLanguageId = null
+    List<string>? SelectedSkillIds = null,
+    string? PrimaryLanguageId = null,
+    bool? IncludeMandatoryFundamentals = null
 );
 
 public record AdaptiveAnswerRequest(
@@ -80,6 +81,31 @@ public record RoadmapHandoffContract(
     List<RoadmapSkillGapInput> SkillGaps
 );
 
+public record SkillMatrixItemDto(
+    string CanonicalSkillId,
+    string SkillName,
+    string Category,
+    bool IsMandatoryFundamental,
+    string OverallStatus, // "Advanced" | "Intermediate" | "Beginner" | "Insufficient Evidence" | "Not Assessed"
+    string FundamentalsDimension, // "Demonstrated" | "Emerging" | "Insufficient Evidence" | "Not Assessed"
+    string AppliedDimension, // "Demonstrated" | "Emerging" | "Insufficient Evidence" | "Not Assessed"
+    string ReasoningDimension, // "Demonstrated" | "Emerging" | "Insufficient Evidence" | "Not Assessed"
+    string GapType, // "ASSESSED GAP" | "EVIDENCE GAP" | "ROLE COVERAGE GAP" | "NONE"
+    List<string> EvidenceObserved,
+    string WhyThisLevel,
+    List<string> WhatToImproveNext
+);
+
+public record PostAnswerExplanationDto(
+    string QuestionId,
+    string SkillId,
+    string SkillName,
+    string EvaluatedLevel,
+    List<string> WhatYouCovered,
+    List<string> WhatCouldBeStronger,
+    string ReferenceExplanation
+);
+
 public record CareerReadinessProfile(
     string RoleId,
     string AssessmentType,
@@ -87,7 +113,8 @@ public record CareerReadinessProfile(
     ProfileSummaryDto Summary,
     List<SkillProfileItemDto> Skills,
     List<string> TopGaps,
-    RoadmapHandoffContract RoadmapInput
+    RoadmapHandoffContract RoadmapInput,
+    List<SkillMatrixItemDto>? SkillMatrix = null
 );
 
 public record AdaptiveSessionResponse(
@@ -99,7 +126,8 @@ public record AdaptiveSessionResponse(
     List<AdaptiveSkillResultDto>? Skills,
     List<string>? TopGaps,
     List<string> UnsupportedSkillIds,
-    CareerReadinessProfile? Profile = null
+    CareerReadinessProfile? Profile = null,
+    PostAnswerExplanationDto? LastExplanation = null
 );
 
 public class SkillAssessmentState
@@ -153,6 +181,10 @@ public class DiagnosticSessionState
     public RoadmapResponse? Roadmap { get; set; }
     public GapBasedProjectDto? Project { get; set; }
     public ProjectEvaluationDto? ProjectEvaluation { get; set; }
+
+    public PostAnswerExplanationDto? LastExplanation { get; set; }
+    public bool AwaitingNextQuestion { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

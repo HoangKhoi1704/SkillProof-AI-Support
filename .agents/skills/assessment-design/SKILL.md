@@ -1,65 +1,57 @@
 ---
 name: assessment-design
-description: Designs SkillProof career-readiness assessments using role competencies, realistic interview-style questions, practical cases, reasoning prompts, rubrics, and source-verification rules.
+description: Designs SkillProof career-readiness assessments using role competencies, realistic interview-style questions, practical cases, reasoning prompts, rubrics, and strict provenance verification rules.
 ---
 
 # Assessment Design Skill
 
-Use this skill when creating or reviewing SkillProof diagnostic tests.
+Use this skill when creating, auditing, or reviewing SkillProof diagnostic questions, skills, and assessment data.
 
 ## Goal
-Create a career-readiness test that evaluates real job readiness rather than only academic recall.
+Create a career-readiness assessment that evaluates real job readiness and practical reasoning rather than academic trivia, anchored by verifiable provenance.
 
 ## Core Flow
 ```text
-Target Role
-→ Competency
-→ Interview / Case Question
-→ Rubric
-→ Expected Evidence
-→ Skill Level
+Canonical Role (roadmap.sh)
+→ Competency / Skill
+→ Question (Knowledge / Interview / Practical Case / Reasoning)
+→ Rubric (Insufficient Evidence, Beginner, Intermediate, Advanced)
+→ Expected Signals & Evidence
+→ Provenance Gate (Source Inspected + Locator + Claim Verified)
 ```
 
-## Procedure
+## Anti-Hallucination & Provenance Protocol
 
-### 1. Read Source Files
-Read the authoritative source files in `docs/`: `00_SOURCE_OF_TRUTH_SKILLPROOF.md`, `01_IMPLEMENTATION_SPEC_SKILLPROOF.md`, `03_MULTI_AGENT_SOURCE_WORKFLOW_SKILLPROOF.md`, `04_DOCUMENTATION_AUDIT_CHECKLIST.md`, and `05_CURATED_SEED_QUESTIONS_SKILLPROOF.md`.
+When anchoring questions or skills to external sources, adhere strictly to the **Provenance Gate**:
 
-### 2. Select Role Competencies
-Prototype roles: Backend Developer (`backend-developer`) and Financial Analyst (`financial-analyst`). Only assess competencies defined in the project source of truth/spec.
+1. **Source Discovery**: Search engines and directory listings are discovery evidence only. A snippet or search title MUST NOT be used as proof that a source supports a claim.
+2. **Source Inspection**: The source must be opened and its actual accessible content inspected.
+3. **Locator Identification**: A specific chapter, heading, section anchor, or problem ID must be recorded.
+4. **Claim Verification**: The inspected content must directly support the question's validity or interview practice claim.
+5. **Audit Metadata**: `verifiedAt`, `canonicalUrl`, and `locator` are required for claim-verified evidence.
 
-### 3. Choose Question Type
-Use a mix of Knowledge, Interview, Practical Case, and Reasoning questions.
+### Prohibited Practices
+- **No model-memory citations**: Never reconstruct quotations, page numbers, or interview claims from AI memory.
+- **No title/reputation inference**: A book or author's reputation does not prove that a specific technical claim was verified.
+- **No false company attribution**: Do not claim "Amazon/Google asks this" without direct, verifiable evidence from accessible company guidance.
+- **No URL-exists assumption**: A working URL does not prove that the underlying content supports the attributed claim.
+- **No textbook content verification claims**: Books like DDIA are catalogued as `reference-only` professional references; do not claim full-text inspection without authorized accessible sources.
 
-### 4. Create Realistic Questions
-Questions should reflect common hiring expectations, realistic workplace situations, practical problem solving, explanation ability, and role-specific reasoning. Avoid trivia.
+## Role & Framework Taxonomy
 
-### 5. Source Rules
-If a question is claimed to come from a real company/interview/published dataset, store a verifiable source. Otherwise mark `[source not verified - unverified]`.
+### Canonical Role Foundation (V2 Target)
+- Canonical role sources:
+  - `https://roadmap.sh/frontend` (Frontend Developer)
+  - `https://roadmap.sh/backend` (Backend Developer)
+  - `https://roadmap.sh/data-analyst` (Data Analyst)
+- Roadmap.sh is the canonical foundation for role skill requirements, prerequisite topologies, and learning paths.
+- **Questions map INTO canonical skills**: The canonical taxonomy must not mutate merely to fit available interview questions.
+- **AI must not invent canonical skills or nodes**: Internal slugs may be normalized, but nodes must trace to real roadmap.sh elements.
 
-### 6. Define Rubric
-Every question must have a backend evaluation rubric using ONLY: Beginner, Intermediate, Advanced, Insufficient Evidence.
-> **Privacy Invariant**: Rubrics are backend-only evaluation data and must NEVER be exposed in public question DTOs.
+### Assessment Semantics
+- Qualitative tiers: **`Insufficient Evidence`**, **`Beginner`**, **`Intermediate`**, **`Advanced`**.
+- **`Not Assessed` is a distinct state**: Unassessed skills must NEVER silently become `Beginner`, `failed`, or `0%`. Lack of assessment evidence is not proof of lack of skill.
+- **Mandatory Fundamentals**: Roles must assess appropriate fundamentals (OOP, SOLID, basic DSA, complexity/Big-O, runtime memory) alongside practical scenarios.
 
-Example:
-```text
-Competency: Financial Modeling
-Question: How would you build a 3-year revenue forecast?
-Beginner: generic answer, no clear assumptions or drivers.
-Intermediate: uses historical trend, assumptions, and key revenue drivers.
-Advanced: adds scenarios/sensitivity and links forecast to broader financial statements.
-Insufficient Evidence: empty, irrelevant, or too vague.
-```
-
-### 7. Define Expected Evidence
-Specify what evidence in the answer would support each level.
-
-### 8. Keep the Prototype Short
-Use 5–8 questions per role for the MVP (curated in `docs/05_CURATED_SEED_QUESTIONS_SKILLPROOF.md`).
-
-### 9. Review Assessment Quality
-Each question must map to one primary competency, have a clear rubric, and be job-relevant.
-
-## Output Format
-Prefer structured definitions with role, competency, type, question, rubric (backend only), sourceType, and sourceReference.
-
+### Privacy Invariant
+- Expected signals and scoring rubrics are backend-only evaluation data and must **NEVER** be exposed in public question DTOs to candidate browsers.

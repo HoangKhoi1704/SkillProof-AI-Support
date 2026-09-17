@@ -1,0 +1,160 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SkillProof V3 Roadmap Graph Relationships",
+  "version": "3.0.0",
+  "description": "Approved structural edges and pedagogical sequences connecting canonical competencies across roadmap topologies.",
+  "relationships": [
+    {
+      "id": "rel-fe-http-to-html",
+      "roleId": "frontend-developer",
+      "sourceSkillId": "shared.internet-http",
+      "targetSkillId": "frontend.html-core",
+      "relationType": "recommended-before",
+      "description": "Understanding internet protocols before markup rendering"
+    },
+    {
+      "id": "rel-fe-html-to-css",
+      "roleId": "frontend-developer",
+      "sourceSkillId": "frontend.html-core",
+      "targetSkillId": "frontend.css-styling",
+      "relationType": "recommended-before",
+      "description": "Structuring documents before applying visual layout styles"
+    },
+    {
+      "id": "rel-fe-html-to-js",
+      "roleId": "frontend-developer",
+      "sourceSkillId": "frontend.html-core",
+      "targetSkillId": "shared.javascript",
+      "relationType": "recommended-before",
+      "description": "Understanding DOM structure before applying dynamic JavaScript behaviors"
+    },
+    {
+      "id": "rel-fe-js-to-ts",
+      "roleId": "frontend-developer",
+      "sourceSkillId": "shared.javascript",
+      "targetSkillId": "frontend.typescript",
+      "relationType": "recommended-before",
+      "description": "Mastering dynamic JavaScript semantics before applying static typing"
+    },
+    {
+      "id": "rel-fe-js-to-react",
+      "roleId": "frontend-developer",
+      "sourceSkillId": "shared.javascript",
+      "targetSkillId": "frontend.framework-react",
+      "relationType": "prerequisite",
+      "description": "JavaScript language fundamentals required before component frameworks"
+    },
+    {
+      "id": "rel-fe-js-to-vue",
+      "roleId": "frontend-developer",
+      "sourceSkillId": "shared.javascript",
+      "targetSkillId": "frontend.framework-vue",
+      "relationType": "prerequisite",
+      "description": "JavaScript language fundamentals required before component frameworks"
+    },
+    {
+      "id": "rel-fe-js-to-angular",
+      "roleId": "frontend-developer",
+      "sourceSkillId": "shared.javascript",
+      "targetSkillId": "frontend.framework-angular",
+      "relationType": "prerequisite",
+      "description": "JavaScript language fundamentals required before component frameworks"
+    },
+    {
+      "id": "rel-fe-js-to-svelte",
+      "roleId": "frontend-developer",
+      "sourceSkillId": "shared.javascript",
+      "targetSkillId": "frontend.framework-svelte",
+      "relationType": "prerequisite",
+      "description": "JavaScript language fundamentals required before component frameworks"
+    },
+    {
+      "id": "rel-be-http-to-rest",
+      "roleId": "backend-developer",
+      "sourceSkillId": "shared.internet-http",
+      "targetSkillId": "backend.rest-apis",
+      "relationType": "prerequisite",
+      "description": "HTTP protocol semantics prerequisite for REST interface contracts"
+    },
+    {
+      "id": "rel-be-rdbms-to-caching",
+      "roleId": "backend-developer",
+      "sourceSkillId": "backend.relational-databases",
+      "targetSkillId": "backend.caching",
+      "relationType": "recommended-before",
+      "description": "Primary relational persistence studied before in-memory caching layers"
+    },
+    {
+      "id": "rel-be-rdbms-to-nosql",
+      "roleId": "backend-developer",
+      "sourceSkillId": "backend.relational-databases",
+      "targetSkillId": "backend.nosql-databases",
+      "relationType": "recommended-before",
+      "description": "ACID relational databases studied before non-relational eventual consistency"
+    },
+    {
+      "id": "rel-be-sys-to-resilience",
+      "roleId": "backend-developer",
+      "sourceSkillId": "backend.system-design",
+      "targetSkillId": "backend.resilience-patterns",
+      "relationType": "recommended-before",
+      "description": "Distributed architecture basics studied before advanced throttling and circuit breakers"
+    },
+    {
+      "id": "rel-da-foundations-to-sheets",
+      "roleId": "data-analyst",
+      "sourceSkillId": "data-analyst.foundations",
+      "targetSkillId": "data-analyst.spreadsheets",
+      "relationType": "recommended-before",
+      "description": "Analytics taxonomy studied before spreadsheet modeling"
+    },
+    {
+      "id": "rel-da-sheets-to-sql",
+      "roleId": "data-analyst",
+      "sourceSkillId": "data-analyst.spreadsheets",
+      "targetSkillId": "shared.sql",
+      "relationType": "recommended-before",
+      "description": "Tabular formula operations studied before relational SQL queries"
+    },
+    {
+      "id": "rel-da-sql-to-wrangling",
+      "roleId": "data-analyst",
+      "sourceSkillId": "shared.sql",
+      "targetSkillId": "data-analyst.data-wrangling",
+      "relationType": "recommended-before",
+      "description": "Database query extraction studied before Pandas/dplyr data wrangling"
+    },
+    {
+      "id": "rel-da-wrangling-to-eda",
+      "roleId": "data-analyst",
+      "sourceSkillId": "data-analyst.data-wrangling",
+      "targetSkillId": "data-analyst.eda",
+      "relationType": "recommended-before",
+      "description": "Data cleaning and transformation studied before exploratory analysis"
+    },
+    {
+      "id": "rel-da-eda-to-stats",
+      "roleId": "data-analyst",
+      "sourceSkillId": "data-analyst.eda",
+      "targetSkillId": "data-analyst.statistics",
+      "relationType": "recommended-before",
+      "description": "Visual data exploration studied before inferential statistics and hypothesis testing"
+    },
+    {
+      "id": "rel-da-stats-to-bi",
+      "roleId": "data-analyst",
+      "sourceSkillId": "data-analyst.statistics",
+      "targetSkillId": "data-analyst.bi-dashboards",
+      "relationType": "recommended-before",
+      "description": "Statistical modeling and metrics studied before executive dashboard design"
+    },
+    {
+      "id": "rel-da-stats-to-vis",
+      "roleId": "data-analyst",
+      "sourceSkillId": "data-analyst.statistics",
+      "targetSkillId": "data-analyst.visualization",
+      "relationType": "recommended-before",
+      "description": "Statistical distributions studied before choosing chart encodings"
+    }
+  ]
+}

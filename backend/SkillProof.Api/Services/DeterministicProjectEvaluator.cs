@@ -4,6 +4,10 @@ namespace SkillProof.Api.Services;
 
 public class DeterministicProjectEvaluator : IProjectEvaluator
 {
+    private readonly IRepositoryEvidenceVerifier _repoVerifier;
+    private readonly IDeploymentEvidenceVerifier _deployVerifier;
+    private readonly IDataAnalystEvidenceVerifier _daVerifier;
+
     private static readonly Dictionary<string, string[]> SkillKeywordSignals =
         new(StringComparer.OrdinalIgnoreCase)
         {
@@ -25,7 +29,18 @@ public class DeterministicProjectEvaluator : IProjectEvaluator
             ["rust"] = new[] { "rust", "borrow", "ownership", "tokio", "async", "result", "crate" }
         };
 
-    public Task<ProjectEvaluationDto> EvaluateAsync(
+    public DeterministicProjectEvaluator(
+        IRepositoryEvidenceVerifier? repoVerifier = null,
+        IDeploymentEvidenceVerifier? deployVerifier = null,
+        IDataAnalystEvidenceVerifier? daVerifier = null)
+    {
+        var urlValidator = new UrlSafetyValidator();
+        _repoVerifier = repoVerifier ?? new RepositoryEvidenceVerifier(urlValidator);
+        _deployVerifier = deployVerifier ?? new DeploymentEvidenceVerifier(urlValidator);
+        _daVerifier = daVerifier ?? new DataAnalystEvidenceVerifier(urlValidator);
+    }
+
+    public async Task<ProjectEvaluationDto> EvaluateAsync(
         GapBasedProjectDto project,
         SubmitProjectEvidenceRequest request,
         CancellationToken cancellationToken = default)
@@ -33,104 +48,302 @@ public class DeterministicProjectEvaluator : IProjectEvaluator
         if (project == null) throw new ArgumentNullException(nameof(project));
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        var combinedEvidence = string.Join(" ", new[]
+        // 1. Execute layered deterministic verifiers
+        RepositoryEvidenceResult? repoResult = null;
+        if (!string.IsNullOrWhiteSpace(request.RepositoryUrl))
+        {
+            repoResult = await _repoVerifier.VerifyRepositoryAsync(request.RepositoryUrl, cancellationToken);
+        }
+
+        DeploymentEvidenceResult? deployResult = null;
+        if (!string.IsNullOrWhiteSpace(request.DeployedUrl))
+        {
+            deployResult = await _deployVerifier.VerifyDeploymentAsync(request.DeployedUrl, project.RoleId, cancellationToken);
+        }
+
+        DataAnalystEvidenceResult? daResult = null;
+        if (!string.IsNullOrWhiteSpace(request.NotebookUrl) ||
+            !string.IsNullOrWhiteSpace(request.DatasetUrl) ||
+            !string.IsNullOrWhiteSpace(request.DashboardUrl) ||
+            project.RoleId.Equals("data-analyst", StringComparison.OrdinalIgnoreCase))
+        {
+            daResult = await _daVerifier.VerifyDataAnalystEvidenceAsync(
+                request.NotebookUrl,
+                request.DatasetUrl,
+                request.DashboardUrl,
+                request.Notes,
+                cancellationToken
+            );
+        }
+
+        // Composite artifacts list & security warnings
+        var artifacts = new List<VerificationArtifactItem>();
+        var securityWarnings = new List<string>();
+
+        if (repoResult != null)
+        {
+            securityWarnings.AddRange(repoResult.SecurityWarnings);
+            artifacts.Add(new VerificationArtifactItem(
+                EvidenceId: $"ev-repo-{Guid.NewGuid():N}"[..12],
+                Type: EvidenceType.Repository,
+                Status: repoResult.Status,
+                SourceLocation: request.RepositoryUrl ?? "Repository",
+                Summary: repoResult.RepositoryExists
+                    ? $"Observed repository with {repoResult.FoundFiles.Count} verified files (branch: {repoResult.DefaultBranch})."
+                    : (repoResult.ErrorMessage ?? "Repository could not be verified."),
+                VerifiedAt: DateTimeOffset.UtcNow
+            ));
+        }
+
+        if (deployResult != null)
+        {
+            artifacts.Add(new VerificationArtifactItem(
+                EvidenceId: $"ev-dep-{Guid.NewGuid():N}"[..12],
+                Type: EvidenceType.Deployment,
+                Status: deployResult.Status,
+                SourceLocation: request.DeployedUrl ?? "Deployment",
+                Summary: deployResult.IsReachable
+                    ? $"Deployed application verified reachable (HTTP {deployResult.StatusCode}, {deployResult.ContentType})."
+                    : (deployResult.ErrorMessage ?? "Deployment unreachable."),
+                VerifiedAt: DateTimeOffset.UtcNow
+            ));
+        }
+
+        if (daResult != null && (daResult.NotebookFound || daResult.DatasetFound || daResult.DashboardReachable))
+        {
+            artifacts.Add(new VerificationArtifactItem(
+                EvidenceId: $"ev-da-{Guid.NewGuid():N}"[..12],
+                Type: daResult.NotebookFound ? EvidenceType.Notebook : (daResult.DashboardReachable ? EvidenceType.Dashboard : EvidenceType.Dataset),
+                Status: daResult.Status,
+                SourceLocation: request.NotebookUrl ?? request.DashboardUrl ?? "Analytics Workspace",
+                Summary: daResult.NotesSummary ?? "Data analytics evidence artifacts verified.",
+                VerifiedAt: DateTimeOffset.UtcNow
+            ));
+        }
+
+        var compositeReport = new CompositeEvidenceReport(
+            Repository: repoResult,
+            Deployment: deployResult,
+            DataAnalyst: daResult,
+            Artifacts: artifacts,
+            SecurityWarnings: securityWarnings
+        );
+
+        // 2. Text evidence fallback for legacy backward compatibility
+        var combinedTextEvidence = string.Join(" ", new[]
         {
             request.ProjectSummary,
             request.ImplementationExplanation,
             request.ArchitectureDecisions,
             request.TestingExplanation,
+            request.Notes,
             string.Join(" ", request.EvidenceExcerpts ?? new List<string>())
-        }).Trim();
+        }.Where(s => !string.IsNullOrWhiteSpace(s))).Trim();
 
-        var skillEvidenceResults = new List<SkillEvidenceResultDto>();
+        bool hasStructuredVerifiedEvidence =
+            (repoResult != null && repoResult.Status == VerificationState.Verified) ||
+            (deployResult != null && deployResult.Status == VerificationState.Verified) ||
+            (daResult != null && daResult.Status == VerificationState.Verified);
+
+        bool hasFailedOrInvalidEvidence =
+            (repoResult != null && repoResult.Status == VerificationState.Invalid) ||
+            (deployResult != null && deployResult.Status == VerificationState.Invalid) ||
+            (daResult != null && daResult.Status == VerificationState.Invalid) ||
+            (repoResult != null && repoResult.Status == VerificationState.Unavailable && string.IsNullOrWhiteSpace(combinedTextEvidence));
+
         var requirementResults = new List<RequirementEvaluationResultDto>();
+        var skillEvidenceResults = new List<SkillEvidenceResultDto>();
         var demonstratedEvidence = new List<string>();
         var missingEvidence = new List<string>();
         var improvementSuggestions = new List<string>();
 
-        foreach (var targetedSkill in project.TargetedSkills)
-        {
-            var skillKey = targetedSkill.SkillId.Trim().ToLowerInvariant();
-            var targetArea = targetedSkill.TargetArea;
-
-            int matchCount = 0;
-            var matchedKeywords = new List<string>();
-
-            if (SkillKeywordSignals.TryGetValue(skillKey, out var signals))
-            {
-                foreach (var signal in signals)
-                {
-                    if (combinedEvidence.Contains(signal, StringComparison.OrdinalIgnoreCase))
-                    {
-                        matchCount++;
-                        matchedKeywords.Add(signal);
-                    }
-                }
-            }
-            else
-            {
-                if (combinedEvidence.Contains(targetedSkill.SkillId, StringComparison.OrdinalIgnoreCase)) matchCount += 2;
-                if (combinedEvidence.Contains(targetArea, StringComparison.OrdinalIgnoreCase)) matchCount += 2;
-            }
-
-            string status;
-            var evidenceItems = new List<string>();
-            var missingItems = new List<string>();
-
-            if (string.IsNullOrWhiteSpace(combinedEvidence) || combinedEvidence.Length < 15 || matchCount == 0)
-            {
-                status = "Insufficient Evidence";
-                var neutralMsg = $"Insufficient evidence was provided for {targetArea}.";
-                missingItems.Add(neutralMsg);
-                missingEvidence.Add(neutralMsg);
-                improvementSuggestions.Add($"Provide concrete implementation details or code excerpts explaining your approach to {targetArea}.");
-            }
-            else if (matchCount >= 2 && combinedEvidence.Length >= 50)
-            {
-                status = "Demonstrated";
-                var desc = $"Observed concrete engineering evidence addressing {targetArea} (key signals: {string.Join(", ", matchedKeywords.Take(3))}).";
-                evidenceItems.Add(desc);
-                demonstratedEvidence.Add(desc);
-            }
-            else
-            {
-                status = "Partially Demonstrated";
-                var partialMsg = $"Partial evidence observed for {targetArea}; further elaboration on edge cases and failure modes recommended.";
-                evidenceItems.Add(partialMsg);
-                var neutralMissing = $"Insufficient evidence was provided for {targetArea} under failure edge cases.";
-                missingItems.Add(neutralMissing);
-                missingEvidence.Add(neutralMissing);
-                improvementSuggestions.Add($"Deepen your technical explanation of {targetArea} by including automated test assertions and boundary handling.");
-            }
-
-            skillEvidenceResults.Add(new SkillEvidenceResultDto(
-                SkillId: targetedSkill.SkillId,
-                EvidenceStatus: status,
-                Evidence: evidenceItems,
-                MissingEvidence: missingItems
-            ));
-        }
-
-        // Map requirement results
+        // 3. Build Requirement Evidence Matrix
         foreach (var req in project.Requirements)
         {
-            var skillResult = skillEvidenceResults.FirstOrDefault(s => s.SkillId.Equals(req.TargetsSkill, StringComparison.OrdinalIgnoreCase));
-            var reqStatus = skillResult?.EvidenceStatus ?? "Insufficient Evidence";
-            var reqNotes = reqStatus == "Demonstrated"
-                ? $"Verified requirement addressing {req.TargetsSkill} with substantive evidence."
-                : (reqStatus == "Partially Demonstrated"
-                    ? $"Partial implementation noted for {req.TargetsSkill}."
-                    : $"Insufficient evidence provided for requirement targeting {req.TargetsSkill}.");
+            var targetSkill = req.TargetsSkill.Trim().ToLowerInvariant();
+            var reqDeliverable = req.Deliverable ?? req.Requirement;
+            var evidenceFound = new List<string>();
+            string sourceArtifact = "Unverified Submission";
+            string reqStatus;
+            string reqNotes;
+
+            if (hasStructuredVerifiedEvidence)
+            {
+                // Inspect repository evidence
+                if (repoResult != null && repoResult.RepositoryExists)
+                {
+                    sourceArtifact = $"Repository: {request.RepositoryUrl}";
+                    if (targetSkill.Contains("test") && repoResult.TestFiles.Count > 0)
+                    {
+                        evidenceFound.Add($"Verified automated test files: {string.Join(", ", repoResult.TestFiles)}");
+                    }
+                    if (repoResult.ManifestFiles.Count > 0)
+                    {
+                        evidenceFound.Add($"Verified build manifest: {string.Join(", ", repoResult.ManifestFiles)}");
+                    }
+                    if (repoResult.LanguageIndicators.Count > 0)
+                    {
+                        evidenceFound.Add($"Observed technology indicators: {string.Join(", ", repoResult.LanguageIndicators)}");
+                    }
+                }
+
+                // Inspect deployment evidence
+                if (deployResult != null && deployResult.IsReachable)
+                {
+                    sourceArtifact = string.IsNullOrWhiteSpace(sourceArtifact) || sourceArtifact == "Unverified Submission"
+                        ? $"Deployment: {request.DeployedUrl}"
+                        : $"{sourceArtifact} + Deployed: {request.DeployedUrl}";
+                    evidenceFound.Add($"Verified reachable endpoint: HTTP {deployResult.StatusCode} ({deployResult.PageTitle ?? deployResult.ContentType})");
+                }
+
+                // Inspect data analyst evidence
+                if (daResult != null && daResult.Status == VerificationState.Verified)
+                {
+                    sourceArtifact = $"Analytics: {request.NotebookUrl ?? request.DashboardUrl ?? "Workspace"}";
+                    if (daResult.NotebookFound)
+                    {
+                        evidenceFound.Add($"Verified notebook structure ({daResult.CodeCellCount} code cells, imports: {string.Join(", ", daResult.NotebookImports.Take(3))})");
+                    }
+                    if (daResult.DashboardReachable)
+                    {
+                        evidenceFound.Add("Verified interactive executive dashboard accessibility.");
+                    }
+                }
+
+                if (evidenceFound.Count > 0)
+                {
+                    reqStatus = "Demonstrated";
+                    reqNotes = $"We could verify concrete evidence satisfying '{reqDeliverable}' via {sourceArtifact}.";
+                    demonstratedEvidence.Add($"Satisfied requirement '{reqDeliverable}' with verified artifact.");
+                }
+                else
+                {
+                    reqStatus = "Partially Demonstrated";
+                    reqNotes = $"Partial implementation observed; specific deliverable '{reqDeliverable}' requires further documentation.";
+                    missingEvidence.Add($"Not enough evidence was available to verify '{reqDeliverable}'.");
+                }
+            }
+            else if (hasFailedOrInvalidEvidence)
+            {
+                reqStatus = "Insufficient Evidence";
+                sourceArtifact = "Invalid / Unreachable Evidence";
+                reqNotes = $"Verification failed for submitted evidence artifacts. Could not confirm requirement '{reqDeliverable}'.";
+                missingEvidence.Add($"Could not verify '{reqDeliverable}' due to inaccessible submission source.");
+            }
+            else
+            {
+                // Legacy text evaluation fallback
+                int matchCount = 0;
+                var matchedSignals = new List<string>();
+
+                string[]? signals = null;
+                if (SkillKeywordSignals.TryGetValue(targetSkill, out var directSignals))
+                {
+                    signals = directSignals;
+                }
+                else
+                {
+                    var shortKey = targetSkill.Split('.').Last().Replace("-apis", "-api");
+                    if (shortKey.Contains("relational-database") || shortKey.Contains("database")) shortKey = "sql";
+                    SkillKeywordSignals.TryGetValue(shortKey, out signals);
+                }
+
+                if (signals != null)
+                {
+                    foreach (var sig in signals)
+                    {
+                        if (combinedTextEvidence.Contains(sig, StringComparison.OrdinalIgnoreCase))
+                        {
+                            matchCount++;
+                            matchedSignals.Add(sig);
+                        }
+                    }
+                }
+                else
+                {
+                    if (combinedTextEvidence.Contains(req.TargetsSkill, StringComparison.OrdinalIgnoreCase)) matchCount += 2;
+                    if (combinedTextEvidence.Contains(req.Requirement, StringComparison.OrdinalIgnoreCase)) matchCount += 2;
+                }
+
+                if (matchCount >= 2 && combinedTextEvidence.Length >= 40)
+                {
+                    reqStatus = "Demonstrated";
+                    sourceArtifact = "Candidate Written Evidence";
+                    evidenceFound.Add($"Written technical explanation provides concrete details: {string.Join(", ", matchedSignals.Take(3))}");
+                    reqNotes = $"Verified requirement addressing {req.TargetsSkill} with substantive written explanation.";
+                    demonstratedEvidence.Add($"Substantive explanation for requirement targeting {req.TargetsSkill}.");
+                }
+                else if (matchCount >= 1 || combinedTextEvidence.Length >= 20)
+                {
+                    reqStatus = "Partially Demonstrated";
+                    sourceArtifact = "Candidate Written Evidence";
+                    evidenceFound.Add("Introductory technical summary observed.");
+                    reqNotes = $"Partial evidence observed for requirement targeting {req.TargetsSkill}.";
+                    missingEvidence.Add($"Further technical elaboration required for '{reqDeliverable}'.");
+                }
+                else
+                {
+                    reqStatus = "Insufficient Evidence";
+                    sourceArtifact = "Insufficient Submission";
+                    reqNotes = $"Insufficient evidence was provided for requirement targeting {req.TargetsSkill}.";
+                    missingEvidence.Add($"Insufficient evidence provided for requirement targeting {req.TargetsSkill}.");
+                }
+            }
 
             requirementResults.Add(new RequirementEvaluationResultDto(
                 Requirement: req.Requirement,
                 TargetsSkill: req.TargetsSkill,
                 Status: reqStatus,
-                EvaluationNotes: reqNotes
+                EvaluationNotes: reqNotes,
+                EvidenceFound: evidenceFound,
+                SourceArtifact: sourceArtifact
             ));
         }
 
-        // Compute overall qualitative status
+        // 4. Build Skill Evidence Matrix
+        foreach (var targetedSkill in project.TargetedSkills)
+        {
+            var skillId = targetedSkill.SkillId.Trim().ToLowerInvariant();
+            var targetArea = targetedSkill.TargetArea;
+            var matchingReqs = requirementResults.Where(r => r.TargetsSkill.Equals(skillId, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            string skillStatus;
+            var evList = new List<string>();
+            var missingList = new List<string>();
+
+            if (matchingReqs.Any(r => r.Status == "Demonstrated"))
+            {
+                skillStatus = "Demonstrated";
+                evList.Add($"We could verify concrete technical artifacts addressing {targetArea}.");
+            }
+            else if (matchingReqs.Any(r => r.Status == "Partially Demonstrated") ||
+                     (combinedTextEvidence.Length >= 40 && (combinedTextEvidence.Contains(skillId, StringComparison.OrdinalIgnoreCase) || combinedTextEvidence.Contains(targetArea, StringComparison.OrdinalIgnoreCase))))
+            {
+                skillStatus = "Partially Demonstrated";
+                evList.Add($"Partial evidence observed for {targetArea}; further elaboration on edge cases and failure modes recommended.");
+                var partialMissing = $"Insufficient evidence was provided for {targetArea} under failure edge cases.";
+                missingList.Add(partialMissing);
+                missingEvidence.Add(partialMissing);
+                improvementSuggestions.Add($"Include concrete repository test files or measurable implementation artifacts for {targetArea}.");
+            }
+            else
+            {
+                skillStatus = "Insufficient Evidence";
+                var neutralMsg = $"Insufficient evidence was provided for {targetArea}.";
+                missingList.Add(neutralMsg);
+                missingEvidence.Add(neutralMsg);
+                improvementSuggestions.Add($"Submit a verifiable public repository link or deployed demonstration addressing {targetArea}.");
+            }
+
+            skillEvidenceResults.Add(new SkillEvidenceResultDto(
+                SkillId: targetedSkill.SkillId,
+                EvidenceStatus: skillStatus,
+                Evidence: evList,
+                MissingEvidence: missingList
+            ));
+        }
+
+        // 5. Compute Overall Status
         string overallStatus;
         if (skillEvidenceResults.All(s => s.EvidenceStatus == "Demonstrated"))
         {
@@ -145,31 +358,32 @@ public class DeterministicProjectEvaluator : IProjectEvaluator
             overallStatus = "Insufficient Evidence";
         }
 
-        // Deterministic Claim Safety Gate
-        var portfolioProof = GenerateGatedProof(project, skillEvidenceResults);
+        // 6. Generate Gated Portfolio / CV Proof
+        var portfolioProof = GenerateGatedProof(project, skillEvidenceResults, compositeReport);
 
-        var evaluation = new ProjectEvaluationDto(
+        return new ProjectEvaluationDto(
             ProjectId: project.ProjectId,
             OverallStatus: overallStatus,
             SkillEvidence: skillEvidenceResults,
             RequirementResults: requirementResults,
-            DemonstratedEvidence: demonstratedEvidence,
-            MissingEvidence: missingEvidence,
-            ImprovementSuggestions: improvementSuggestions,
-            PortfolioProof: portfolioProof
+            DemonstratedEvidence: demonstratedEvidence.Distinct().ToList(),
+            MissingEvidence: missingEvidence.Distinct().ToList(),
+            ImprovementSuggestions: improvementSuggestions.Distinct().ToList(),
+            PortfolioProof: portfolioProof,
+            VerificationReport: compositeReport
         );
-
-        return Task.FromResult(evaluation);
     }
 
     public static PortfolioProofDto GenerateGatedProof(
         GapBasedProjectDto project,
-        List<SkillEvidenceResultDto> skillEvidence)
+        List<SkillEvidenceResultDto> skillEvidence,
+        CompositeEvidenceReport? verificationReport = null)
     {
         var demonstratedSkills = new List<string>();
         var portfolioBullets = new List<string>();
         var cvBullets = new List<string>();
         var evidenceNotes = new List<string>();
+        var traceability = new List<string>();
 
         foreach (var item in skillEvidence)
         {
@@ -179,19 +393,22 @@ public class DeterministicProjectEvaluator : IProjectEvaluator
             if (item.EvidenceStatus == "Demonstrated")
             {
                 demonstratedSkills.Add(item.SkillId);
-                portfolioBullets.Add($"Engineered {targetArea} for {project.Title}, demonstrating verified architectural implementation and test coverage.");
-                cvBullets.Add($"Architected and implemented {targetArea} in {project.Title} with verified automated testing and error isolation.");
+                portfolioBullets.Add($"Engineered {targetArea} for {project.Title}, supported by verified repository artifacts and observable technical deliverables.");
+                cvBullets.Add($"Architected and delivered {targetArea} in {project.Title}, verified against objective technical standards with automated testing.");
                 evidenceNotes.Add($"Demonstrated verified technical competency in {targetArea}.");
+                traceability.Add($"project:{project.ProjectId} | skill:{item.SkillId} | status:Demonstrated | evidence:VerifiedArtifact");
             }
             else if (item.EvidenceStatus == "Partially Demonstrated")
             {
-                // Partially Demonstrated produces cautious notes ONLY, NO strong CV bullets!
+                // Cautious notes ONLY, NO strong CV bullets!
                 evidenceNotes.Add($"Partial evidence submitted for {targetArea}; additional integration verification or benchmark analysis recommended prior to CV inclusion.");
+                traceability.Add($"project:{project.ProjectId} | skill:{item.SkillId} | status:PartiallyDemonstrated | evidence:Partial");
             }
             else
             {
                 // Insufficient Evidence NEVER generates a positive skill claim or CV bullet!
                 evidenceNotes.Add($"Insufficient evidence was provided for {targetArea}; excluded from portfolio proof.");
+                traceability.Add($"project:{project.ProjectId} | skill:{item.SkillId} | status:InsufficientEvidence | evidence:None");
             }
         }
 
@@ -211,7 +428,8 @@ public class DeterministicProjectEvaluator : IProjectEvaluator
             DemonstratedSkills: demonstratedSkills,
             PortfolioBullets: portfolioBullets,
             CvBullets: cvBullets,
-            EvidenceNotes: evidenceNotes
+            EvidenceNotes: evidenceNotes,
+            ClaimTraceability: traceability
         );
     }
 }
