@@ -5,12 +5,7 @@ import { JourneyState } from './types';
 import { journeyStateRepository, createInitialJourneyState } from './session-storage-repository';
 
 export function useJourneyState() {
-  const [state, setState] = useState<JourneyState>(() => {
-    if (typeof window !== 'undefined') {
-      return journeyStateRepository.getState();
-    }
-    return createInitialJourneyState();
-  });
+  const [state, setState] = useState<JourneyState>(() => createInitialJourneyState());
 
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 

@@ -9,7 +9,7 @@ import { useJourneyState } from '../lib/journey-state';
 
 export default function RolesPage() {
   const router = useRouter();
-  const { state, selectRole } = useJourneyState();
+  const { state, isLoaded, selectRole } = useJourneyState();
 
   const [roles, setRoles] = useState<RoleSummaryV3[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -50,8 +50,8 @@ export default function RolesPage() {
     >
       <div className="max-w-2xl mx-auto py-4">
         {isLoading && (
-          <div className="flex items-center justify-center py-12 text-slate-400">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping mr-3"></span>
+          <div className="flex items-center justify-center py-12 text-slate-400 gap-3">
+            <span className="w-5 h-5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></span>
             <span className="text-sm">Loading canonical career roles...</span>
           </div>
         )}
@@ -65,7 +65,7 @@ export default function RolesPage() {
         {!isLoading && !errorMessage && (
           <div className="grid grid-cols-1 gap-4" data-testid="roles-list">
             {roles.map(role => {
-              const isSelected = state.selectedRoleId === role.id;
+              const isSelected = isLoaded && state.selectedRoleId === role.id;
               return (
                 <div
                   key={role.id}

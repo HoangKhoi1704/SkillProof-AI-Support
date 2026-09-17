@@ -91,7 +91,7 @@ export default function JourneyShell({
               <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
               SkillProof
             </Link>
-            {state.selectedRoleTitle && (
+            {isLoaded && state.selectedRoleTitle && (
               <span
                 className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-medium"
                 data-testid="selected-role-badge"
